@@ -1,0 +1,8 @@
+<component name="ArtifactManager">
+  <artifact type="jar" build-on-make="true" name="MakanismCommon">
+    <output-path>$PROJECT_DIR$/_build/lib</output-path>
+    <root id="archive" name="makanism-common.jar">
+      <element id="module-output" name="MakanismCommon" />
+    </root>
+  </artifact>
+</component>

@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Configuration status="INFO">
+    <Appenders>
+        <Console name="utillog" target="SYSTEM_OUT">
+            <PatternLayout disableAnsi="false" pattern="%highlight{[%-5level]} %style{D%d{dd-HH:mm:ss.SSS}{GMT+8}}{dim,white} %-48.48style{%c{1.}}{cyan} %highlight{%2level{ERROR=!>, WARN=>>, INFO=>, length=0} %msg}%n" />
+        </Console>
+        <Console name="debug" target="SYSTEM_OUT">
+            <PatternLayout disableAnsi="false" pattern="%style{[%-5level] D%d{dd-HH:mm:ss.SSS}{GMT+8} %-53.53style{%c{1.}:%throwable{short.lineNumber}}{dim,cyan} %style{%msg}{dim,white}}{dim,white}%n" />
+        </Console>
+        <Console name="err" target="SYSTEM_OUT">
+            <PatternLayout disableAnsi="false" pattern="%style{[%-5level] D%d{dd-HH:mm:ss.SSS}{GMT+8} %-53.53style{%c{1.}}{dim,cyan} %msg%n%throwable}{dim,white}%n" />
+        </Console>
+        <!--
+        <Console name="console2" target="SYSTEM_OUT">%d{HH:mm:ss.SSS}
+            <PatternLayout pattern="%d %p [%t] %C{1.} %-5level %logger{36} - %msg%n" />
+        </Console>
+        -->
+        <!--
+        <File name="MyFile" fileName="log.log" immediateFlush="false" append="false">
+            <PatternLayout pattern="%d{yyy-MM-dd HH:mm:ss.SSS} [%t] %-5level %logger{36} - %msg%n"/>
+        </File>
+        -->
+    </Appenders>
+    <Loggers>
+        <Logger name="lyrth.makanism" level="debug">
+            <AppenderRef ref="utillog"/>
+        </Logger>
+        <Logger name="discord4j.core" level="info">
+            <AppenderRef ref="debug"/>
+        </Logger>
+        <Logger name="discord4j.rest" level="info">
+            <AppenderRef ref="debug"/>
+        </Logger>
+        <Logger name="reactor.netty" level="error">
+            <AppenderRef ref="debug"/>
+        </Logger>
+        <Logger name="reactor" level="info">
+            <AppenderRef ref="debug"/>
+        </Logger>
+        <Logger name="reactor" level="error">
+            <AppenderRef ref="err"/>
+        </Logger>
+        <Logger name="io.netty" level="error">
+            <AppenderRef ref="err"/>
+        </Logger>
+        <Logger name="reactor.netty.resources.PooledConnectionProvider" level="error">
+
+        </Logger>
+        <Logger name="reactorLog" level="trace">
+            <AppenderRef ref="debug"/>
+        </Logger>
+        <Root level="info">
+            <!-- <AppenderRef ref="console" /> -->
+            <!-- <AppenderRef ref="console" /> -->
+            <!-- <AppenderRef ref="MyFile"/> -->
+        </Root>
+    </Loggers>
+</Configuration>
