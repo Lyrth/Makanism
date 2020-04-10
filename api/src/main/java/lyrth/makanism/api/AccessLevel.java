@@ -4,13 +4,16 @@ import discord4j.core.object.entity.Member;
 import discord4j.core.object.entity.User;
 import discord4j.rest.util.Permission;
 import discord4j.rest.util.PermissionSet;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import reactor.core.publisher.Mono;
+import reactor.util.annotation.Nullable;
 
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.LinkedHashSet;
 
-public enum PermissionLevel {
+public enum AccessLevel {
     // Bot Owner
     OWNER(true),
 
@@ -27,28 +30,33 @@ public enum PermissionLevel {
     CUSTOM()
     ;
 
+    private static final Logger log = LoggerFactory.getLogger(AccessLevel.class);
+
     private boolean botOwnerOnly = true;
     private boolean any = true;  // any permission or all perms
-    private HashSet<Permission> permissions = new LinkedHashSet<>();
+    private final HashSet<Permission> permissions = new LinkedHashSet<>();
 
-    PermissionLevel(boolean botOwnerOnly){
+    AccessLevel(boolean botOwnerOnly){
         this.botOwnerOnly = botOwnerOnly;
     }
 
-    PermissionLevel(Permission... perms){
+    AccessLevel(Permission... perms){
         permissions.addAll(Arrays.asList(perms));
+        botOwnerOnly = false;
     }
 
-    PermissionLevel(boolean any, Permission... perms){
+    AccessLevel(boolean any, Permission... perms){
         permissions.addAll(Arrays.asList(perms));
         this.any = any;
+        botOwnerOnly = false;
     }
 
-    public static PermissionLevel custom(boolean any, Permission... perms){
-        PermissionLevel permissionLevel = PermissionLevel.CUSTOM;
-        permissionLevel.permissions.addAll(Arrays.asList(perms));
-        permissionLevel.any = any;
-        return permissionLevel;
+    public static AccessLevel custom(boolean any, Permission... perms){
+        AccessLevel accessLevel = AccessLevel.CUSTOM;
+        accessLevel.permissions.addAll(Arrays.asList(perms));
+        accessLevel.any = any;
+        accessLevel.botOwnerOnly = false;
+        return accessLevel;
     }
 
     public boolean isBotOwnerOnly() {
@@ -67,17 +75,22 @@ public enum PermissionLevel {
         return PermissionSet.of(permissions.toArray(new Permission[]{}));
     }
 
-    public Mono<Boolean> allows(Member member){
+    public Mono<Boolean> allows(@Nullable Member member){
+        if (member == null) return Mono.empty();
         if (botOwnerOnly)
             return Mono.just(member.getId().asLong() == 368727799189733376L); //TODO: get ID from storage
+        if (permissions.size() == 0)
+            return Mono.just(true);
         return member.getBasePermissions()
             .flatMapIterable(PermissionSet::asEnumSet)
             .filter(permissions::contains)
-            .count().cast(Integer.class)
-            .map(count -> any ? count > 1 : count == permissions.size());
+            .count()
+            .map(count -> any ? count >= 1 : count == permissions.size())
+            .defaultIfEmpty(false);
     }
 
-    public Mono<Boolean> allows(User user){
+    public Mono<Boolean> allows(@Nullable User user){
+        if (user == null) return Mono.empty();
         if (botOwnerOnly)
             return Mono.just(user.getId().asLong() == 368727799189733376L); //TODO: get ID from storage
         return Mono.just(permissions.size() == 0);

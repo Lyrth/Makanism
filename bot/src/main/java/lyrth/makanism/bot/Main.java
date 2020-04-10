@@ -1,18 +1,26 @@
 package lyrth.makanism.bot;
 
+import com.google.gson.GsonBuilder;
 import discord4j.common.GitProperties;
 import discord4j.core.DiscordClient;
+import discord4j.core.DiscordClientBuilder;
 import discord4j.core.event.EventDispatcher;
 import discord4j.core.object.presence.Activity;
 import discord4j.core.object.presence.Presence;
+import discord4j.rest.util.Snowflake;
 import discord4j.store.api.service.StoreService;
 import discord4j.store.jdk.JdkStoreService;
 import discord4j.store.redis.RedisStoreService;
 import io.lettuce.core.RedisException;
-import lyrth.makanism.bot.handlers.ConnectionHandler;
+import lyrth.makanism.bot.handlers.GatewayHandler;
 import lyrth.makanism.bot.util.BotProps;
+import lyrth.makanism.bot.util.file.SourceProvider;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.io.FileWriter;
+import java.io.IOException;
+import java.util.ServiceLoader;
 
 public class Main {
     private static final Logger log = LoggerFactory.getLogger(Main.class);
@@ -21,6 +29,15 @@ public class Main {
 //        log.debug("Installing BlockHound...");
 //        BlockHound.install();
 //        log.debug("BlockHound ready.");
+
+        String fileName = "scratch_test.json";
+        try {
+            new GsonBuilder()/*.setPrettyPrinting()*/.create().toJson(Snowflake.of(928579379673976L), new FileWriter(fileName));
+        } catch (IOException ignored){
+
+        }
+
+        System.exit(0);
 
         // load bot meta
         log.debug("Reading .properties...");
@@ -52,11 +69,12 @@ public class Main {
             BotProps.D4JProps.get("git.commit.time")
         );
 
-        DiscordClient.create(token).gateway()
+        DiscordClientBuilder.create(token).setDebugMode(false).build()
+            .gateway()
             .setStoreService(getStoreService())
             .setInitialStatus(shardInfo -> Presence.doNotDisturb(Activity.listening("initialization sounds.")))
             .setEventDispatcher(EventDispatcher.buffering())
-            .withConnection(ConnectionHandler::create)
+            .withGateway(GatewayHandler::create)
             .block();
 
         log.info("ded!");
@@ -70,5 +88,4 @@ public class Main {
             return new JdkStoreService();
         }
     }
-
 }

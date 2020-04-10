@@ -9,6 +9,7 @@ module lyrth.makanism.common {
     requires transitive discord4j.rest;
     requires transitive discord4j.voice;
     requires transitive emoji.java;
+    requires transitive io.github.classgraph;
     requires transitive lava.common;
     requires transitive lavaplayer;
     requires transitive lettuce.core;
@@ -20,11 +21,11 @@ module lyrth.makanism.common {
     requires transitive reactor.core;
     requires transitive reactor.extra;
     requires transitive reactor.netty;
-    requires transitive reactor.pool;
     requires transitive stores.api;
     requires transitive stores.jdk;
     requires transitive stores.redis;
 
     exports lyrth.makanism.common.util;
+    exports lyrth.makanism.common.util.reactor;
 
 }

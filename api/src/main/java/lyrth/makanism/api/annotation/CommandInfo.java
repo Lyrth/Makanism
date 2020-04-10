@@ -1,6 +1,6 @@
 package lyrth.makanism.api.annotation;
 
-import lyrth.makanism.api.PermissionLevel;
+import lyrth.makanism.api.AccessLevel;
 
 import java.lang.annotation.*;
 
@@ -9,9 +9,8 @@ import java.lang.annotation.*;
 @Target({ElementType.TYPE})
 public @interface CommandInfo {
     String name() default "\0";
-    String[] aliases() default {};  // Excludes the command name. Is included in abstract
-    boolean isGuildOnly() default false;
-    PermissionLevel perms() default PermissionLevel.OWNER;
+    String[] aliases() default {};  // Not including the command name. Is included in abstract
+    AccessLevel accessLevel() default AccessLevel.OWNER;
     String category() default "General";
     String desc() default "";
     String usage() default "\0";

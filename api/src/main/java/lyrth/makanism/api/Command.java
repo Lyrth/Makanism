@@ -1,12 +1,12 @@
 package lyrth.makanism.api;
 
+import discord4j.core.object.entity.Member;
 import discord4j.core.object.entity.User;
 import lyrth.makanism.api.annotation.CommandInfo;
 import reactor.core.publisher.Mono;
+import reactor.util.annotation.Nullable;
 
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
+import java.util.*;
 
 @CommandInfo()
 public abstract class Command {
@@ -17,14 +17,15 @@ public abstract class Command {
         return commandInfo.name().equals("\0") ? this.getClass().getSimpleName().toLowerCase() : commandInfo.name();
     }
 
-    public List<String> getAliases(){
-        List<String> list = Arrays.asList(commandInfo.aliases());
-        list.add(getName());
-        return Collections.unmodifiableList(list);
+    public Set<String> getAliases(){
+        Set<String> set = new LinkedHashSet<>(Arrays.asList(commandInfo.aliases()));
+        set.add(getName());
+        return Collections.unmodifiableSet(set);
     }
 
-    public PermissionLevel getPerms(){
-        return commandInfo.perms();
+    public AccessLevel getPerms(){
+        // TODO: complain when there are perms for bot commands
+        return commandInfo.accessLevel();
     }
 
     public String getCategory(){
@@ -50,10 +51,22 @@ public abstract class Command {
 
     public abstract boolean isGuildOnly();
 
-    public Mono<Boolean> allows(User author){
+    public Mono<Boolean> allows(@Nullable User author){
         return this.getPerms().allows(author);
     }
 
-    public abstract Mono<?> execute(CommandEvent e);
+    public Mono<Boolean> allows(@Nullable Member author){
+        return this.getPerms().allows(author);
+    }
+
+    // Can be an empty Mono, also prevents guild commands being run in dms. T: Allowed, F: Perm blocked, Empty: Non-user/GuildCommand in DM
+    public Mono<Boolean> allows(@Nullable Member author, @Nullable User fallback){
+        if (this instanceof GuildCommand)
+            return this.getPerms().allows(author);
+        else
+            return this.getPerms().allows(fallback);
+    }
+
+    public abstract Mono<Void> execute(CommandEvent e);
 
 }

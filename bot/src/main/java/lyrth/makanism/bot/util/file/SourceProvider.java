@@ -1,0 +1,43 @@
+package lyrth.makanism.bot.util.file;
+
+import com.google.gson.reflect.TypeToken;
+import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
+
+import java.lang.reflect.Type;
+
+public interface SourceProvider {
+
+    SourceProvider  create();
+    SourceProvider  create(String root);
+
+    <T> Mono<T>       read(String name, Class<T> clazz);
+    <T> Mono<T>       read(String name, TypeToken<T> clazz);
+    <T> Mono<Void>   write(String name, T t);
+
+    Flux<String> listItems(String path);
+    Flux<String>  listDirs(String path);
+
+}
+
+/*
+    Filesystem structure [Configs]:
+    /
+    `-- config/  [root]
+        |-- bot/
+        |   `-- bot.json
+        `-- guilds/
+            `-- {guildID}/
+               |-- guild.json
+               `-- module_settings.json
+
+    Database structure:
+    Makanism_config (database) [root]
+        TABLE guilds
+            guildId BIGINT PRIMARY KEY
+            guild JSONB
+            module_settings JSONB
+        TABLE bot
+            bot JSONB
+
+ */

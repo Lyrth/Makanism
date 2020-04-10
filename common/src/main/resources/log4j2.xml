@@ -2,13 +2,25 @@
 <Configuration status="INFO">
     <Appenders>
         <Console name="utillog" target="SYSTEM_OUT">
-            <PatternLayout disableAnsi="false" pattern="%highlight{[%-5level]} %style{D%d{dd-HH:mm:ss.SSS}{GMT+8}}{dim,white} %-48.48style{%c{1.}}{cyan} %highlight{%2level{ERROR=!>, WARN=>>, INFO=>, length=0} %msg}%n" />
+            <PatternLayout disableAnsi="false">
+                <pattern>
+                    %highlight{[%-5level]} %style{D%d{dd-HH:mm:ss.SSS}{GMT+8}}{dim,white} %-48.48style{%c{1.}}{cyan} %highlight{%2level{ERROR=!&gt;, WARN=&gt;&gt;, INFO=&gt;, length=0} %msg}%n
+                </pattern>
+            </PatternLayout>
         </Console>
         <Console name="debug" target="SYSTEM_OUT">
-            <PatternLayout disableAnsi="false" pattern="%style{[%-5level] D%d{dd-HH:mm:ss.SSS}{GMT+8} %-53.53style{%c{1.}:%throwable{short.lineNumber}}{dim,cyan} %style{%msg}{dim,white}}{dim,white}%n" />
+            <PatternLayout disableAnsi="false">
+                <pattern>
+                    %style{[%-5level] D%d{dd-HH:mm:ss.SSS}{GMT+8} %-53.53style{%c{1.}:%throwable{short.lineNumber}}{dim,cyan} %style{%msg}{dim,white}}{dim,white}%n
+                </pattern>
+            </PatternLayout>
         </Console>
         <Console name="err" target="SYSTEM_OUT">
-            <PatternLayout disableAnsi="false" pattern="%style{[%-5level] D%d{dd-HH:mm:ss.SSS}{GMT+8} %-53.53style{%c{1.}}{dim,cyan} %msg%n%throwable}{dim,white}%n" />
+            <PatternLayout disableAnsi="false">
+                <pattern>
+                    %style{[%-5level] D%d{dd-HH:mm:ss.SSS}{GMT+8} %-53.53style{%c{1.}}{dim,cyan} %msg%n%throwable}{dim,white}%n
+                </pattern>
+            </PatternLayout>
         </Console>
         <!--
         <Console name="console2" target="SYSTEM_OUT">%d{HH:mm:ss.SSS}
