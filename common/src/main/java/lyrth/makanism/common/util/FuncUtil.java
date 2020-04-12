@@ -4,6 +4,7 @@ import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Predicate;
 
+@Deprecated
 public class FuncUtil {
     public static <T> Function<T, T> identity() {
         return t -> t;

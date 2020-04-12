@@ -1,4 +1,4 @@
-package lyrth.makanism.bot.util.file;
+package lyrth.makanism.common.util.file;
 
 import com.google.gson.reflect.TypeToken;
 import reactor.core.publisher.Flux;
@@ -7,9 +7,6 @@ import reactor.core.publisher.Mono;
 import java.lang.reflect.Type;
 
 public interface SourceProvider {
-
-    SourceProvider  create();
-    SourceProvider  create(String root);
 
     <T> Mono<T>       read(String name, Class<T> clazz);
     <T> Mono<T>       read(String name, TypeToken<T> clazz);

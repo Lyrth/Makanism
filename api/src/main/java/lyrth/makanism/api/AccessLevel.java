@@ -51,6 +51,14 @@ public enum AccessLevel {
         botOwnerOnly = false;
     }
 
+    public static AccessLevel custom(Permission... perms){
+        AccessLevel accessLevel = AccessLevel.CUSTOM;
+        accessLevel.permissions.addAll(Arrays.asList(perms));
+        accessLevel.any = true;
+        accessLevel.botOwnerOnly = false;
+        return accessLevel;
+    }
+
     public static AccessLevel custom(boolean any, Permission... perms){
         AccessLevel accessLevel = AccessLevel.CUSTOM;
         accessLevel.permissions.addAll(Arrays.asList(perms));

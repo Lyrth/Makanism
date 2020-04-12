@@ -2,71 +2,86 @@ package lyrth.makanism.bot.handlers;
 
 import discord4j.core.GatewayDiscordClient;
 import discord4j.core.event.domain.message.MessageCreateEvent;
-import io.github.classgraph.ClassGraph;
-import io.github.classgraph.ScanResult;
 import lyrth.makanism.api.Command;
-import lyrth.makanism.api.CommandEvent;
+import lyrth.makanism.api.CommandCtx;
 import lyrth.makanism.bot.commands.CheckPerms;
 import lyrth.makanism.bot.commands.Mrawr;
 import lyrth.makanism.bot.commands.Ping;
-import lyrth.makanism.common.util.reactor.Jump;
+import lyrth.makanism.bot.commands.SetPrefix;
+import lyrth.makanism.bot.util.BotProps;
+import lyrth.makanism.common.util.file.config.BotConfig;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import reactor.core.publisher.Mono;
 
 import java.util.*;
-
-import static lyrth.makanism.common.util.FuncUtil.itself;
+import java.util.stream.Stream;
 
 public class CommandHandler {
     private static final Logger log = LoggerFactory.getLogger(CommandHandler.class);
 
-    public static Mono<Void> handle(GatewayDiscordClient client){
+    public static Mono<Void> handle(GatewayDiscordClient client, BotConfig config, BotProps props){
 
-        LinkedHashSet<Command> commands = new LinkedHashSet<>(Arrays.asList(
+        // Unmodifiable, no need for concurrent (Module commands need to be)
+        // todo probably just ServiceLoader
+        HashMap<String, Command> commands = Stream.of(
+
             new Ping(),
             new Mrawr(),
-            new CheckPerms()
-        ));
+            new CheckPerms(),
+            new SetPrefix()
 
-        try (ScanResult scanResult = new ClassGraph().enableClassInfo()
-            .whitelistPackages("lyrth.makanism.bot.commands").scan()){  // todo variable package names
-            List<String> packageList = new LinkedList<>(scanResult
-                .getSubclasses("lyrth.makanism.api.Command")
-                .getNames());
-            packageList.remove("lyrth.makanism.api.BotCommand");
-            packageList.remove("lyrth.makanism.api.GuildCommand");
-            commands.stream().map(cmd -> cmd.getClass().getName()).forEach(packageList::remove);
-            if (packageList.size() > 0){
-                log.warn("{} count mismatch, {} unused", CommandHandler.class.getName(), packageList.size());
-                packageList.forEach(log::debug);
-            }
-        }
+        ).collect(
+            HashMap::new,
+            (map, cmd) -> {
+                map.putIfAbsent(cmd.getName().toLowerCase(), cmd);
+                if (cmd.getAliases() != null)
+                    for (String alias : cmd.getAliases()) map.putIfAbsent(alias.toLowerCase(), cmd);
+            },
+            (a,b) -> {}
+        );
 
-        String prefix = ";";  // TODO: LOAD
-
+        // This part should be fast.
         return client.on(MessageCreateEvent.class)
-            .map(CommandEvent::fromMsgEvent)
-            .filter(e -> !e.getContent().isEmpty())
-            .filter(e -> e.getContent().startsWith(prefix))
-            .flatMap(e -> {
-                String invokedName = e.getArgs().get(0).replaceFirst(prefix, "").toLowerCase();
-                Optional<Command> command = commands.stream()
-                    .filter(cmd -> cmd.getAliases().contains(invokedName))
-                    .findFirst();
-                return Mono.justOrEmpty(command)
-                    .flatMap(cmd -> cmd.allows(e.getMember().orElse(null), e.getUser().orElse(null))
-                        .switchIfEmpty(Jump.to1())  // Empty: -1 Non-user/GuildCommand in DM
-                        .filter(itself())           // True :  0 Allowed
-                        .switchIfEmpty(Jump.to2())  // False:  1 Not allowed
-                        .flatMap($ -> cmd.execute(e).thenReturn(0))
-                        .onErrorReturn(Jump::from1, -1)
-                        .onErrorResume(Jump::from2, $ -> e.getChannel().flatMap(ch -> ch.createMessage("Not allowed!")).thenReturn(1))
-                    )
-                    .defaultIfEmpty(-1);  // -1 also: no command with that name
+            .filter(event -> !event.getMessage().getContent().isEmpty()     // Empty check
+                                && checkPrefix(event, config))              // Prefix check
+            .flatMap(event -> {                                             // Command check
+                String[] words = event.getMessage().getContent().split("\\s+", 3);
+                String second = words.length > 1 ? words[1] : "";
+                boolean inGuild = event.getGuildId().isPresent();
+                String invokedName;
+                if (inGuild) {   // Guild
+                    if (words[0].equals("<@!" + config.getBotId().asString() + ">") ||
+                        words[0].equals("<@" + config.getBotId().asString() + ">"))         // @User command
+                        invokedName = second;
+                    else {                                                                  // ;command or ; command
+                        String prefix = config.getGuildConfig(event.getGuildId().get()).getPrefix();
+                        invokedName = words[0].equals(prefix) ? second : words[0].substring(prefix.length());
+                    }
+                } else  invokedName = words[0].equals(config.getDefaultPrefix()) ?          // ;command or ; command
+                    second : words[0].substring(config.getDefaultPrefix().length());
+                if (invokedName.isEmpty()) return Mono.empty();   // Some reason a user just sent a prefix lol.
+                Command command = commands.get(invokedName.toLowerCase());
+                if (command == null) return Mono.empty();       // Command not found: empty. Todo: delegate to ModuleHandler
+
+                return command
+                    .allows(event.getMember().orElse(null), event.getMessage().getAuthor().orElse(null))
+                    .flatMap(allowed -> allowed ?
+                        command.execute(CommandCtx.from(event, config, invokedName.toLowerCase())) :
+                        event.getMessage().getChannel().flatMap(ch -> ch.createMessage("You are not allowed to run this!")).then()
+                    );
             })
-            //.doOnNext(i -> log.debug("perm {}", i))
-            .then();
+            .then();   // no u
+    }
+
+
+    private static boolean checkPrefix(MessageCreateEvent event, BotConfig config){    // just checks prefix
+        if (event.getGuildId().isPresent())  // Guild
+            return event.getMessage().getContent().startsWith(config.getGuildConfig(event.getGuildId().get()).getPrefix()) ||
+                event.getMessage().getContent().startsWith("<@!" + config.getBotId().asString() + "> ") ||
+                event.getMessage().getContent().startsWith("<@" + config.getBotId().asString() + "> ");
+        else  // DM
+            return event.getMessage().getContent().startsWith(config.getDefaultPrefix());   // not gonna check mention in dms lol
     }
 
 }

@@ -1,6 +1,7 @@
 package lyrth.makanism.bot.util;
 
 import discord4j.common.GitProperties;
+import lyrth.makanism.common.util.file.Props;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -8,16 +9,16 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.Properties;
 
-public final class BotProps {  // TODO: kill?
+public final class BotProps implements Props {
     private static final Logger log = LoggerFactory.getLogger(BotProps.class);
 
-    private static Properties props;
+    private Properties props;
 
-    public static String get(String name){
+    public String get(String name){
         return get(name,null);
     }
 
-    public static String get(String name, String defaultValue){
+    public String get(String name, String defaultValue){
         if (props == null){
             props =  new Properties();
             try {

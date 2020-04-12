@@ -1,9 +1,9 @@
-package lyrth.makanism.bot.util.file.impl;
+package lyrth.makanism.common.util.file.impl;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.reflect.TypeToken;
-import lyrth.makanism.bot.util.file.SourceProvider;
+import lyrth.makanism.common.util.file.SourceProvider;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import reactor.core.publisher.Flux;
@@ -12,10 +12,8 @@ import reactor.core.scheduler.Scheduler;
 import reactor.core.scheduler.Schedulers;
 
 import java.io.*;
-import java.lang.reflect.Type;
+import java.lang.reflect.Modifier;
 import java.util.Arrays;
-
-import static lyrth.makanism.common.util.FuncUtil.it;
 
 public class FileSourceProvider implements SourceProvider {    // TODO : Caches
     private static final Logger log = LoggerFactory.getLogger(FileSourceProvider.class);
@@ -24,16 +22,12 @@ public class FileSourceProvider implements SourceProvider {    // TODO : Caches
     private final Scheduler scheduler;
     private final String root;
 
-    public FileSourceProvider create(){
-        return new FileSourceProvider("");
+    public FileSourceProvider(){
+        this("");
     }
 
-    public FileSourceProvider create(String root){
-        return new FileSourceProvider(root);
-    }
-
-    private FileSourceProvider(String root){
-        gson = new GsonBuilder().setPrettyPrinting().create();
+    public FileSourceProvider(String root){
+        gson = new GsonBuilder().setPrettyPrinting().excludeFieldsWithModifiers(Modifier.TRANSIENT, Modifier.STATIC).create();
         scheduler = Schedulers.boundedElastic();  // TODO: find a fitting scheduler. newBoundedElastic??
         this.root = root.endsWith("/") ? root : root + "/";
     }
@@ -45,6 +39,7 @@ public class FileSourceProvider implements SourceProvider {    // TODO : Caches
         Mono<T> read = Mono.fromCallable(() -> {
                 FileReader reader = new FileReader(fileName);
                 T t = gson.fromJson(reader, clazz);
+                if (t == null) t = gson.fromJson("{}", clazz);
                 reader.close();
                 return t;
             })
@@ -61,6 +56,7 @@ public class FileSourceProvider implements SourceProvider {    // TODO : Caches
         Mono<T> read = Mono.fromCallable(() -> {
             FileReader reader = new FileReader(fileName);
             T t = gson.fromJson(reader, type.getType());
+            if (t == null) t = gson.fromJson("{}", type.getType());
             reader.close();
             return t;
         })
@@ -120,7 +116,7 @@ public class FileSourceProvider implements SourceProvider {    // TODO : Caches
         return Mono.fromCallable(() -> new File(root + path).list((cur, name) -> new File(cur, name).isFile()))
             .subscribeOn(scheduler)
             .map(Arrays::asList)
-            .flatMapIterable(it())
+            .flatMapIterable(s -> s)
             .filter(name -> name.endsWith(".json"))
             .map(name -> name.replaceFirst(".json$", ""));
     }
@@ -130,7 +126,7 @@ public class FileSourceProvider implements SourceProvider {    // TODO : Caches
         return Mono.fromCallable(() -> new File(root + path).list((cur, name) -> new File(cur, name).isDirectory()))
             .subscribeOn(scheduler)
             .map(Arrays::asList)
-            .flatMapIterable(it())
+            .flatMapIterable(s -> s)
             .map(name -> name.replaceFirst("[\\/]+$", ""));
     }
 }

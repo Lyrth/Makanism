@@ -6,30 +6,47 @@ import discord4j.core.object.entity.Guild;
 import discord4j.core.object.entity.Member;
 import discord4j.core.object.entity.Message;
 import discord4j.core.object.entity.User;
-import discord4j.core.object.entity.channel.Channel;
 import discord4j.core.object.entity.channel.MessageChannel;
 import discord4j.gateway.ShardInfo;
 import discord4j.rest.util.Snowflake;
+import lyrth.makanism.common.util.file.config.BotConfig;
+import lyrth.makanism.common.util.file.config.GuildConfig;
 import reactor.core.publisher.Mono;
 
 import java.time.Instant;
 import java.util.Optional;
 
-public class CommandEvent {
+public class CommandCtx {
     private MessageCreateEvent event;
-    // private BotSettings
     private Args args;
+    private BotConfig config;
+    private String invokedName;
 
-    public static CommandEvent fromMsgEvent(MessageCreateEvent event){
-        return new CommandEvent(event);
+    public static CommandCtx from(MessageCreateEvent event, BotConfig config, String invokedName){
+        return new CommandCtx(event, config, invokedName);
     }
 
-    private CommandEvent(MessageCreateEvent event){
+    private CommandCtx(MessageCreateEvent event, BotConfig config, String invokedName){
         this.event = event;
+        this.config = config;
+        this.invokedName = invokedName;
     }
 
     public GatewayDiscordClient getClient() {
         return event.getClient();
+    }
+
+    public BotConfig getBotConfig() {
+        return config;
+    }
+
+    public GuildConfig getGuildConfig(){
+        return getGuildId().isPresent() ? config.getGuildConfig(getGuildId().get()) : null;
+    }
+
+    public GuildConfig setModuleSetting(String module, String key, String value){
+        return getGuildId().isPresent() ?
+            config.getGuildConfig(getGuildId().get()).setModuleSetting(module, key, value) : null;
     }
 
     public Message getMessage() {
@@ -74,7 +91,7 @@ public class CommandEvent {
 
     public Args getArgs() {
         return (args == null) ?
-            args = new Args(getMessage().getContent()) :
+            args = new Args(getContent().substring(getContent().toLowerCase().indexOf(invokedName))) :
             args;
     }
 }

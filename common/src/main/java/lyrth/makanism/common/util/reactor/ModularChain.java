@@ -1,4 +1,4 @@
-package lyrth.makanism.bot.util;
+package lyrth.makanism.common.util.reactor;
 
 import org.reactivestreams.Publisher;
 import org.slf4j.Logger;

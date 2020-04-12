@@ -17,10 +17,8 @@ public abstract class Command {
         return commandInfo.name().equals("\0") ? this.getClass().getSimpleName().toLowerCase() : commandInfo.name();
     }
 
-    public Set<String> getAliases(){
-        Set<String> set = new LinkedHashSet<>(Arrays.asList(commandInfo.aliases()));
-        set.add(getName());
-        return Collections.unmodifiableSet(set);
+    public String[] getAliases(){
+        return commandInfo.aliases();
     }
 
     public AccessLevel getPerms(){
@@ -67,6 +65,6 @@ public abstract class Command {
             return this.getPerms().allows(fallback);
     }
 
-    public abstract Mono<Void> execute(CommandEvent e);
+    public abstract Mono<Void> execute(CommandCtx e);
 
 }
