@@ -4,8 +4,6 @@ import com.google.gson.reflect.TypeToken;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
-import java.lang.reflect.Type;
-
 public interface SourceProvider {
 
     <T> Mono<T>       read(String name, Class<T> clazz);

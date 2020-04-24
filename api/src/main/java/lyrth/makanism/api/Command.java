@@ -6,8 +6,6 @@ import lyrth.makanism.api.annotation.CommandInfo;
 import reactor.core.publisher.Mono;
 import reactor.util.annotation.Nullable;
 
-import java.util.*;
-
 @CommandInfo()
 public abstract class Command {
 
@@ -27,7 +25,9 @@ public abstract class Command {
     }
 
     public String getCategory(){
-        return commandInfo.category();
+        return commandInfo.category().equals("\0") ?
+            (this.getParentModuleName().isEmpty() ? "General" : this.getParentModuleName()) :
+            commandInfo.category();
     }
 
     public String getDesc(){
@@ -40,6 +40,12 @@ public abstract class Command {
 
     public int getMinArgs(){
         return commandInfo.minArgs();
+    }
+
+    // Returns the name of the parent module with proper capitalization
+    public String getParentModuleName(){
+        return commandInfo.parentModule().getSimpleName().equals("IModule") ?
+            "" : commandInfo.parentModule().getSimpleName();
     }
 
     public String getFormattedUsage(){
@@ -58,13 +64,12 @@ public abstract class Command {
     }
 
     // Can be an empty Mono, also prevents guild commands being run in dms. T: Allowed, F: Perm blocked, Empty: Non-user/GuildCommand in DM
-    public Mono<Boolean> allows(@Nullable Member author, @Nullable User fallback){
+    public Mono<Boolean> allows(@Nullable Member member, @Nullable User user){
         if (this instanceof GuildCommand)
-            return this.getPerms().allows(author);
+            return this.getPerms().allows(member);
         else
-            return this.getPerms().allows(fallback);
+            return this.getPerms().allows(user);
     }
 
     public abstract Mono<Void> execute(CommandCtx e);
-
 }

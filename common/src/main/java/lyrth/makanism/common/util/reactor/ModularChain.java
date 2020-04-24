@@ -10,6 +10,7 @@ import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
 /* I can't do this immutably >~< */
+@Deprecated
 public class ModularChain {
     private static final Logger log = LoggerFactory.getLogger(ModularChain.class);
 

@@ -7,21 +7,16 @@
     <parent>
         <groupId>lyrth.makanism</groupId>
         <artifactId>makanism-api</artifactId>
-        <version>0.0.1</version>
+        <version>0.1.0-SNAPSHOT</version>
     </parent>
 
-    <artifactId>test-module</artifactId>
-    <version>0.0.1</version>
+    <artifactId>music-module</artifactId>
+    <version>0.1.0</version>
 
     <dependencies>
         <dependency>
             <groupId>lyrth.makanism</groupId>
             <artifactId>makanism-api</artifactId>
-            <version>${parent.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>lyrth.makanism</groupId>
-            <artifactId>makanism-common</artifactId>
             <version>${parent.version}</version>
         </dependency>
     </dependencies>

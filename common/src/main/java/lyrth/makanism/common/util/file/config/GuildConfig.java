@@ -15,15 +15,16 @@ import java.util.HashSet;
 public class GuildConfig {    // TODO not null fields
     private static final Logger log = LoggerFactory.getLogger(GuildConfig.class);
 
-    private transient HashMap<String, HashMap<String,String>> modulesSettings;  // TODO, jsonify V
+    private transient HashMap<String, HashMap<String,String>> modulesSettings;  // <Module, <[Submodule.]SettingName,Value>> TODO, jsonify V
     private transient static final TypeToken<HashMap<String, HashMap<String,String>>> MOD_SETTINGS_TYPE = new TypeToken<>(){};
 
     private transient SourceProvider source;
     private transient Props props;
 
     private HashSet<String> enabledModules;
+    private HashSet<String> enabledSubModules;      // submodules has module.submodule notation, no effect when parent module is disabled
     private HashSet<String> blacklistedCommands;
-    private HashSet<String> whitelistedCommands;  // Whitelist has precedence.
+    private HashSet<String> whitelistedCommands;    // Whitelist has precedence.
 
     private Snowflake guildId;
     private String prefix;
@@ -36,18 +37,25 @@ public class GuildConfig {    // TODO not null fields
             source.read(path + "guild", GuildConfig.class),
             source.read(path + "module_settings", MOD_SETTINGS_TYPE),
             GuildConfig::setModulesSettings
-        )
-            .map(config -> {
-                config.setSource(source);
-                config.setProps(props);
-                if (config.getId() == null) config.setId(guildId);
-                if (config.getPrefix() == null) config.setPrefix(props.get("bot.prefix"));
-                config.setPrefix(config.getPrefix());  // remove spaces :P
-                if (config.getWhitelistedCommands() == null) config.setWhitelistedCommands(new HashSet<>());
-                if (config.getBlacklistedCommands() == null) config.setBlacklistedCommands(new HashSet<>());
-                if (config.getEnabledModules() == null) config.setEnabledModules(new HashSet<>());
-                return config;
-            });
+        ).map(config ->
+            config.setSource(source)
+                .setProps(props)
+                .setId(config.getId() == null ?
+                    guildId :
+                    config.getId())
+                .setPrefix(config.getPrefix() == null ?
+                    props.get("bot.prefix") :
+                    config.getPrefix())
+                .setWhitelistedCommands(config.getWhitelistedCommands() == null ?
+                    new HashSet<>() :
+                    config.getWhitelistedCommands())
+                .setBlacklistedCommands(config.getBlacklistedCommands() == null ?
+                    new HashSet<>() :
+                    config.getBlacklistedCommands())
+                .setEnabledModules(config.getEnabledModules() == null ?
+                    new HashSet<>() :
+                    config.getEnabledModules())
+        );
     }
 
     // Write to resource
@@ -61,6 +69,14 @@ public class GuildConfig {    // TODO not null fields
     public GuildConfig setPrefix(String prefix) {
         this.prefix = prefix.replace(' ', '_');
         return this;
+    }
+
+    public void addEnabledModule(String moduleName) {
+        this.enabledModules.add(moduleName.toLowerCase());
+    }
+
+    public void removeEnabledModule(String moduleName) {
+        this.enabledModules.remove(moduleName.toLowerCase());
     }
 
     private GuildConfig setId(Snowflake id){
@@ -136,5 +152,9 @@ public class GuildConfig {    // TODO not null fields
 
     public Snowflake getId() {
         return guildId;
+    }
+
+    public Props getProps() {
+        return props;
     }
 }

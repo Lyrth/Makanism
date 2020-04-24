@@ -13,7 +13,8 @@ import java.util.Arrays;
 import java.util.HashSet;
 import java.util.LinkedHashSet;
 
-public enum AccessLevel {
+public enum AccessLevel {  // TODO roles and more custom
+
     // Bot Owner
     OWNER(true),
 
@@ -32,7 +33,7 @@ public enum AccessLevel {
 
     private static final Logger log = LoggerFactory.getLogger(AccessLevel.class);
 
-    private boolean botOwnerOnly = true;
+    private boolean botOwnerOnly;   // default true
     private boolean any = true;  // any permission or all perms
     private final HashSet<Permission> permissions = new LinkedHashSet<>();
 

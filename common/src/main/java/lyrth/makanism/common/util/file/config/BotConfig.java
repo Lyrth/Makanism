@@ -1,6 +1,7 @@
 package lyrth.makanism.common.util.file.config;
 
 import discord4j.rest.util.Snowflake;
+import lyrth.makanism.common.util.file.IModuleHandler;
 import lyrth.makanism.common.util.file.Props;
 import lyrth.makanism.common.util.file.SourceProvider;
 import org.slf4j.Logger;
@@ -10,6 +11,7 @@ import reactor.core.publisher.Mono;
 
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Optional;
 
 public class BotConfig {
     private static final Logger log = LoggerFactory.getLogger(BotConfig.class);
@@ -19,6 +21,8 @@ public class BotConfig {
     private transient SourceProvider source;
     private transient Props props;
 
+    private transient IModuleHandler moduleHandler;
+
     private String defaultPrefix;    // only modifiable in json
     private Snowflake botId;
     private Snowflake ownerId;
@@ -26,31 +30,20 @@ public class BotConfig {
     private HashSet<String> disabledCommands;   // global blacklist
 
 
-    public static Mono<BotConfig> load(SourceProvider source, HashMap<Snowflake, GuildConfig> guildConfigs, Props props){
+    public static Mono<BotConfig> load(SourceProvider source, HashMap<Snowflake, GuildConfig> guildConfigs, Props props, IModuleHandler moduleHandler){
         String path = "bot/bot";
-        return source.read(path, BotConfig.class).map(config -> config.setSource(source).setGuildConfigs(guildConfigs).setProps(props));
-    }
-
-    public static BotConfig lazyLoad(SourceProvider source, Props props){  // in order to setup guildConfigs first
-        BotConfig config = new BotConfig();
-        config.setProps(props);
-        config.setSource(source);
-        config.setGuildConfigs(new HashMap<>());
-        return config;
-    }
-
-    public Mono<BotConfig> load(){
-        String path = "bot/bot";
-        return source.read(path, BotConfig.class)
-            .map(config -> {
-                config.setSource(this.source);
-                config.setProps(this.props);
-                config.setGuildConfigs(this.guildConfigs);
-                if (config.getDefaultPrefix() == null) config.setDefaultPrefix(props.get("bot.prefix"));
-                config.setDefaultPrefix(config.getDefaultPrefix());  // remove spaces :P
-                if (config.getDisabledCommands() == null) config.setDisabledCommands(new HashSet<>());
-                return config;
-            });
+        return source.read(path, BotConfig.class).map(config ->
+            config.setSource(source)
+                .setProps(props)
+                .setGuildConfigs(guildConfigs)
+                .setModuleHandler(moduleHandler)
+                .setDefaultPrefix(config.getDefaultPrefix() == null ?
+                    props.get("bot.prefix") :
+                    config.getDefaultPrefix())
+                .setDisabledCommands(config.getDisabledCommands() == null ?
+                    new HashSet<>() :
+                    config.getDisabledCommands())
+        );
     }
 
     // Write to resource
@@ -65,19 +58,43 @@ public class BotConfig {
                 .flatMap(GuildConfig::update).then());
     }
 
+    public Optional<Boolean> enableGuildModule(String moduleName, Snowflake guildId){
+        return Optional.of(guildConfigs.get(guildId))   // this should never be null
+            .flatMap(guildConfig ->
+                moduleHandler.enable(moduleName, guildConfig).map(b -> {
+                    if (b) guildConfig.addEnabledModule(moduleName);
+                    return b;
+                })
+            );
+    }
+
+    public Optional<Boolean> disableGuildModule(String moduleName, Snowflake guildId){
+        return Optional.of(guildConfigs.get(guildId))   // this should never be null
+            .flatMap(guildConfig ->
+                moduleHandler.disable(moduleName, guildId).map(b -> {
+                    if (b) guildConfig.removeEnabledModule(moduleName);
+                    return b;
+                })
+            );
+    }
+
     public BotConfig putGuildConfig(GuildConfig config){
         guildConfigs.put(config.getId(),config);
         return this;
     }
 
-    public BotConfig setIds(Snowflake botId, Snowflake ownerId) {
+    public void setIds(Snowflake botId, Snowflake ownerId) {
         this.botId = botId;
         this.ownerId = ownerId;
-        return this;
     }
 
     private BotConfig setSource(SourceProvider source){
         this.source = source;
+        return this;
+    }
+
+    private BotConfig setModuleHandler(IModuleHandler handler) {
+        moduleHandler = handler;
         return this;
     }
 
@@ -117,6 +134,10 @@ public class BotConfig {
         return disabledCommands;
     }
 
+    public boolean isCommandDisabled(String name) {
+        return disabledCommands.contains(name);
+    }
+
     public GuildConfig getGuildConfig(Snowflake guildId) {
         return guildConfigs.get(guildId);
     }
@@ -125,4 +146,11 @@ public class BotConfig {
         return source;
     }
 
+    public Props getProps() {
+        return props;
+    }
+
+    public IModuleHandler getModuleHandler(){
+        return moduleHandler;
+    }
 }

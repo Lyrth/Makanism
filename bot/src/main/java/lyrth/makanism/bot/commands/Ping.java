@@ -24,10 +24,3 @@ public class Ping extends BotCommand {
             .then();
     }
 }
-
-/*
-String pong = "Pong! REST: %dms.\nWebsocket: %dms";
-return channel.createMessage("Pinging....")
-    .flatMap(message -> message.edit(String.format(pong, message.getTimestamp().toEpochMilli() - event.getMessage().getTimestamp().toEpochMilli(), message.getClient().getResponseTime())
-  .thenReturn(Reply.empty());
- */

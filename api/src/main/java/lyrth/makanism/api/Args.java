@@ -4,8 +4,9 @@ import java.util.Arrays;
 import java.util.List;
 
 public class Args {
-    private String raw;
-    private String[] split;
+
+    private final String raw;
+    private final String[] split;
 
     public Args(String raw){
         this.raw = raw;
@@ -30,10 +31,10 @@ public class Args {
 
     // fromIndex is inclusive.
     /*  - fromIndex = 2
-        0    1   2   3   4    5
-        aaaa bbb ccc ddd eeee ff
+        0   1   2   3   4   5
+        aaa bbb ccc ddd eee ff
         - Returns:
-        ccc ddd eeee ff
+        ccc ddd eee ff
      */
     public String getRest(int fromIndex){
         if (fromIndex < 0) throw new IllegalArgumentException("Index cannot be less than 0.");

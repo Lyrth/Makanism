@@ -17,10 +17,11 @@ import java.time.Instant;
 import java.util.Optional;
 
 public class CommandCtx {
-    private MessageCreateEvent event;
+
+    private final BotConfig config;
+    private final String invokedName;
+    private final MessageCreateEvent event;
     private Args args;
-    private BotConfig config;
-    private String invokedName;
 
     public static CommandCtx from(MessageCreateEvent event, BotConfig config, String invokedName){
         return new CommandCtx(event, config, invokedName);

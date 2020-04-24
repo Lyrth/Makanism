@@ -4,21 +4,21 @@
         <Console name="utillog" target="SYSTEM_OUT">
             <PatternLayout disableAnsi="false">
                 <pattern>
-                    %highlight{[%-5level]} %style{D%d{dd-HH:mm:ss.SSS}{GMT+8}}{dim,white} %-48.48style{%c{1.}}{cyan} %highlight{%2level{ERROR=!&gt;, WARN=&gt;&gt;, INFO=&gt;, length=0} %msg}%n
+                    %highlight{[%-5level]} %style{D%d{dd-HH:mm:ss.SSS}{GMT+8}}{dim,white} %-48.48style{%c{1.}}{cyan} %highlight{%2level{ERROR=!&gt;, WARN=&gt;&gt;, INFO=&gt;, length=0} %msg%n%throwable}
                 </pattern>
             </PatternLayout>
         </Console>
         <Console name="debug" target="SYSTEM_OUT">
             <PatternLayout disableAnsi="false">
                 <pattern>
-                    %style{[%-5level] D%d{dd-HH:mm:ss.SSS}{GMT+8} %-53.53style{%c{1.}:%throwable{short.lineNumber}}{dim,cyan} %style{%msg}{dim,white}}{dim,white}%n
+                    %style{[%-5level] D%d{dd-HH:mm:ss.SSS}{GMT+8} %-53.53style{%c{2.}:%throwable{short.lineNumber}}{dim,cyan} %style{%msg%n%throwable}{dim,white}}{dim,white}
                 </pattern>
             </PatternLayout>
         </Console>
         <Console name="err" target="SYSTEM_OUT">
             <PatternLayout disableAnsi="false">
                 <pattern>
-                    %style{[%-5level] D%d{dd-HH:mm:ss.SSS}{GMT+8} %-53.53style{%c{1.}}{dim,cyan} %msg%n%throwable}{dim,white}%n
+                    %style{[%-5level] D%d{dd-HH:mm:ss.SSS}{GMT+8} %-53.53style{%c{2.}}{dim,cyan} %msg%n%throwable}{dim,white}
                 </pattern>
             </PatternLayout>
         </Console>
@@ -37,31 +37,40 @@
         <Logger name="lyrth.makanism" level="debug">
             <AppenderRef ref="utillog"/>
         </Logger>
-        <Logger name="discord4j.core" level="info">
+        <Logger name="makanism.module" level="debug">
+            <AppenderRef ref="utillog"/>
+        </Logger>
+        <Logger name="discord4j.voice" level="info"><!-- info -->
             <AppenderRef ref="debug"/>
         </Logger>
-        <Logger name="discord4j.rest" level="info">
+        <Logger name="discord4j.discordjson" level="info"><!-- info -->
             <AppenderRef ref="debug"/>
         </Logger>
-        <Logger name="reactor.netty" level="error">
+        <Logger name="discord4j.core" level="info"><!-- info -->
             <AppenderRef ref="debug"/>
         </Logger>
-        <Logger name="reactor" level="info">
+        <Logger name="discord4j.rest" level="info"><!-- info -->
             <AppenderRef ref="debug"/>
         </Logger>
-        <Logger name="reactor" level="error">
+        <Logger name="reactor.netty" level="error"><!-- error -->
+            <AppenderRef ref="debug"/>
+        </Logger>
+        <Logger name="reactor" level="info"><!-- info -->
+            <AppenderRef ref="debug"/>
+        </Logger>
+        <Logger name="reactor" level="error"><!-- error -->
             <AppenderRef ref="err"/>
         </Logger>
-        <Logger name="io.netty" level="error">
+        <Logger name="io.netty" level="error"><!-- error -->
             <AppenderRef ref="err"/>
         </Logger>
-        <Logger name="reactor.netty.resources.PooledConnectionProvider" level="error">
+        <Logger name="reactor.netty.resources.PooledConnectionProvider" level="error"><!-- error -->
 
         </Logger>
-        <Logger name="reactorLog" level="trace">
+        <Logger name="reactorLog" level="trace"><!-- custom .log(...) name -->
             <AppenderRef ref="debug"/>
         </Logger>
-        <Root level="info">
+        <Root level="debug">
             <!-- <AppenderRef ref="console" /> -->
             <!-- <AppenderRef ref="console" /> -->
             <!-- <AppenderRef ref="MyFile"/> -->

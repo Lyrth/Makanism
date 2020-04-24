@@ -8,14 +8,14 @@ import reactor.core.publisher.Mono;
 
 @CommandInfo(accessLevel = AccessLevel.OWNER)
 public class SetPrefix extends GuildCommand {
-    @Override
-    public Mono<Void> execute(CommandCtx e) {
 
-        return Mono.just(e.getArgs().getRest(1).replace(' ', '_'))
-            .doOnNext(prefix -> e.getGuildConfig().setPrefix(prefix))
+    @Override
+    public Mono<Void> execute(CommandCtx ctx) {
+        return Mono.just(ctx.getArgs().getRest(1).replace(' ', '_')) // todo not empty
+            .doOnNext(prefix -> ctx.getGuildConfig().setPrefix(prefix))
             .map(prefix -> "Server command prefix changed to `" + prefix + "`.")
             .flatMap(reply ->
-                e.getChannel().flatMap(ch -> ch.createMessage(reply))
+                ctx.getChannel().flatMap(ch -> ch.createMessage(reply))
             ).then();
     }
 }

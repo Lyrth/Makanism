@@ -6,7 +6,7 @@
         <sourceOutputDir name="target/generated-sources/annotations" />
         <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
         <outputRelativeToContentRoot value="true" />
-        <module name="TestModule" />
+        <module name="Music" />
         <module name="MakanismCommon" />
         <module name="MakanismApi" />
         <module name="Makanism" />
@@ -16,7 +16,7 @@
       <module name="Makanism" target="11" />
       <module name="MakanismApi" target="11" />
       <module name="MakanismCommon" target="11" />
-      <module name="TestModule" target="11" />
+      <module name="Music" target="11" />
     </bytecodeTargetLevel>
   </component>
 </project>

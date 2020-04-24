@@ -23,9 +23,8 @@ public class ConsoleHandler {
     private static Mono<Void> handleConsoleCommand(String line){
         return Mono.just(line)
             .doOnNext(log::info)
-            .filter(s -> s.matches("^(shutdown|stop|exit|quit) ?"))  // smol to do: possible arg
+            .filter(s -> s.matches("^(shutdown|stop|exit|quit) ?"))  // small to do: possible arg
             .doOnNext($ -> System.exit(0))
             .then();
     }
-
 }

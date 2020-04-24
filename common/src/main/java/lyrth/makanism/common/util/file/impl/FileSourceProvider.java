@@ -85,6 +85,7 @@ public class FileSourceProvider implements SourceProvider {    // TODO : Caches
     }
 
     // Creates a file if and only if it doesn't exist.
+    @SuppressWarnings("ResultOfMethodCallIgnored")
     private Mono<Void> createFile(String fileName){
         return Mono.fromCallable(() -> {
             File file = new File(fileName);
@@ -111,6 +112,7 @@ public class FileSourceProvider implements SourceProvider {    // TODO : Caches
         }).subscribeOn(scheduler).then();
     }
 
+    @SuppressWarnings("ReactiveStreamsNullableInLambdaInTransform")     // fromCallable is fine with null return.
     @Override
     public Flux<String> listItems(String path) {
         return Mono.fromCallable(() -> new File(root + path).list((cur, name) -> new File(cur, name).isFile()))
@@ -121,12 +123,13 @@ public class FileSourceProvider implements SourceProvider {    // TODO : Caches
             .map(name -> name.replaceFirst(".json$", ""));
     }
 
+    @SuppressWarnings("ReactiveStreamsNullableInLambdaInTransform")
     @Override
     public Flux<String> listDirs(String path) {
         return Mono.fromCallable(() -> new File(root + path).list((cur, name) -> new File(cur, name).isDirectory()))
             .subscribeOn(scheduler)
             .map(Arrays::asList)
             .flatMapIterable(s -> s)
-            .map(name -> name.replaceFirst("[\\/]+$", ""));
+            .map(name -> name.replaceFirst("[\\\\/]+$", ""));
     }
 }
