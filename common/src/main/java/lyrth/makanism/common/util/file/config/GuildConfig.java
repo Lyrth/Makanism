@@ -4,8 +4,6 @@ import com.google.gson.reflect.TypeToken;
 import discord4j.rest.util.Snowflake;
 import lyrth.makanism.common.util.file.Props;
 import lyrth.makanism.common.util.file.SourceProvider;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import reactor.core.publisher.Mono;
 import reactor.util.annotation.Nullable;
 
@@ -13,7 +11,6 @@ import java.util.HashMap;
 import java.util.HashSet;
 
 public class GuildConfig {    // TODO not null fields
-    private static final Logger log = LoggerFactory.getLogger(GuildConfig.class);
 
     private transient HashMap<String, HashMap<String,String>> modulesSettings;  // <Module, <[Submodule.]SettingName,Value>> TODO, jsonify V
     private transient static final TypeToken<HashMap<String, HashMap<String,String>>> MOD_SETTINGS_TYPE = new TypeToken<>(){};

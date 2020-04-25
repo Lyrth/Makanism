@@ -20,8 +20,8 @@ public abstract class GuildModule implements IModule {
     protected BotConfig config;
     protected GatewayDiscordClient client;
 
-    DirectProcessor<GuildConfig> registerProcessor;
-    DirectProcessor<GuildConfig> removeProcessor;
+    private final DirectProcessor<GuildConfig> registerProcessor;
+    private final DirectProcessor<GuildConfig> removeProcessor;
 
     // 0-arg constructor for ServiceLoader, do not use by itself?
     public GuildModule(){

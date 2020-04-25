@@ -19,9 +19,9 @@ public class ModuleCmd extends GuildCommand {   // TODO : fix this mess
     public Mono<Void> execute(CommandCtx ctx) {
         if (!(ctx.getArgs().get(1).toLowerCase().equals("enable") ||
             ctx.getArgs().get(1).toLowerCase().equals("disable")) || ctx.getArgs().getCount() < 3)
-            return ctx.getChannel().flatMap(ch -> ch.createMessage("Invalid args.")).then();
+            return ctx.sendReply("Invalid args.");
         return Mono.just(ctx.getArgs().get(2))
-            .map(moduleName -> ctx.getArgs().get(1).equals("enable") ?
+            .map(moduleName -> ctx.getArgs().get(1).toLowerCase().equals("enable") ?
                 ctx.getBotConfig().enableGuildModule(moduleName,ctx.getGuildId().orElse(Snowflake.of(0L))) :
                 ctx.getBotConfig().disableGuildModule(moduleName,ctx.getGuildId().orElse(Snowflake.of(0L)))
             )
@@ -32,7 +32,6 @@ public class ModuleCmd extends GuildCommand {   // TODO : fix this mess
                 ctx.getArgs().get(2).toLowerCase() + " already " + ctx.getArgs().get(1).toLowerCase() + "d."
             )
             .defaultIfEmpty("Module not found.")
-            .flatMap(reply -> ctx.getChannel().flatMap(ch -> ch.createMessage(reply)))
-            .then();
+            .flatMap(ctx::sendReply);
     }
 }

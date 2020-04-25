@@ -14,8 +14,6 @@ public class SetPrefix extends GuildCommand {
         return Mono.just(ctx.getArgs().getRest(1).replace(' ', '_')) // todo not empty
             .doOnNext(prefix -> ctx.getGuildConfig().setPrefix(prefix))
             .map(prefix -> "Server command prefix changed to `" + prefix + "`.")
-            .flatMap(reply ->
-                ctx.getChannel().flatMap(ch -> ch.createMessage(reply))
-            ).then();
+            .flatMap(ctx::sendReply);
     }
 }

@@ -29,8 +29,6 @@ public class UserInfo extends GuildCommand {
             .toString());
 
         return Mono.justOrEmpty(reply)
-            .flatMap(str ->
-                ctx.getChannel().flatMap(ch -> ch.createMessage(str))
-            ).then();
+            .flatMap(ctx::sendReply);
     }
 }

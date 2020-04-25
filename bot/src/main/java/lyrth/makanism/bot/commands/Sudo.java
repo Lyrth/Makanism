@@ -38,9 +38,9 @@ public class Sudo extends BotCommand {
                             ctx.getShardInfo(),
                             message,
                             ctx.getGuildId().map(Snowflake::asLong).orElse(null), member.orElse(null)))).then())
-            .onErrorResume(NumberFormatException.class, t -> ctx.getChannel().flatMap(ch -> ch.createMessage("Invalid args.")).then())
+            .onErrorResume(NumberFormatException.class, t -> ctx.sendReply("Invalid args."))
             .doOnError(t -> log.error("Error at sudo!", t))
-            .onErrorResume(t -> ctx.getChannel().flatMap(ch -> ch.createMessage("Error! " + t.getMessage())).then());
+            .onErrorResume(t -> ctx.sendReply("Error! " + t.getMessage()));
     }
 
     private static MessageData getMessageData(User user, CommandCtx ctx){

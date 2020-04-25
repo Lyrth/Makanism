@@ -46,39 +46,7 @@ public class CommandHandler {
             .filter(event -> !event.getMessage().getContent().isEmpty()                     // Empty check
                 && !event.getMessage().getAuthor().map(User::isBot).orElse(true)            // Is bot?
                 && checkPrefix(event, event.getMessage().getContent(), config))             // Prefix check
-            .flatMap(event -> {                                                             // Command check
-                String[] words = event.getMessage().getContent().split("\\s+", 3);
-                String second = words.length > 1 ? words[1] : "";
-                boolean inGuild = event.getGuildId().isPresent();
-                String invokedName;
-                if (inGuild) {   // Guild
-                    if (words[0].equals("<@!" + config.getBotId().asString() + ">") ||
-                        words[0].equals("<@" + config.getBotId().asString() + ">"))         // @User command
-                        invokedName = second;
-                    else {                                                                  // ;command or ; command
-                        String prefix = config.getGuildConfig(event.getGuildId().get()).getPrefix();
-                        invokedName = words[0].equals(prefix) ? second : words[0].substring(prefix.length());
-                    }
-                } else  invokedName = words[0].equals(config.getDefaultPrefix()) ?          // ;command or ; command
-                    second : words[0].substring(config.getDefaultPrefix().length());
-
-                // Prefix only, or command disabled.
-                if (invokedName.isEmpty() || config.isCommandDisabled(invokedName)) return Mono.empty();
-
-                Command command = commands.get(invokedName.toLowerCase());
-                if (command == null)            // Command not found: delegate to ModuleHandler
-                    return config.getModuleHandler().handleCommand(event,config,invokedName);
-
-                return command    // todo check # of args, filter if guildCommand? (already filtered?)
-                    .allows(event.getMember().orElse(null), event.getMessage().getAuthor().orElse(null))
-                    .flatMap(allowed -> allowed ?
-                        command.execute(CommandCtx.from(event, config, invokedName.toLowerCase())) :
-                        event.getMessage().getChannel().flatMap(ch -> ch.createMessage("You are not allowed to run this!")).then()
-                    )
-                    .doOnError(t -> log.error("CAUgHt eWWoW!", t))
-                    .onErrorResume(t -> event.getMessage().getChannel()
-                        .flatMap(ch -> ch.createMessage("Oh no, an error has occurred! ``` " + t.toString() + "```")).then());
-            })
+            .flatMap(event -> checkCommand(event, config, commands))                        // Command check
             .then();
     }
 
@@ -89,5 +57,41 @@ public class CommandHandler {
                 content.startsWith("<@" + config.getBotId().asString() + "> "))
             .orElseGet(() ->     // DMs
                 content.startsWith(config.getDefaultPrefix()));     // not gonna check mention in dms lol
+    }
+
+    private static Mono<Void> checkCommand(MessageCreateEvent event, BotConfig config, Map<String, Command> commands){
+        String[] words = event.getMessage().getContent().split("\\s+", 3);
+        String second = words.length > 1 ? words[1] : "";
+        boolean inGuild = event.getGuildId().isPresent();
+        String invokedName;
+        if (inGuild) {   // Guild
+            if (words[0].equals("<@!" + config.getBotId().asString() + ">") ||
+                words[0].equals("<@" + config.getBotId().asString() + ">"))         // @User command
+                invokedName = second;
+            else {                                                                  // ;command or ; command
+                String prefix = config.getGuildConfig(event.getGuildId().get()).getPrefix();
+                invokedName = words[0].equals(prefix) ? second : words[0].substring(prefix.length());
+            }
+        } else  invokedName = words[0].equals(config.getDefaultPrefix()) ?          // ;command or ; command
+            second : words[0].substring(config.getDefaultPrefix().length());
+
+        // Prefix only, or command disabled.
+        if (invokedName.isEmpty() || config.isCommandDisabled(invokedName)) return Mono.empty();
+
+        // TODO Command overrides (ModuleHandler checkForCommandOverride, then pass
+
+        Command command = commands.get(invokedName.toLowerCase());
+        if (command == null)            // Command not found: delegate to ModuleHandler
+            return config.getModuleHandler().handleCommand(event,config,invokedName);
+
+        return command    // todo check # of args, filter if guildCommand? (already filtered?)
+            .allows(event.getMember().orElse(null), event.getMessage().getAuthor().orElse(null))
+            .flatMap(allowed -> allowed ?
+                command.execute(CommandCtx.from(event, config, invokedName.toLowerCase())) :
+                event.getMessage().getChannel().flatMap(ch -> ch.createMessage("You are not allowed to run this!")).then()
+            )
+            .doOnError(t -> log.error("CAUgHt eWWoW!", t))
+            .onErrorResume(t -> event.getMessage().getChannel()
+                .flatMap(ch -> ch.createMessage("Oh no, an error has occurred! ``` " + t.toString() + "```")).then());
     }
 }

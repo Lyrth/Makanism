@@ -95,4 +95,10 @@ public class CommandCtx {
             args = new Args(getContent().substring(getContent().toLowerCase().indexOf(invokedName))) :
             args;
     }
+
+    public Mono<Void> sendReply(String message){        // TODO: Checking?
+        return getChannel()
+            .flatMap(channel -> channel.createMessage(message))
+            .then();
+    }
 }

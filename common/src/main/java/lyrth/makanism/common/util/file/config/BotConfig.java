@@ -4,8 +4,6 @@ import discord4j.rest.util.Snowflake;
 import lyrth.makanism.common.util.file.IModuleHandler;
 import lyrth.makanism.common.util.file.Props;
 import lyrth.makanism.common.util.file.SourceProvider;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
@@ -14,7 +12,6 @@ import java.util.HashSet;
 import java.util.Optional;
 
 public class BotConfig {
-    private static final Logger log = LoggerFactory.getLogger(BotConfig.class);
 
     private transient HashMap<Snowflake, GuildConfig> guildConfigs;
 
