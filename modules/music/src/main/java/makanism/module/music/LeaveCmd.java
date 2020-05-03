@@ -1,7 +1,7 @@
 package makanism.module.music;
 
-import lyrth.makanism.api.AccessLevel;
-import lyrth.makanism.api.CommandCtx;
+import lyrth.makanism.api.util.AccessLevel;
+import lyrth.makanism.api.util.CommandCtx;
 import lyrth.makanism.api.GuildModuleCommand;
 import lyrth.makanism.api.annotation.CommandInfo;
 import reactor.core.publisher.Mono;

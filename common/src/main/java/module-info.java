@@ -17,11 +17,15 @@ module lyrth.makanism.common {
 
     // Export heck below.
     requires transitive com.google.gson;
-    requires transitive discord.json;
     requires transitive discord4j.common;
     requires transitive discord4j.core;
+    requires transitive discord4j.discordjson;
+    requires transitive discord4j.discordjson.api;
     requires transitive discord4j.gateway;
     requires transitive discord4j.rest;
+    requires transitive discord4j.store.api;
+    requires transitive discord4j.store.jdk;
+    requires transitive discord4j.store.redis;
     requires transitive discord4j.voice;
     requires transitive emoji.java;
     requires transitive io.github.classgraph;
@@ -36,8 +40,4 @@ module lyrth.makanism.common {
     requires transitive reactor.core;
     requires transitive reactor.extra;
     requires transitive reactor.netty;
-    requires transitive stores.api;
-    requires transitive stores.jdk;
-    requires transitive stores.redis;
-
 }

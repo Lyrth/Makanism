@@ -1,4 +1,4 @@
-package lyrth.makanism.api;
+package lyrth.makanism.api.util;
 
 import java.util.Arrays;
 import java.util.List;

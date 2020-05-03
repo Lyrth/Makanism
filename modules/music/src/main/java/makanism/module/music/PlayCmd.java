@@ -2,6 +2,8 @@ package makanism.module.music;
 
 import lyrth.makanism.api.*;
 import lyrth.makanism.api.annotation.CommandInfo;
+import lyrth.makanism.api.util.AccessLevel;
+import lyrth.makanism.api.util.CommandCtx;
 import reactor.core.publisher.Mono;
 
 @CommandInfo(

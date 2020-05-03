@@ -5,5 +5,6 @@ module lyrth.makanism.api {
     exports lyrth.makanism.api;
     exports lyrth.makanism.api.annotation;
     // exports lyrth.makanism.api.handler;
+    exports lyrth.makanism.api.util;
 
 }

@@ -3,7 +3,7 @@ package lyrth.makanism.bot.handlers;
 import discord4j.core.GatewayDiscordClient;
 import discord4j.core.event.domain.message.MessageCreateEvent;
 import discord4j.rest.util.Snowflake;
-import lyrth.makanism.api.CommandCtx;
+import lyrth.makanism.api.util.CommandCtx;
 import lyrth.makanism.api.GuildModule;
 import lyrth.makanism.api.GuildModuleCommand;
 import lyrth.makanism.common.util.file.IModuleHandler;

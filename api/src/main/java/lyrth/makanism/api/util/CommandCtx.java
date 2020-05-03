@@ -1,4 +1,4 @@
-package lyrth.makanism.api;
+package lyrth.makanism.api.util;
 
 import discord4j.core.GatewayDiscordClient;
 import discord4j.core.event.domain.message.MessageCreateEvent;

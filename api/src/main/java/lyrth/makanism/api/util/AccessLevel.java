@@ -1,4 +1,4 @@
-package lyrth.makanism.api;
+package lyrth.makanism.api.util;
 
 import discord4j.core.object.entity.Member;
 import discord4j.core.object.entity.User;

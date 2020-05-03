@@ -1,6 +1,6 @@
 package lyrth.makanism.api.annotation;
 
-import lyrth.makanism.api.AccessLevel;
+import lyrth.makanism.api.util.AccessLevel;
 import lyrth.makanism.api.IModule;
 
 import java.lang.annotation.*;

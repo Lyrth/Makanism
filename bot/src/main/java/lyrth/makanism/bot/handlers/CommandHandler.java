@@ -4,7 +4,7 @@ import discord4j.core.GatewayDiscordClient;
 import discord4j.core.event.domain.message.MessageCreateEvent;
 import discord4j.core.object.entity.User;
 import lyrth.makanism.api.Command;
-import lyrth.makanism.api.CommandCtx;
+import lyrth.makanism.api.util.CommandCtx;
 import lyrth.makanism.bot.commands.*;
 import lyrth.makanism.common.util.file.config.BotConfig;
 import org.slf4j.Logger;
