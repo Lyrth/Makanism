@@ -5,7 +5,9 @@
       <module fileurl="file://$PROJECT_DIR$/bot/Makanism.iml" filepath="$PROJECT_DIR$/bot/Makanism.iml" />
       <module fileurl="file://$PROJECT_DIR$/api/MakanismApi.iml" filepath="$PROJECT_DIR$/api/MakanismApi.iml" />
       <module fileurl="file://$PROJECT_DIR$/common/MakanismCommon.iml" filepath="$PROJECT_DIR$/common/MakanismCommon.iml" />
+      <module fileurl="file://$PROJECT_DIR$/modules/module-template/ModuleTemplate.iml" filepath="$PROJECT_DIR$/modules/module-template/ModuleTemplate.iml" />
       <module fileurl="file://$PROJECT_DIR$/modules/music/Music.iml" filepath="$PROJECT_DIR$/modules/music/Music.iml" />
+      <module fileurl="file://$PROJECT_DIR$/modules/reactor_docs/ReactorDocs.iml" filepath="$PROJECT_DIR$/modules/reactor_docs/ReactorDocs.iml" />
     </modules>
   </component>
 </project>

@@ -6,9 +6,11 @@
         <sourceOutputDir name="target/generated-sources/annotations" />
         <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
         <outputRelativeToContentRoot value="true" />
-        <module name="Music" />
-        <module name="MakanismCommon" />
+        <module name="ReactorDocs" />
         <module name="MakanismApi" />
+        <module name="MakanismCommon" />
+        <module name="ModuleTemplate" />
+        <module name="Music" />
         <module name="Makanism" />
       </profile>
     </annotationProcessing>
@@ -16,7 +18,9 @@
       <module name="Makanism" target="11" />
       <module name="MakanismApi" target="11" />
       <module name="MakanismCommon" target="11" />
+      <module name="ModuleTemplate" target="11" />
       <module name="Music" target="11" />
+      <module name="ReactorDocs" target="11" />
     </bytecodeTargetLevel>
   </component>
 </project>

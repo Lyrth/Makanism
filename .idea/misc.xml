@@ -10,6 +10,8 @@
         <option value="$PROJECT_DIR$/common/pom.xml" />
         <option value="$PROJECT_DIR$/bot/pom.xml" />
         <option value="$PROJECT_DIR$/modules/music/pom.xml" />
+        <option value="$PROJECT_DIR$/modules/reactor_docs/pom.xml" />
+        <option value="$PROJECT_DIR$/modules/module-template/pom.xml" />
       </list>
     </option>
   </component>

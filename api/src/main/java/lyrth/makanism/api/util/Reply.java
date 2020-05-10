@@ -70,6 +70,9 @@ public class Reply {
         return new Reply().setContent(content);
     }
 
+    public static Reply fromEmbed(Consumer<? super EmbedCreateSpec> spec){
+        return new Reply().setEmbed(spec);
+    }
 
     /// Modifier methods
 

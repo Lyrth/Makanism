@@ -6,7 +6,6 @@
         <element id="module-output" name="MakanismCommon" />
       </element>
       <element id="library" level="project" name="Maven: com.austinv11.servicer:Servicer:1.0.0" />
-      <element id="library" level="project" name="Maven: com.discord4j:discord-json:1.2.2-SNAPSHOT" />
       <element id="library" level="project" name="Maven: com.discord4j:discord4j-common:3.1.0-SNAPSHOT" />
       <element id="library" level="project" name="Maven: com.discord4j:discord4j-core:3.1.0-SNAPSHOT" />
       <element id="library" level="project" name="Maven: com.discord4j:discord4j-gateway:3.1.0-SNAPSHOT" />
@@ -48,7 +47,6 @@
       <element id="library" level="project" name="Maven: org.jsoup:jsoup:1.12.1" />
       <element id="library" level="project" name="Maven: org.reactivestreams:reactive-streams:1.0.3" />
       <element id="library" level="project" name="Maven: org.slf4j:slf4j-api:1.7.30" />
-      <element id="library" level="project" name="Maven: com.discord4j:discord-json-api:1.2.2-SNAPSHOT" />
       <element id="library" level="project" name="Maven: io.lettuce:lettuce-core:5.3.0.RELEASE" />
       <element id="library" level="project" name="Maven: io.netty:netty-buffer:4.1.49.Final" />
       <element id="library" level="project" name="Maven: io.netty:netty-codec-http2:4.1.49.Final" />
@@ -64,6 +62,8 @@
       <element id="library" level="project" name="Maven: io.netty:netty-transport:4.1.49.Final" />
       <element id="library" level="project" name="Maven: io.projectreactor.netty:reactor-netty:0.9.7.RELEASE" />
       <element id="library" level="project" name="Maven: io.projectreactor:reactor-core:3.3.5.RELEASE" />
+      <element id="library" level="project" name="Maven: com.discord4j:discord-json-api:1.3.0-SNAPSHOT" />
+      <element id="library" level="project" name="Maven: com.discord4j:discord-json:1.3.0-SNAPSHOT" />
     </root>
   </artifact>
 </component>
