@@ -2,6 +2,8 @@ package makanism.module.music;
 
 import com.sedmelluq.discord.lavaplayer.player.AudioPlayer;
 import com.sedmelluq.discord.lavaplayer.player.AudioPlayerManager;
+import discord4j.core.GatewayDiscordClient;
+import discord4j.rest.util.Snowflake;
 import discord4j.voice.VoiceConnection;
 import reactor.core.publisher.Mono;
 import reactor.util.annotation.Nullable;
@@ -12,32 +14,27 @@ public class GuildMusicManager {
     public final TrackScheduler scheduler;
     public final LavaplayerAudioProvider provider;
 
-    private VoiceConnection connection;
+    private final Snowflake guildId;
+    private final GatewayDiscordClient client;
 
-    public GuildMusicManager(AudioPlayerManager manager) {
-        player = manager.createPlayer();
-        scheduler = new TrackScheduler(player);
-        player.addListener(scheduler);
-        provider = new LavaplayerAudioProvider(player);
+    public GuildMusicManager(AudioPlayerManager manager, Snowflake guildId, GatewayDiscordClient client) {
+        this.player = manager.createPlayer();
+        this.scheduler = new TrackScheduler(this.player);
+        this.provider = new LavaplayerAudioProvider(this.player);
+        this.player.addListener(this.scheduler);
+        this.guildId = guildId;
+        this.client = client;
     }
 
-    public void setConnection(VoiceConnection connection) {
-        this.connection = connection;
+    public Mono<VoiceConnection> getConnection() {
+        return client.getVoiceConnectionRegistry().getVoiceConnection(guildId.asLong());
     }
 
-    public boolean isConnected(){
-        return (connection != null && connection.isConnected());
-    }
-
-    @Nullable
-    public VoiceConnection getConnection() {
-        return isConnected() ? connection : null;
-    }
-
+    // returns true on successful disconnect
     public Mono<Boolean> disconnect(){
-        return isConnected() ?
-            connection.disconnect().thenReturn(true) :
-            Mono.just(false);
+        return getConnection()
+            .flatMap(conn -> conn.disconnect().thenReturn(true))
+            .defaultIfEmpty(false);
     }
 
     // TODO send message to bus

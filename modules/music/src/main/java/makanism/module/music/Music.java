@@ -59,18 +59,17 @@ public class Music extends GuildModule {
         return member.getVoiceState()
             .doOnNext(vs -> log.info("SessId {}", vs.getSessionId()))
             .flatMap(VoiceState::getChannel)
-            .flatMap(channel -> Mono.just(channel)
+            .transform(ch -> ch
                 .filterWhen(vc ->
                     client.getMemberById(member.getGuildId(), config.getBotId())    // get bot as member of guild
                         .flatMap(Member::getVoiceState)                             // get bot's voice state
-                        .map(vs -> vs.getChannelId().map(id -> id.equals(vc.getId())).orElse(false))    // check if bot's channel is also requesting member's channel
+                        .map(vs -> vs.getChannelId().map(vc.getId()::equals).orElse(false))    // check if bot's channel is also requesting member's channel
                         .map(b -> !b)                                               // if it's the same channel, don't redo the join.
                         .defaultIfEmpty(true)                                       // bot VoiceState is empty (not in any channel), so let it join.
                 )
                 .doOnNext(vc -> log.info("ChannelId {}", vc.getId().asString()))
                 .flatMap(vc -> manager.disconnect().then(vc.join(spec -> spec.setProvider(manager.provider))))
-                .doOnNext(conn -> log.info("VoiceState {}", conn.getState().name()))
-                .doOnNext(manager::setConnection)
+                //.doOnNext(conn -> log.info("VoiceState {}", conn.getState().name()))
                 .map($ -> true)                                                     // true if successful
                 .defaultIfEmpty(false)                                              // false if bot already in channel
             );
@@ -116,8 +115,8 @@ public class Music extends GuildModule {
     @Override
     protected Mono<Void> onRegister(GuildConfig config) {
         // if not yet setup, new GuildMusicManager
-        guildManagers.computeIfAbsent(config.getId(), id -> new GuildMusicManager(playerManager));
-        return Mono.empty();
+        return Mono.fromRunnable(() ->
+            guildManagers.computeIfAbsent(config.getId(), id -> new GuildMusicManager(playerManager, id, client)));
     }
 
     @Override
