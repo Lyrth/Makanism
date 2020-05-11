@@ -7,6 +7,7 @@ import com.sedmelluq.discord.lavaplayer.track.playback.NonAllocatingAudioFrameBu
 import discord4j.core.object.VoiceState;
 import discord4j.core.object.entity.Member;
 import discord4j.rest.util.Snowflake;
+import discord4j.voice.VoiceConnection;
 import lyrth.makanism.api.GuildModule;
 import lyrth.makanism.api.annotation.GuildModuleInfo;
 import lyrth.makanism.common.util.file.config.GuildConfig;
@@ -54,41 +55,30 @@ public class Music extends GuildModule {
         return join(manager, member);
     }
 
-    // ^
+    // ^                        // todo check if bot's current channel has track and members
     private Mono<Boolean> join(GuildMusicManager manager, Member member){
         return member.getVoiceState()
             .doOnNext(vs -> log.info("SessId {}", vs.getSessionId()))
             .flatMap(VoiceState::getChannel)
             .transform(ch -> ch
                 .filterWhen(vc ->
-                    client.getMemberById(member.getGuildId(), config.getBotId())    // get bot as member of guild
-                        .flatMap(Member::getVoiceState)                             // get bot's voice state
-                        .map(vs -> vs.getChannelId().map(vc.getId()::equals).orElse(false))    // check if bot's channel is also requesting member's channel
-                        .map(b -> !b)                                               // if it's the same channel, don't redo the join.
-                        .defaultIfEmpty(true)                                       // bot VoiceState is empty (not in any channel), so let it join.
+                    client.getVoiceConnectionRegistry()
+                        .getVoiceConnection(vc.getGuildId().asLong())       // get current guild VoiceConnection
+                        .flatMap(VoiceConnection::getChannelId)             // get what channel it is on
+                        .map(id -> vc.getGuildId().asLong() != id)          // make sure it's not the same channel
+                        .defaultIfEmpty(true)                               // connection is empty, so not in channel
                 )
                 .doOnNext(vc -> log.info("ChannelId {}", vc.getId().asString()))
-                .flatMap(vc -> manager.disconnect().then(vc.join(spec -> spec.setProvider(manager.provider))))
-                //.doOnNext(conn -> log.info("VoiceState {}", conn.getState().name()))
-                .map($ -> true)                                                     // true if successful
-                .defaultIfEmpty(false)                                              // false if bot already in channel
+                /*
+                .flatMap(vc -> manager.disconnect()                         // if d4j cannot smoothly move between channels
+                    .then(vc.join(spec -> spec.setProvider(manager.provider))))
+                 */
+                .flatMap(vc -> vc.join(spec -> spec.setProvider(manager.provider)))
+                .doOnEach(vc -> log.debug("Join completed."))
+                .doOnNext(vc -> log.info("VConn connected."))
+                .map($ -> true)                                             // true if successful. TODO: account for errors
+                .defaultIfEmpty(false)                                      // false if bot already in channel
             );
-
-        /*
-        return member.getVoiceState()                                       // todo check if bot's current channel has track and members
-            .flatMap(memberVS -> memberVS.getChannel()                      // get the channel member is in
-                .filterWhen(vc -> vc.getVoiceStates()
-                    .doOnNext(vs -> log.debug("{} == {} ?",vs.getUserId(), config.getBotId()))
-                    .any(vs -> vs.getUserId().equals(config.getBotId()))    // true if bot is in already
-                    .map(b -> !b)                                           // so don't continue if true
-                )
-                .flatMap(vc -> manager.disconnect()
-                    .then(vc.join(spec -> spec.setProvider(manager.provider)))
-                    .doOnNext(manager::setConnection)
-                    .thenReturn(true))
-                .defaultIfEmpty(false)
-            );
-        */
     }
 
     // true: played successfully, false: input invalid/not ready, empty: member not in voice channel
@@ -108,6 +98,7 @@ public class Music extends GuildModule {
             .flatMap(GuildMusicManager::disconnect);
     }
 
+    // Stops everything
     public Mono<Boolean> stop(Snowflake guildId){       // TODO yeah
         return Mono.empty();
     }
