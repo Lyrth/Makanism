@@ -80,6 +80,11 @@ public class BotConfig {
         return this;
     }
 
+    public boolean hasGuildConfig(Snowflake guildId){
+        return guildConfigs.containsKey(guildId);
+    }
+
+
     public void setIds(Snowflake botId, Snowflake ownerId) {
         this.botId = botId;
         this.ownerId = ownerId;

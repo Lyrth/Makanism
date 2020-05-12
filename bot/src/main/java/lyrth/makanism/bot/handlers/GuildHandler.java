@@ -8,6 +8,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import reactor.core.publisher.Mono;
 
+import java.util.function.Predicate;
+
 public class GuildHandler {
     private static final Logger log = LoggerFactory.getLogger(GuildHandler.class);
 
@@ -22,6 +24,7 @@ public class GuildHandler {
                 gce.getGuild().getMemberCount()
             ))
             .map(gce -> gce.getGuild().getId())
+            .filter(Predicate.not(botConfig::hasGuildConfig))   // make sure guildConfig doesn't exist before setting it up
             .flatMap(guildId -> GuildConfig.load(guildId, botConfig.getSourceProvider(), botConfig.getProps()))
             .flatMap(GuildConfig::update)
             .doOnNext(guildConfig -> botConfig.getModuleHandler().setupModulesFor(guildConfig))
