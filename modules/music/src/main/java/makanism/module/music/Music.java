@@ -65,19 +65,14 @@ public class Music extends GuildModule {
                     client.getVoiceConnectionRegistry()
                         .getVoiceConnection(vc.getGuildId().asLong())       // get current guild VoiceConnection
                         .flatMap(VoiceConnection::getChannelId)             // get what channel it is on
-                        .map(id -> vc.getGuildId().asLong() != id)          // make sure it's not the same channel
+                        .map(id -> vc.getId().asLong() != id)               // make sure it's not the same channel
                         .defaultIfEmpty(true)                               // connection is empty, so not in channel
                 )
                 .doOnNext(vc -> log.info("ChannelId {}", vc.getId().asString()))
-                /*
-                .flatMap(vc -> manager.disconnect()                         // if d4j cannot smoothly move between channels
-                    .then(vc.join(spec -> spec.setProvider(manager.provider))))
-                 */
                 .flatMap(vc -> vc.join(spec -> spec.setProvider(manager.provider)))
-                .doOnEach(vc -> log.debug("Join completed."))
+                .doOnEach(vc -> log.debug("Join signalled."))
                 .doOnNext(vc -> log.info("VConn connected."))
-                .map($ -> true)                                             // true if successful. TODO: account for errors
-                .defaultIfEmpty(false)                                      // false if bot already in channel
+                .hasElement()           // true if successful. false if bot already in channel. TODO: account for errors
             );
     }
 

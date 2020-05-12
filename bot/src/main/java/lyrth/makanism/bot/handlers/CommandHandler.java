@@ -2,6 +2,7 @@ package lyrth.makanism.bot.handlers;
 
 import discord4j.core.GatewayDiscordClient;
 import discord4j.core.event.domain.message.MessageCreateEvent;
+import discord4j.core.object.entity.Message;
 import discord4j.core.object.entity.User;
 import lyrth.makanism.api.Command;
 import lyrth.makanism.api.util.CommandCtx;

@@ -16,7 +16,6 @@ public class GatewayHandler {
     private static final Logger log = LoggerFactory.getLogger(GatewayHandler.class);
 
     public static Mono<Void> create(GatewayDiscordClient client){
-
         final SourceProvider source = new FileSourceProvider("config");     // pick a SourceProvider impl
 
         return ModuleHandler.load()
