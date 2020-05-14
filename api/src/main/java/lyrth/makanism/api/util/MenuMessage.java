@@ -10,11 +10,5 @@ import java.util.concurrent.ConcurrentHashMap;
 /// TODO: Persistence between restarts, 10 passive (non-command related) listeners per guild
 public class MenuMessage extends Reply {
 
-    // Message IDs to listen to.          <Guild ID,  ReactMenu>
-    private static final ConcurrentHashMap<Snowflake, Set<Menu>> messageIds = new ConcurrentHashMap<>();
-
-    /// Constructors
-    
-
 
 }

@@ -20,6 +20,8 @@ public class BotConfig {
 
     private transient IModuleHandler moduleHandler;
 
+    private static final String PATH = "bot/bot";
+
     private String defaultPrefix;    // only modifiable in json
     private Snowflake botId;
     private Snowflake ownerId;
@@ -28,8 +30,7 @@ public class BotConfig {
 
 
     public static Mono<BotConfig> load(SourceProvider source, HashMap<Snowflake, GuildConfig> guildConfigs, Props props, IModuleHandler moduleHandler){
-        String path = "bot/bot";
-        return source.read(path, BotConfig.class).map(config ->
+        return source.read(PATH, BotConfig.class).map(config ->
             config.setSource(source)
                 .setProps(props)
                 .setGuildConfigs(guildConfigs)
@@ -45,8 +46,7 @@ public class BotConfig {
 
     // Write to resource
     public Mono<BotConfig> update(){
-        String path = "bot/bot";
-        return source.write(path, this).thenReturn(this);
+        return source.write(PATH, this).thenReturn(this);
     }
 
     public Mono<Void> saveAll(){
