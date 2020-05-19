@@ -11,8 +11,8 @@ public class ReactionHandler {
 
     public static Mono<Void> handle(GatewayDiscordClient client, BotConfig botConfig){
         return Mono.when(
-            client.on(ReactionAddEvent.class).flatMap(MenuRegistry::listen),
-            client.on(ReactionRemoveEvent.class).flatMap(MenuRegistry::listen)
+            client.on(ReactionAddEvent.class).doOnNext(MenuRegistry::listen),
+            client.on(ReactionRemoveEvent.class).doOnNext(MenuRegistry::listen)
         );
     }
 }
