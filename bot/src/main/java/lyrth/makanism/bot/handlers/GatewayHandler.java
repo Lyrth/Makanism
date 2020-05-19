@@ -42,6 +42,6 @@ public class GatewayHandler {
                         .flatMap(config -> CommandHandler.handle(client, config))
                         .onErrorContinue((t, $) -> log.error("CAUgHt eWWoW!", t))
                 );
-        });
+            });
     }
 }
