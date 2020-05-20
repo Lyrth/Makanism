@@ -34,6 +34,7 @@ public class GatewayHandler {
                     GuildHandler.handle(client, botConfig),
                     botConfig.getModuleHandler().handle(client, botConfig),
                     ConsoleHandler.handle(client),
+                    ReactionHandler.handle(client, botConfig),
                     client.getApplicationInfo()
                         .doOnNext(appInfo -> botConfig.setIds(appInfo.getId(), appInfo.getOwnerId()))
                         .then(botConfig.update())

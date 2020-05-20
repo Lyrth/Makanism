@@ -99,6 +99,7 @@ public class Reply {
         return channelMono.flatMap(this::send);
     }
 
+    // Most likely the only method that should be overridden.
     public Mono<Message> send(MessageChannel channel){
         return channel.createMessage(this::apply);
     }

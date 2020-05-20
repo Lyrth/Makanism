@@ -29,6 +29,7 @@ public class CommandHandler {
             new SetPrefix(),
             new Echo(),
             new Sudo(),
+            new Test(),
             new UserInfo(),
             new ModuleCmd()
 
