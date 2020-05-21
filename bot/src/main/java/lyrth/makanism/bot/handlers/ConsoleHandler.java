@@ -16,7 +16,7 @@ public class ConsoleHandler {
     public static Mono<Void> handle(GatewayDiscordClient client){
         return Flux.fromStream(new BufferedReader(new InputStreamReader(System.in)).lines())    // console lines
             .flatMap(ConsoleHandler::handleConsoleCommand)
-            .subscribeOn(Schedulers.single())    // subscribe on a different thread to not block the main thread
+            .subscribeOn(Schedulers.newSingle("console"))   // subscribe on a different thread to not block the main thread
             .then();
     }
 

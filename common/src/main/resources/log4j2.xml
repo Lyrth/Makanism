@@ -4,21 +4,21 @@
         <Console name="utillog" target="SYSTEM_OUT">
             <PatternLayout disableAnsi="false">
                 <pattern>
-                    %highlight{[%-5level]} %style{D%d{dd-HH:mm:ss.SSS}{GMT+8}}{dim,white} %-48.48style{%c{1.}}{cyan} %highlight{%2level{ERROR=!&gt;, WARN=&gt;&gt;, INFO=&gt;, length=0} %msg%n%throwable}
+                    %highlight{[%-5level]} %style{D%d{dd-HH:mm:ss.SSS}{GMT+8}}{dim,white} %style{[%16.16t]}{blue} %-35.35style{%c{1.}}{cyan} %highlight{%2level{ERROR=!&gt;, WARN=&gt;&gt;, INFO=&gt;, length=0} %msg%n%throwable}
                 </pattern>
             </PatternLayout>
         </Console>
         <Console name="debug" target="SYSTEM_OUT">
             <PatternLayout disableAnsi="false">
                 <pattern>
-                    %style{[%-5level] D%d{dd-HH:mm:ss.SSS}{GMT+8} %-53.53style{%c{2.}:%throwable{short.lineNumber}}{dim,cyan} %style{%msg%n%throwable}{dim,white}}{dim,white}
+                    %style{[%-5level] D%d{dd-HH:mm:ss.SSS}{GMT+8}   %-57.57style{%c{2.}:%throwable{short.lineNumber}}{dim,cyan} %style{%msg%n%throwable}{dim,white}}{dim,white}
                 </pattern>
             </PatternLayout>
         </Console>
         <Console name="err" target="SYSTEM_OUT">
             <PatternLayout disableAnsi="false">
                 <pattern>
-                    %style{[%-5level] D%d{dd-HH:mm:ss.SSS}{GMT+8} %-53.53style{%c{2.}}{dim,cyan} %msg%n%throwable}{dim,white}
+                    %style{[%-5level] D%d{dd-HH:mm:ss.SSS}{GMT+8}   %-57.57style{%c{2.}}{dim,cyan} %msg%n%throwable}{dim,white}
                 </pattern>
             </PatternLayout>
         </Console>
@@ -35,6 +35,9 @@
     </Appenders>
     <Loggers>
         <Logger name="lyrth.makanism" level="debug">
+            <AppenderRef ref="utillog"/>
+        </Logger>
+        <Logger name="SaveHandler" level="debug"> <!-- test: debug, prod: info -->
             <AppenderRef ref="utillog"/>
         </Logger>
         <Logger name="makanism.module" level="debug">

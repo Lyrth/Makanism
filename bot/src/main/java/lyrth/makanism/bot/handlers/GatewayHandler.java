@@ -34,15 +34,20 @@ public class GatewayHandler {
                     GuildHandler.handle(client, botConfig),
                     botConfig.getModuleHandler().handle(client, botConfig),
                     ConsoleHandler.handle(client),
+                    SaveHandler.handle(client, botConfig),
                     ReactionHandler.handle(client, botConfig),
-                    client.getApplicationInfo()
-                        .doOnNext(appInfo -> botConfig.setIds(appInfo.getId(), appInfo.getOwnerId()))
-                        .then(botConfig.update())
-                        .cache()
-                        .doOnNext(config -> log.info("Loaded bot config."))
+                    updateAndLoadConfig(client, botConfig)
                         .flatMap(config -> CommandHandler.handle(client, config))
                         .onErrorContinue((t, $) -> log.error("CAUgHt eWWoW!", t))
                 );
             });
+    }
+
+    private static Mono<BotConfig> updateAndLoadConfig(GatewayDiscordClient client, BotConfig botConfig){
+        return client.getApplicationInfo()
+            .doOnNext(appInfo -> botConfig.setIds(appInfo.getId(), appInfo.getOwnerId()))
+            .then(botConfig.update())
+            .cache()
+            .doOnNext(config -> log.info("Loaded bot config."));
     }
 }
