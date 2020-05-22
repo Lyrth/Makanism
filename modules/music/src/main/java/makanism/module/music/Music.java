@@ -6,7 +6,7 @@ import com.sedmelluq.discord.lavaplayer.source.AudioSourceManagers;
 import com.sedmelluq.discord.lavaplayer.track.playback.NonAllocatingAudioFrameBuffer;
 import discord4j.core.object.VoiceState;
 import discord4j.core.object.entity.Member;
-import discord4j.rest.util.Snowflake;
+import discord4j.common.util.Snowflake;
 import discord4j.voice.VoiceConnection;
 import lyrth.makanism.api.GuildModule;
 import lyrth.makanism.api.annotation.GuildModuleInfo;
@@ -50,28 +50,23 @@ public class Music extends GuildModule {
 
     // true: success, false: already joined, empty: not in visible vc, error: perms?
     public Mono<Boolean> join(Snowflake guildId, Member member){
-        GuildMusicManager manager = guildManagers.get(guildId);
-        if (manager == null) return Mono.empty();
-        return join(manager, member);
+        return Mono.justOrEmpty(guildManagers.get(guildId))
+            .flatMap(manager -> join(manager, member));
     }
 
     // ^                        // todo check if bot's current channel has track and members
     private Mono<Boolean> join(GuildMusicManager manager, Member member){
         return member.getVoiceState()
-            .doOnNext(vs -> log.info("SessId {}", vs.getSessionId()))
             .flatMap(VoiceState::getChannel)
-            .transform(ch -> ch
+            .flatMap(ch -> Mono.just(ch)
                 .filterWhen(vc ->
                     client.getVoiceConnectionRegistry()
-                        .getVoiceConnection(vc.getGuildId().asLong())       // get current guild VoiceConnection
+                        .getVoiceConnection(vc.getGuildId())                // get current guild VoiceConnection
                         .flatMap(VoiceConnection::getChannelId)             // get what channel it is on
-                        .map(id -> vc.getId().asLong() != id)               // make sure it's not the same channel
+                        .map(vc.getId()::equals)                            // make sure it's not the same channel
                         .defaultIfEmpty(true)                               // connection is empty, so not in channel
                 )
-                .doOnNext(vc -> log.info("ChannelId {}", vc.getId().asString()))
                 .flatMap(vc -> vc.join(spec -> spec.setProvider(manager.provider)))
-                .doOnEach(vc -> log.debug("Join signalled."))
-                .doOnNext(vc -> log.info("VConn connected."))
                 .hasElement()           // true if successful. false if bot already in channel. TODO: account for errors
             );
     }
@@ -88,8 +83,7 @@ public class Music extends GuildModule {
 
     // true: leave success, false: bot not in vc, empty: ??    TODO: Vote, stop playing
     public Mono<Boolean> leave(Snowflake guildId){
-        GuildMusicManager musicManager = guildManagers.get(guildId);
-        return Mono.justOrEmpty(musicManager)
+        return Mono.justOrEmpty(guildManagers.get(guildId))
             .flatMap(GuildMusicManager::disconnect);
     }
 

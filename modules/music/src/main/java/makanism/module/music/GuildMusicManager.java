@@ -3,7 +3,7 @@ package makanism.module.music;
 import com.sedmelluq.discord.lavaplayer.player.AudioPlayer;
 import com.sedmelluq.discord.lavaplayer.player.AudioPlayerManager;
 import discord4j.core.GatewayDiscordClient;
-import discord4j.rest.util.Snowflake;
+import discord4j.common.util.Snowflake;
 import discord4j.voice.VoiceConnection;
 import reactor.core.publisher.Mono;
 
@@ -26,7 +26,7 @@ public class GuildMusicManager {
     }
 
     public Mono<VoiceConnection> getConnection() {
-        return client.getVoiceConnectionRegistry().getVoiceConnection(guildId.asLong());
+        return client.getVoiceConnectionRegistry().getVoiceConnection(guildId);
     }
 
     // returns true on successful disconnect

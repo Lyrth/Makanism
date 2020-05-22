@@ -27,7 +27,7 @@ module lyrth.makanism.common {
     requires transitive discord4j.store.jdk;
     requires transitive discord4j.store.redis;
     requires transitive discord4j.voice;
-    requires transitive emoji.java;
+    requires transitive emoji4j;
     requires transitive io.github.classgraph;
     requires transitive io.netty.codec;
     requires transitive io.netty.codec.http;

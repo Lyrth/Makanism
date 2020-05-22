@@ -6,7 +6,7 @@ import discord4j.core.object.entity.Message;
 import discord4j.core.object.entity.User;
 import discord4j.discordjson.json.*;
 import discord4j.discordjson.possible.Possible;
-import discord4j.rest.util.Snowflake;
+import discord4j.common.util.Snowflake;
 import lyrth.makanism.api.util.AccessLevel;
 import lyrth.makanism.api.BotCommand;
 import lyrth.makanism.api.util.CommandCtx;

@@ -1,7 +1,7 @@
 package lyrth.makanism.api;
 
 import discord4j.core.GatewayDiscordClient;
-import discord4j.rest.util.Snowflake;
+import discord4j.common.util.Snowflake;
 import lyrth.makanism.api.annotation.GuildModuleInfo;
 import lyrth.makanism.common.util.file.config.BotConfig;
 import lyrth.makanism.common.util.file.config.GuildConfig;

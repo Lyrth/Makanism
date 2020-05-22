@@ -13,7 +13,6 @@
       <element id="library" level="project" name="Maven: com.discord4j:discord4j-voice:3.1.0-SNAPSHOT" />
       <element id="library" level="project" name="Maven: com.discord4j:simple-fsm:1.0.1" />
       <element id="library" level="project" name="Maven: com.discord4j:stores-api:3.1.0-SNAPSHOT" />
-      <element id="library" level="project" name="Maven: com.discord4j:stores-jdk:3.1.0-SNAPSHOT" />
       <element id="library" level="project" name="Maven: com.discord4j:stores-redis:3.1.0-SNAPSHOT" />
       <element id="library" level="project" name="Maven: com.fasterxml.jackson.core:jackson-annotations:2.10.0" />
       <element id="library" level="project" name="Maven: com.fasterxml.jackson.core:jackson-core:2.10.0" />
@@ -27,7 +26,6 @@
       <element id="library" level="project" name="Maven: com.sedmelluq:lava-common:1.1.0" />
       <element id="library" level="project" name="Maven: com.sedmelluq:lavaplayer-natives:1.3.13" />
       <element id="library" level="project" name="Maven: com.sedmelluq:lavaplayer:1.3.47" />
-      <element id="library" level="project" name="Maven: com.vdurmont:emoji-java:5.1.1" />
       <element id="library" level="project" name="Maven: commons-codec:commons-codec:1.11" />
       <element id="library" level="project" name="Maven: commons-io:commons-io:2.6" />
       <element id="library" level="project" name="Maven: commons-logging:commons-logging:1.2" />
@@ -43,7 +41,6 @@
       <element id="library" level="project" name="Maven: org.apache.logging.log4j:log4j-core:2.12.1" />
       <element id="library" level="project" name="Maven: org.apache.logging.log4j:log4j-slf4j-impl:2.12.1" />
       <element id="library" level="project" name="Maven: org.fusesource.jansi:jansi:1.18" />
-      <element id="library" level="project" name="Maven: org.json:json:20170516" />
       <element id="library" level="project" name="Maven: org.jsoup:jsoup:1.12.1" />
       <element id="library" level="project" name="Maven: org.reactivestreams:reactive-streams:1.0.3" />
       <element id="library" level="project" name="Maven: org.slf4j:slf4j-api:1.7.30" />
@@ -62,8 +59,14 @@
       <element id="library" level="project" name="Maven: io.netty:netty-transport:4.1.49.Final" />
       <element id="library" level="project" name="Maven: io.projectreactor.netty:reactor-netty:0.9.7.RELEASE" />
       <element id="library" level="project" name="Maven: io.projectreactor:reactor-core:3.3.5.RELEASE" />
-      <element id="library" level="project" name="Maven: com.discord4j:discord-json-api:1.3.0-SNAPSHOT" />
-      <element id="library" level="project" name="Maven: com.discord4j:discord-json:1.3.0-SNAPSHOT" />
+      <element id="library" level="project" name="Maven: cglib:cglib-nodep:2.2" />
+      <element id="library" level="project" name="Maven: com.discord4j:discord-json-api:1.3.1" />
+      <element id="library" level="project" name="Maven: com.discord4j:discord-json:1.3.2-SNAPSHOT" />
+      <element id="library" level="project" name="Maven: com.discord4j:stores-jdk:3.1.0" />
+      <element id="library" level="project" name="Maven: com.googlecode.lambdaj:lambdaj:2.3.3" />
+      <element id="library" level="project" name="Maven: com.kcthota:emoji4j:6.0" />
+      <element id="library" level="project" name="Maven: org.hamcrest:hamcrest-all:1.1" />
+      <element id="library" level="project" name="Maven: org.objenesis:objenesis:1.2" />
     </root>
   </artifact>
 </component>

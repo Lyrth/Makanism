@@ -2,7 +2,7 @@ package lyrth.makanism.common.util.file;
 
 import discord4j.core.GatewayDiscordClient;
 import discord4j.core.event.domain.message.MessageCreateEvent;
-import discord4j.rest.util.Snowflake;
+import discord4j.common.util.Snowflake;
 import lyrth.makanism.common.util.file.config.BotConfig;
 import lyrth.makanism.common.util.file.config.GuildConfig;
 import reactor.core.publisher.Mono;

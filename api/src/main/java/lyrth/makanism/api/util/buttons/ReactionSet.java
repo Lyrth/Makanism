@@ -1,8 +1,8 @@
 package lyrth.makanism.api.util.buttons;
 
-import com.vdurmont.emoji.Emoji;
-import com.vdurmont.emoji.EmojiManager;
 import discord4j.core.object.reaction.ReactionEmoji;
+import emoji4j.Emoji;
+import emoji4j.EmojiUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import reactor.util.annotation.Nullable;
@@ -44,11 +44,15 @@ public interface ReactionSet {
                 return null;
             }
         } else {
-            return ReactionEmoji.unicode(getUnicodeEmoji(s));
+            String unicode = getUnicodeEmoji(s);
+            if (unicode != null)
+                return ReactionEmoji.unicode(unicode);
+            else log.warn("Invalid emoji: [{}]", s);
+            return null;
         }
     }
 
     static String getUnicodeEmoji(String name){
-        return Optional.ofNullable(EmojiManager.getForAlias(name)).map(Emoji::getUnicode).orElse(name);
+        return Optional.ofNullable(EmojiUtils.getEmoji(name)).map(Emoji::getEmoji).orElse(null);
     }
 }

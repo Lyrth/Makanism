@@ -1,8 +1,8 @@
 package lyrth.makanism.api.util.buttons;
 
-import com.vdurmont.emoji.EmojiManager;
 import discord4j.core.event.domain.message.ReactionAddEvent;
 import discord4j.core.event.domain.message.ReactionRemoveEvent;
+import emoji4j.EmojiUtils;
 import reactor.core.publisher.Mono;
 
 public class YesNoReactListener extends ReactListener {     // TODO: lol actually add some functionality.
@@ -11,9 +11,9 @@ public class YesNoReactListener extends ReactListener {     // TODO: lol actuall
     public Mono<?> on(ReactionAddEvent event) {
         return Mono.justOrEmpty(event.getEmoji().asUnicodeEmoji())
             .flatMap(emoji -> {
-                if (emoji.getRaw().equals(EmojiManager.getForAlias("white_check_mark").getUnicode()))
+                if (emoji.getRaw().equals(EmojiUtils.getEmoji("white_check_mark").getEmoji()))
                     return event.getChannel().flatMap(ch -> ch.createMessage("check! :o"));
-                if (emoji.getRaw().equals(EmojiManager.getForAlias("x").getUnicode()))
+                if (emoji.getRaw().equals(EmojiUtils.getEmoji("x").getEmoji()))
                     return cancel();     // FIXME: don't delete, cancel instead.
                 return Mono.empty();
             });

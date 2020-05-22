@@ -1,6 +1,6 @@
 package lyrth.makanism.bot.commands;
 
-import discord4j.rest.util.Snowflake;
+import discord4j.common.util.Snowflake;
 import lyrth.makanism.api.util.AccessLevel;
 import lyrth.makanism.api.util.CommandCtx;
 import lyrth.makanism.api.GuildCommand;

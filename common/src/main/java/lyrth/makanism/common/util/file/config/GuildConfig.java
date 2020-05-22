@@ -1,7 +1,7 @@
 package lyrth.makanism.common.util.file.config;
 
 import com.google.gson.reflect.TypeToken;
-import discord4j.rest.util.Snowflake;
+import discord4j.common.util.Snowflake;
 import lyrth.makanism.common.util.file.Props;
 import lyrth.makanism.common.util.file.SourceProvider;
 import reactor.core.publisher.Mono;
