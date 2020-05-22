@@ -100,12 +100,10 @@ public class FileSourceProvider implements SourceProvider {    // TODO : Caches
         return Mono.fromCallable(() -> {
             File current = new File(fileName);
             File backup  = new File(fileName + ".bak");
-            if (backup.exists()) {
-                if (!backup.delete())
-                    log.warn("Cannot delete backup file {}.", fileName);
-                if (!current.renameTo(backup))
-                    log.warn("Cannot rename file {}. Overwriting.", fileName);
-            }
+            if (backup.exists() && !backup.delete())
+                log.warn("Cannot delete backup file {}.", fileName);
+            if (!current.renameTo(backup))
+                log.warn("Cannot rename file {}. Overwriting.", fileName);
             if (current.exists() && !current.delete())
                 throw new IOException("Cannot modify file " + fileName);
             return 0;
