@@ -16,7 +16,7 @@ import java.util.Optional;
 public class ModuleCmd extends GuildCommand {   // TODO : fix this mess; module status
 
     @Override
-    public Mono<Void> execute(CommandCtx ctx) {
+    public Mono<?> execute(CommandCtx ctx) {
         if (!(ctx.getArgs().get(1).toLowerCase().equals("enable") ||
             ctx.getArgs().get(1).toLowerCase().equals("disable")) || ctx.getArgs().getCount() < 3)
             return ctx.sendReply("Invalid args.");

@@ -14,7 +14,7 @@ import reactor.core.publisher.Mono;
 public class JoinCmd extends GuildModuleCommand<Music> {
 
     @Override
-    public Mono<Void> execute(CommandCtx ctx, Music module) {
+    public Mono<?> execute(CommandCtx ctx, Music module) {
         if (ctx.getGuildId().isEmpty() || ctx.getMember().isEmpty()) return Mono.empty();
 
         return module.join(ctx.getGuildId().get(), ctx.getMember().get())
@@ -23,6 +23,6 @@ public class JoinCmd extends GuildModuleCommand<Music> {
                 "already joined"
             )
             .defaultIfEmpty("you're not in a voice channel")
-            .flatMap(reply -> ctx.getChannel().flatMap(ch -> ch.createMessage(reply)).then());
+            .flatMap(ctx::sendReply);
     }
 }

@@ -6,7 +6,7 @@ import reactor.core.publisher.Mono;
 public class Template extends GuildModule {
 
     @Override
-    protected Mono<Void> initModule() {
+    protected Mono<?> initModule() {
         return Mono.empty();
     }
 }

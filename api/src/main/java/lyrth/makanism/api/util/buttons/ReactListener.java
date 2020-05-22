@@ -34,7 +34,7 @@ public abstract class ReactListener {
         return this;
     }
 
-    // default, can be overriden (can also super() call)
+    // the default task, can be overridden (can also super() call)
     public Flux<ReactionEvent> cancelTask(Flux<ReactionEvent> source){
         return source.timeout(
             Mono.defer(() -> Mono.delay(Duration.ofSeconds(30))),             // Wait longer for the user's initial reaction.
@@ -44,7 +44,7 @@ public abstract class ReactListener {
     }
 
     // Cancels the listener and removes the reactions in the message.
-    public <T> Mono<T> cancel(){
+    public final <T> Mono<T> cancel(){
         return Mono.fromCallable(() -> Tuples.of(message.getClient(), message.getId()))
             .flatMap(function(MenuRegistry::removeListener))
             .then(Mono.fromRunnable(() -> reactionProcessor.onComplete()));
@@ -74,8 +74,8 @@ public abstract class ReactListener {
     // fetched on start()
     protected abstract ReactionSet getReactionSet();
 
-    public abstract Mono<Void> on(ReactionAddEvent event);
-    public abstract Mono<Void> on(ReactionRemoveEvent event);
+    public abstract Mono<?> on(ReactionAddEvent event);
+    public abstract Mono<?> on(ReactionRemoveEvent event);
 
     public Snowflake getChannelId() {
         return message.getChannelId();

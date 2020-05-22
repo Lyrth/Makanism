@@ -10,6 +10,6 @@ public interface IModule {
     String getDesc();
     Class<? extends Command>[] getModuleCommands();
 
-    Mono<Void> init(GatewayDiscordClient client, BotConfig config);
+    Mono<?> init(GatewayDiscordClient client, BotConfig config);
 
 }

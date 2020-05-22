@@ -69,24 +69,23 @@ public class FileSourceProvider implements SourceProvider {    // TODO : Caches
 
     // Writes T to a json file.
     @Override
-    public <T> Mono<Void> write(String name, T t) {
+    public <T> Mono<?> write(String name, T t) {
         String fileName = root + (name.endsWith(".json") ? name : name + ".json");
-        Mono<Void> write = Mono.fromCallable(() -> {
+        Mono<?> write = Mono.fromCallable(() -> {
                 FileWriter writer = new FileWriter(fileName);
                 gson.toJson(t, writer);
                 writer.close();
                 return 1;
             })
             .subscribeOn(scheduler)
-            .doOnError(err -> log.error("Error in writing to file {}! ({})", fileName, err.getMessage()))
-            .then();
+            .doOnError(err -> log.error("Error in writing to file {}! ({})", fileName, err.getMessage()));
             //.onErrorResume($ -> Mono.empty());
         return moveBackup(fileName).then(write);
     }
 
     // Creates a file if and only if it doesn't exist.
     @SuppressWarnings("ResultOfMethodCallIgnored")
-    private Mono<Void> createFile(String fileName){
+    private Mono<?> createFile(String fileName){
         return Mono.fromCallable(() -> {
             File file = new File(fileName);
             if (!file.exists()){
@@ -94,22 +93,23 @@ public class FileSourceProvider implements SourceProvider {    // TODO : Caches
                 file.createNewFile();
             }
             return 0;
-        }).subscribeOn(scheduler).then();
+        }).subscribeOn(scheduler);
     }
 
-    private Mono<Void> moveBackup(String fileName){
+    private Mono<?> moveBackup(String fileName){
         return Mono.fromCallable(() -> {
             File current = new File(fileName);
             File backup  = new File(fileName + ".bak");
-            if (backup.exists())
+            if (backup.exists()) {
                 if (!backup.delete())
                     log.warn("Cannot delete backup file {}.", fileName);
-                else if (!current.renameTo(backup))
+                if (!current.renameTo(backup))
                     log.warn("Cannot rename file {}. Overwriting.", fileName);
+            }
             if (current.exists() && !current.delete())
                 throw new IOException("Cannot modify file " + fileName);
             return 0;
-        }).subscribeOn(scheduler).then();
+        }).subscribeOn(scheduler);
     }
 
     @SuppressWarnings("ReactiveStreamsNullableInLambdaInTransform")     // fromCallable is fine with null return.

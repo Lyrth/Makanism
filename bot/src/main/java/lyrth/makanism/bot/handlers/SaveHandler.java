@@ -14,7 +14,7 @@ public class SaveHandler {
 
     private static final Duration SAVE_INTERVAL = Duration.ofMinutes(3);
 
-    public static Mono<Void> handle(GatewayDiscordClient client, BotConfig botConfig){
+    public static Mono<?> handle(GatewayDiscordClient client, BotConfig botConfig){
         return Flux.interval(SAVE_INTERVAL)     // interval already publishes on the parallel scheduler
             .doOnNext(n -> log.trace("Saving..."))
             .flatMap(n -> botConfig.saveAll().thenReturn(n))

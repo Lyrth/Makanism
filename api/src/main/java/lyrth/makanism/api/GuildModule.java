@@ -31,7 +31,7 @@ public abstract class GuildModule implements IModule {
     }
 
     @Override
-    public Mono<Void> init(GatewayDiscordClient client, BotConfig config){
+    public Mono<?> init(GatewayDiscordClient client, BotConfig config){
         this.config = config;
         this.client = client;
         return Mono.when(
@@ -42,14 +42,14 @@ public abstract class GuildModule implements IModule {
     }
 
     // Called once!  // Probably just a filter and not ModuleHandler. TO/nope/DO: ClassGraph????
-    protected abstract Mono<Void> initModule();  // Should return a void Mono subscribing to the GuildModule's functions
+    protected abstract Mono<?> initModule();  // Should return a void Mono subscribing to the GuildModule's functions
     // on(*).filter(guildInEnabledGuild).(useGuildHere)
 
-    protected Mono<Void> onRegister(GuildConfig config) {   // callback when module enabled
+    protected Mono<?> onRegister(GuildConfig config) {   // callback when module enabled
         return Mono.empty();
     }
 
-    protected Mono<Void> onRemove(GuildConfig config) {     // callback when module disabled
+    protected Mono<?> onRemove(GuildConfig config) {     // callback when module disabled
         return Mono.empty();
     }
 

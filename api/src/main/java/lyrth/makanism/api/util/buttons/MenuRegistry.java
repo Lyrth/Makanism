@@ -21,11 +21,11 @@ public class MenuRegistry {
     private transient static final FluxProcessor<ReactionEvent, ReactionEvent> processor = DirectProcessor.create();
     private transient static final FluxSink<ReactionEvent> sink = processor.sink(FluxSink.OverflowStrategy.DROP);
 
-    static void register(ReactListener listener){
+    protected static void register(ReactListener listener){
         listeners.put(listener.getMessageId(), listener);
     }
 
-    static FluxProcessor<ReactionEvent, ReactionEvent> getProcessorFor(
+    protected static FluxProcessor<ReactionEvent, ReactionEvent> getProcessorFor(
         Snowflake messageId,
         Function<Flux<ReactionEvent>, Flux<ReactionEvent>> cancelHook
     ){
@@ -34,7 +34,7 @@ public class MenuRegistry {
                 .transform(cancelHook));
     }
 
-    static Mono<Void> removeListener(GatewayDiscordClient client, Snowflake messageId){
+    protected static Mono<?> removeListener(GatewayDiscordClient client, Snowflake messageId){
         return Mono.just(messageId)
             .filter(listeners::containsKey)
             .map(listeners::remove)

@@ -8,7 +8,7 @@ public interface SourceProvider {
 
     <T> Mono<T>       read(String name, Class<T> clazz);
     <T> Mono<T>       read(String name, TypeToken<T> clazz);
-    <T> Mono<Void>   write(String name, T t);
+    <T> Mono<?>      write(String name, T t);
 
     Flux<String> listItems(String path);
     Flux<String>  listDirs(String path);

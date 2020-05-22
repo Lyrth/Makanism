@@ -14,7 +14,7 @@ import reactor.core.publisher.Mono;
 public class PlayCmd extends GuildModuleCommand<Music> {
 
     @Override
-    public Mono<Void> execute(CommandCtx ctx, Music module) {
+    public Mono<?> execute(CommandCtx ctx, Music module) {
         if (ctx.getGuildId().isEmpty() || ctx.getMember().isEmpty()) return Mono.empty();
         if (ctx.getArgs().getRest(1).isEmpty())
             return ctx.getChannel().flatMap(ch -> ch.createMessage("Invalid args.")).then();
@@ -25,6 +25,6 @@ public class PlayCmd extends GuildModuleCommand<Music> {
                 "invalid music"
             )
             .defaultIfEmpty("you're not in a voice channel")
-            .flatMap(reply -> ctx.getChannel().flatMap(ch -> ch.createMessage(reply)).then());
+            .flatMap(ctx::sendReply);
     }
 }

@@ -13,18 +13,17 @@ import java.io.InputStreamReader;
 public class ConsoleHandler {
     private static final Logger log = LoggerFactory.getLogger(ConsoleHandler.class);
 
-    public static Mono<Void> handle(GatewayDiscordClient client){
+    public static Mono<?> handle(GatewayDiscordClient client){
         return Flux.fromStream(new BufferedReader(new InputStreamReader(System.in)).lines())    // console lines
             .flatMap(ConsoleHandler::handleConsoleCommand)
             .subscribeOn(Schedulers.newSingle("console"))   // subscribe on a different thread to not block the main thread
             .then();
     }
 
-    private static Mono<Void> handleConsoleCommand(String line){
+    private static Mono<?> handleConsoleCommand(String line){
         return Mono.just(line)
             .doOnNext(log::info)
             .filter(s -> s.matches("^(shutdown|stop|exit|quit) ?"))  // small to do: possible arg
-            .doOnNext($ -> System.exit(0))
-            .then();
+            .doOnNext($ -> System.exit(0));
     }
 }

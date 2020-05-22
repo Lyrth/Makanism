@@ -44,7 +44,7 @@ public class Music extends GuildModule {
     }
 
     @Override
-    protected Mono<Void> initModule() {
+    protected Mono<?> initModule() {
         return Mono.empty();
     }
 
@@ -99,15 +99,15 @@ public class Music extends GuildModule {
     }
 
     @Override
-    protected Mono<Void> onRegister(GuildConfig config) {
+    protected Mono<?> onRegister(GuildConfig config) {
         // if not yet setup, new GuildMusicManager
         return Mono.fromRunnable(() ->
             guildManagers.computeIfAbsent(config.getId(), id -> new GuildMusicManager(playerManager, id, client)));
     }
 
     @Override
-    protected Mono<Void> onRemove(GuildConfig config) {
-        return leave(config.getId()).then();
+    protected Mono<?> onRemove(GuildConfig config) {
+        return leave(config.getId());
     }
 }
 

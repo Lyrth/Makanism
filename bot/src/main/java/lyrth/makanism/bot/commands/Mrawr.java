@@ -10,7 +10,7 @@ import reactor.core.publisher.Mono;
 public class Mrawr extends GuildCommand {
 
     @Override
-    public Mono<Void> execute(CommandCtx ctx) {
+    public Mono<?> execute(CommandCtx ctx) {
         return ctx.sendReply("mrrawrrf!");
     }
 }

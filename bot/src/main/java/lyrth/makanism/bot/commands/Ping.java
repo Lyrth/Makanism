@@ -10,14 +10,13 @@ import reactor.core.publisher.Mono;
 public class Ping extends BotCommand {
 
     @Override
-    public Mono<Void> execute(CommandCtx ctx) {
+    public Mono<?> execute(CommandCtx ctx) {
         String reply = "Mrawr! Arrived **%d**ms late.";
         return ctx.getChannel()
             .flatMap(ch -> ch.createMessage("Pinging..."))
             .flatMap(msg -> msg.edit(spec -> spec.setContent(
                 String.format(reply,
                     msg.getTimestamp().toEpochMilli() - ctx.getTimestamp().toEpochMilli()))
-            ))
-            .then();
+            ));
     }
 }

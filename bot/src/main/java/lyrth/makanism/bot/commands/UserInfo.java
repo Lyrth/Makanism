@@ -16,7 +16,7 @@ import java.util.Optional;
 )
 public class UserInfo extends GuildCommand {
     @Override
-    public Mono<Void> execute(CommandCtx ctx) {
+    public Mono<?> execute(CommandCtx ctx) {
 
         Optional<String> reply =
         ctx.getMember().map(m -> (User) m).or(ctx::getUser).map(user ->

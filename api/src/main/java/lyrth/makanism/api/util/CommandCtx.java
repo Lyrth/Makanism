@@ -96,9 +96,9 @@ public class CommandCtx {
             args;
     }
 
-    public Mono<Void> sendReply(String message){        // TODO: Checking?
+    public <T> Mono<T> sendReply(String message){        // TODO: Checking?
         return getChannel()
             .flatMap(channel -> channel.createMessage(message))
-            .then();
+            .then(Mono.empty());
     }
 }

@@ -13,7 +13,7 @@ import java.util.function.Predicate;
 public class GuildHandler {
     private static final Logger log = LoggerFactory.getLogger(GuildHandler.class);
 
-    public static Mono<Void> handle(GatewayDiscordClient client, BotConfig botConfig){
+    public static Mono<?> handle(GatewayDiscordClient client, BotConfig botConfig){
         return client.on(GuildCreateEvent.class)
             // No need for distinct, just make sure guild settings can be "reloaded"
             //.distinct(gce -> gce.getGuild().getId(), GuildHandler::getDistinctGuilds)

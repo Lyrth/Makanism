@@ -10,8 +10,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import reactor.core.publisher.Mono;
 
-import java.io.*;
-
 public class ReactorDocs extends GuildModule {
     private static final Logger log = LoggerFactory.getLogger(ReactorDocs.class);
     /*
@@ -44,7 +42,7 @@ public class ReactorDocs extends GuildModule {
     }
 */
     @Override
-    protected Mono<Void> initModule() {
+    protected Mono<?> initModule() {
         return Mono.empty();
     }
 }

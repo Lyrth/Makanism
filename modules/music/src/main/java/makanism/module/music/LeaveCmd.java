@@ -14,7 +14,7 @@ import reactor.core.publisher.Mono;
 public class LeaveCmd extends GuildModuleCommand<Music> {
 
     @Override
-    public Mono<Void> execute(CommandCtx ctx, Music module) {
+    public Mono<?> execute(CommandCtx ctx, Music module) {
         if (ctx.getGuildId().isEmpty()) return Mono.empty();
 
         return module.leave(ctx.getGuildId().get())
@@ -22,6 +22,6 @@ public class LeaveCmd extends GuildModuleCommand<Music> {
                 "disconnected" :
                 "already disconnected"
             )
-            .flatMap(reply -> ctx.getChannel().flatMap(ch -> ch.createMessage(reply)).then());
+            .flatMap(ctx::sendReply);
     }
 }

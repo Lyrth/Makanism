@@ -11,7 +11,7 @@ import reactor.core.publisher.Mono;
 public class Test extends GuildCommand {
 
     @Override
-    public Mono<Void> execute(CommandCtx ctx) {
+    public Mono<?> execute(CommandCtx ctx) {
         ReactListener menuListener = new MenuReactListener()
             .addAction("one", e -> ctx.sendReply("It's a one!"))
             .addAction("two", e -> ctx.sendReply("It's a two!"))
@@ -19,6 +19,6 @@ public class Test extends GuildCommand {
             .addAction("four", e -> ctx.sendReply("It's a four!"))
             .cancelOn("x")
             .addAction("b", e -> ctx.sendReply("It's a b!"));
-        return MenuMessage.create("1264xb", menuListener).send(ctx).then();
+        return MenuMessage.create("1264xb", menuListener).send(ctx);
     }
 }

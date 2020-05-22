@@ -18,7 +18,7 @@ import java.util.stream.Stream;
 public class CommandHandler {
     private static final Logger log = LoggerFactory.getLogger(CommandHandler.class);
 
-    public static Mono<Void> handle(GatewayDiscordClient client, BotConfig config){
+    public static Mono<?> handle(GatewayDiscordClient client, BotConfig config){
 
         // Not going to modify, no need for concurrent
         HashMap<String, Command> commands = Stream.of(
@@ -61,7 +61,7 @@ public class CommandHandler {
                 content.startsWith(config.getDefaultPrefix()));     // not gonna check mention in dms lol
     }
 
-    private static Mono<Void> checkCommand(MessageCreateEvent event, BotConfig config, Map<String, Command> commands){
+    private static Mono<?> checkCommand(MessageCreateEvent event, BotConfig config, Map<String, Command> commands){
         String[] words = event.getMessage().getContent().split("\\s+", 3);
         String second = words.length > 1 ? words[1] : "";
         boolean inGuild = event.getGuildId().isPresent();
@@ -90,7 +90,7 @@ public class CommandHandler {
             .allows(event.getMember().orElse(null), event.getMessage().getAuthor().orElse(null))
             .flatMap(allowed -> allowed ?
                 command.execute(CommandCtx.from(event, config, invokedName.toLowerCase())) :
-                event.getMessage().getChannel().flatMap(ch -> ch.createMessage("You are not allowed to run this!")).then()
+                event.getMessage().getChannel().flatMap(ch -> ch.createMessage("You are not allowed to run this!"))
             )
             .doOnError(t -> log.error("CAUgHt eWWoW!", t))
             .onErrorResume(t -> event.getMessage().getChannel()
@@ -98,6 +98,6 @@ public class CommandHandler {
                     (t instanceof ClientException) ?
                         ((ClientException)t).getStatus().toString() + ": " + ((ClientException)t).getErrorResponse().map(r -> r.getFields().get("message")).orElse("") :
                         t.toString()
-                    ) + "```")).then());
+                    ) + "```")));
     }
 }

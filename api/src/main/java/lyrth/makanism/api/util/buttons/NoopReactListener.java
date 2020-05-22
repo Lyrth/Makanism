@@ -19,12 +19,12 @@ public class NoopReactListener extends ReactListener {
     }
 
     @Override
-    public Mono<Void> on(ReactionAddEvent event) {
+    public Mono<?> on(ReactionAddEvent event) {
         return Mono.empty();
     }
 
     @Override
-    public Mono<Void> on(ReactionRemoveEvent event) {
+    public Mono<?> on(ReactionRemoveEvent event) {
         return Mono.empty();
     }
 

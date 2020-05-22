@@ -10,7 +10,7 @@ import reactor.core.publisher.Mono;
 public class Echo extends GuildCommand {
 
     @Override
-    public Mono<Void> execute(CommandCtx ctx) {
+    public Mono<?> execute(CommandCtx ctx) {
         return Mono.just(ctx.getArgs().getRest(1).replace('@', '%'))
             .flatMap(ctx::sendReply);
     }

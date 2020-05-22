@@ -73,5 +73,5 @@ public abstract class Command {
             return this.getPerms().allows(user);
     }
 
-    public abstract Mono<Void> execute(CommandCtx e);
+    public abstract Mono<?> execute(CommandCtx e);
 }

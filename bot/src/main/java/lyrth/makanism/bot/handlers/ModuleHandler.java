@@ -35,13 +35,13 @@ public class ModuleHandler  implements IModuleHandler {
             ).map(ModuleHandler::new);
     }
 
-    public Mono<Void> handle(GatewayDiscordClient client, BotConfig config){
+    public Mono<?> handle(GatewayDiscordClient client, BotConfig config){
         return Flux.fromIterable(guildModules.values())
             .flatMap(guildModule -> guildModule.init(client, config))
             .then();
     }
 
-    public Mono<Void> handleCommand(MessageCreateEvent event, BotConfig config, String invokedName){
+    public Mono<?> handleCommand(MessageCreateEvent event, BotConfig config, String invokedName){
         GuildModuleCommand<GuildModule> command = guildModuleCommands.get(invokedName.toLowerCase());
         if (command == null) return Mono.empty();
 
@@ -53,11 +53,11 @@ public class ModuleHandler  implements IModuleHandler {
             .filter(b -> event.getGuildId().map(module::isEnabledFor).orElse(false))
             .flatMap(allowed -> allowed ?
                 command.execute(CommandCtx.from(event, config, invokedName.toLowerCase()), module) :
-                event.getMessage().getChannel().flatMap(ch -> ch.createMessage("You are not allowed to run this!")).then()
+                event.getMessage().getChannel().flatMap(ch -> ch.createMessage("You are not allowed to run this!"))
             )
             .doOnError(t -> log.error("CAUgHt eWWoW!", t))
             .onErrorResume(t -> event.getMessage().getChannel()
-                .flatMap(ch -> ch.createMessage("Oh no, an error has occurred! ``` " + t.toString() + "```")).then());
+                .flatMap(ch -> ch.createMessage("Oh no, an error has occurred! ``` " + t.toString() + "```")));
     }
 
     public ModuleHandler(Map<String,GuildModule> guildModules){

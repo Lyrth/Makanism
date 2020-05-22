@@ -11,12 +11,12 @@ import reactor.core.publisher.Mono;
 public class ReadyHandler {
     private static final Logger log = LoggerFactory.getLogger(ReadyHandler.class);
 
-    public static Mono<Void> handle(GatewayDiscordClient client){
+    public static Mono<?> handle(GatewayDiscordClient client){
         return client.on(ReadyEvent.class)
             .takeUntil(ready -> ready.getShardInfo().getIndex() == ready.getShardInfo().getCount() - 1)
             .doOnNext(ready -> log.info("Logged in as {}#{}", ready.getSelf().getUsername(), ready.getSelf().getDiscriminator()))
             .doOnNext(ready -> log.info("Shard [#{} total], in {} guilds", ready.getShardInfo().format(), ready.getGuilds().size()))
-            .flatMap(ready -> ready.getClient().updatePresence(Presence.online(Activity.listening("you~"))))
+            .flatMap(ready -> ready.getClient().updatePresence(Presence.online(Activity.listening("you~"))))    // haha what
             .then();
     }
 }

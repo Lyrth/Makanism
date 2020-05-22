@@ -12,7 +12,7 @@ import reactor.core.publisher.Mono;
 public class CheckPerms extends GuildCommand {
 
     @Override
-    public Mono<Void> execute(CommandCtx ctx) {
+    public Mono<?> execute(CommandCtx ctx) {
         return Mono.justOrEmpty(ctx.getMember())
             .flatMap(Member::getBasePermissions)
             .flatMapIterable(PermissionSet::asEnumSet)

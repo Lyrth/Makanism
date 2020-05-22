@@ -11,7 +11,7 @@ import reactor.core.publisher.Mono;
 
 public class ReactionHandler {
 
-    public static Mono<Void> handle(GatewayDiscordClient client, BotConfig botConfig){
+    public static Mono<?> handle(GatewayDiscordClient client, BotConfig botConfig){
         return Mono.when(
             client.on(ReactionAddEvent.class)
                 .filter(e -> !e.getUserId().equals(botConfig.getBotId()))

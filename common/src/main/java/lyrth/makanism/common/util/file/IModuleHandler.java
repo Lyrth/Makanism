@@ -13,10 +13,10 @@ public interface IModuleHandler {
 
     void setupModulesFor(GuildConfig config);
 
-    Mono<Void> handleCommand(MessageCreateEvent event, BotConfig config, String invokedName);
+    Mono<?> handleCommand(MessageCreateEvent event, BotConfig config, String invokedName);
 
     Optional<Boolean> enable(String moduleName, GuildConfig config);
     Optional<Boolean> disable(String moduleName, Snowflake guildId);
 
-    Mono<Void> handle(GatewayDiscordClient client, BotConfig config);
+    Mono<?> handle(GatewayDiscordClient client, BotConfig config);
 }

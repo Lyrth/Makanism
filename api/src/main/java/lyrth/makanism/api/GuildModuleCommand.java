@@ -7,9 +7,9 @@ import reactor.core.publisher.Mono;
 @CommandInfo()
 public abstract class GuildModuleCommand<M extends GuildModule> extends GuildCommand {
 
-    public Mono<Void> execute(CommandCtx ctx) throws UnsupportedOperationException {
+    public Mono<?> execute(CommandCtx ctx) throws UnsupportedOperationException {
         throw new UnsupportedOperationException("Don't use this.");
     }
 
-    public abstract Mono<Void> execute(CommandCtx ctx, M module);
+    public abstract Mono<?> execute(CommandCtx ctx, M module);
 }

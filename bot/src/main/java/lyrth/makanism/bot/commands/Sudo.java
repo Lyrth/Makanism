@@ -22,7 +22,7 @@ public class Sudo extends BotCommand {
     private static final Logger log = LoggerFactory.getLogger(Sudo.class);
 
     @Override
-    public Mono<Void> execute(CommandCtx ctx) {
+    public Mono<?> execute(CommandCtx ctx) {        // TODO: fix mess
         return Mono.just(ctx.getArgs().get(1).replaceAll("(<@!?)?(\\d{12,})>?","$2"))
             .flatMap(strId -> Mono.fromCallable(() -> Long.parseLong(strId)))
             .flatMap(id ->
@@ -37,7 +37,7 @@ public class Sudo extends BotCommand {
                             ctx.getClient(),
                             ctx.getShardInfo(),
                             message,
-                            ctx.getGuildId().map(Snowflake::asLong).orElse(null), member.orElse(null)))).then())
+                            ctx.getGuildId().map(Snowflake::asLong).orElse(null), member.orElse(null)))))
             .onErrorResume(NumberFormatException.class, t -> ctx.sendReply("Invalid args."))
             .doOnError(t -> log.error("Error at sudo!", t))
             .onErrorResume(t -> ctx.sendReply("Error! " + t.getMessage()));
