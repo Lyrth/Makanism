@@ -36,7 +36,7 @@ public abstract class ReactListener {
 
     // default, can be overriden (can also super() call)
     public Flux<ReactionEvent> cancelTask(Flux<ReactionEvent> source){
-        return source.doOnNext(e -> log.info("Gets through.")).timeout(
+        return source.timeout(
             Mono.defer(() -> Mono.delay(Duration.ofSeconds(30))),             // Wait longer for the user's initial reaction.
             e -> Mono.delay(Duration.ofSeconds(15)),
             cancel()
@@ -46,7 +46,6 @@ public abstract class ReactListener {
     // Cancels the listener and removes the reactions in the message.
     public <T> Mono<T> cancel(){
         return Mono.fromCallable(() -> Tuples.of(message.getClient(), message.getId()))
-            .doOnNext(t -> log.info("TIMEOUT happened."))
             .flatMap(function(MenuRegistry::removeListener))
             .then(Mono.fromRunnable(() -> reactionProcessor.onComplete()));
     }
@@ -55,12 +54,10 @@ public abstract class ReactListener {
         return Mono.defer(() -> Mono.when(
             putReactions(),
             reactionProcessor
-                .doOnNext(e -> log.debug("after processor"))
                 .flatMap(reactionEvent ->
                     reactionEvent.isAddEvent() ?
                         this.on(reactionEvent.getAddEvent()) :
                         this.on(reactionEvent.getRemoveEvent()))
-                .doOnEach(e -> log.debug("after on, type: " + e.getType().name()))
                 .then()
             )
             .thenReturn(this.message));
@@ -71,7 +68,6 @@ public abstract class ReactListener {
         return this.message.removeAllReactions()
             .thenMany(Flux.fromIterable(getReactionSet().getReactions()))
             .flatMap(this.message::addReaction)
-            .doOnEach(s -> log.debug("done adding reactions."))
             .then();
     }
 

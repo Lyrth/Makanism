@@ -23,7 +23,6 @@ public class MenuRegistry {
 
     static void register(ReactListener listener){
         listeners.put(listener.getMessageId(), listener);
-        log.warn("<Emitter state: hasCompleted: {}, isTerminated: {}>", processor.hasCompleted(), processor.isTerminated());
     }
 
     static FluxProcessor<ReactionEvent, ReactionEvent> getProcessorFor(
@@ -31,25 +30,21 @@ public class MenuRegistry {
         Function<Flux<ReactionEvent>, Flux<ReactionEvent>> cancelHook
     ){
         return FluxProcessor.wrap(EmitterProcessor.create(),
-            processor.doOnNext(e -> log.info("Emitter doOnNext"))
-                .filter(e -> e.getMessageId().equals(messageId))
+            processor.filter(e -> e.getMessageId().equals(messageId))
                 .transform(cancelHook));
     }
 
     static Mono<Void> removeListener(GatewayDiscordClient client, Snowflake messageId){
         return Mono.just(messageId)
             .filter(listeners::containsKey)
-            .doOnNext(e -> log.info("Removing..."))
             .map(listeners::remove)
             .map(ReactListener::getChannelId)
             .flatMap(channelId -> client.getMessageById(channelId, messageId))
-            .flatMap(Message::removeAllReactions)
-            .doOnEach(s -> log.info("Removed."));
+            .flatMap(Message::removeAllReactions);
     }
 
     // dispatch to every *type* of listener
     public static void listen(ReactionAddEvent event){
-        log.info("Add event in registry, sinking.");
         sink.next(new ReactionEvent(event));
     }
 
