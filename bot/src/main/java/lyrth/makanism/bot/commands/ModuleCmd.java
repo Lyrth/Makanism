@@ -13,7 +13,7 @@ import java.util.Optional;
     name = "Module",
     accessLevel = AccessLevel.OWNER
 )
-public class ModuleCmd extends GuildCommand {   // TODO : fix this mess
+public class ModuleCmd extends GuildCommand {   // TODO : fix this mess; module status
 
     @Override
     public Mono<Void> execute(CommandCtx ctx) {

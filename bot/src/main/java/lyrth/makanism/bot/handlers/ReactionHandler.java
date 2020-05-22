@@ -4,7 +4,7 @@ import discord4j.core.GatewayDiscordClient;
 import discord4j.core.event.domain.message.ReactionAddEvent;
 import discord4j.core.event.domain.message.ReactionRemoveEvent;
 import discord4j.core.object.entity.User;
-import lyrth.makanism.api.util.MenuRegistry;
+import lyrth.makanism.api.util.buttons.MenuRegistry;
 import lyrth.makanism.common.util.file.config.BotConfig;
 import reactor.bool.BooleanUtils;
 import reactor.core.publisher.Mono;

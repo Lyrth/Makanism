@@ -2,8 +2,8 @@ package lyrth.makanism.bot.handlers;
 
 import discord4j.core.GatewayDiscordClient;
 import discord4j.core.event.domain.message.MessageCreateEvent;
-import discord4j.core.object.entity.Message;
 import discord4j.core.object.entity.User;
+import discord4j.rest.http.client.ClientException;
 import lyrth.makanism.api.Command;
 import lyrth.makanism.api.util.CommandCtx;
 import lyrth.makanism.bot.commands.*;
@@ -94,6 +94,10 @@ public class CommandHandler {
             )
             .doOnError(t -> log.error("CAUgHt eWWoW!", t))
             .onErrorResume(t -> event.getMessage().getChannel()
-                .flatMap(ch -> ch.createMessage("Oh no, an error has occurred! ``` " + t.toString() + "```")).then());
+                .flatMap(ch -> ch.createMessage("Oh no, an error has occurred! ``` " + (            // TODO: better error reporting.
+                    (t instanceof ClientException) ?
+                        ((ClientException)t).getStatus().toString() + ": " + ((ClientException)t).getErrorResponse().map(r -> r.getFields().get("message")).orElse("") :
+                        t.toString()
+                    ) + "```")).then());
     }
 }

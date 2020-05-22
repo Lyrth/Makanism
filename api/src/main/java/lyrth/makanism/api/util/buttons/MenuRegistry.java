@@ -1,4 +1,4 @@
-package lyrth.makanism.api.util;
+package lyrth.makanism.api.util.buttons;
 
 import discord4j.core.GatewayDiscordClient;
 import discord4j.core.event.domain.message.ReactionAddEvent;
@@ -16,18 +16,10 @@ import java.util.function.Function;
 public class MenuRegistry {
     private static final Logger log = LoggerFactory.getLogger(MenuRegistry.class);
 
-    // stores the different types of listeners and their names
-    // first instance created only taken.
-    //private static final ConcurrentHashMap<String, ReactListener> listeners = new ConcurrentHashMap<>();
-
     // stores messageId - listener pairs.
     private transient static final ConcurrentHashMap<Snowflake, ReactListener> listeners = new ConcurrentHashMap<>();
     private transient static final FluxProcessor<ReactionEvent, ReactionEvent> processor = DirectProcessor.create();
     private transient static final FluxSink<ReactionEvent> sink = processor.sink(FluxSink.OverflowStrategy.DROP);
-
-    //public static void register(String name, ReactListener listenerSet){
-    //    listeners.putIfAbsent(name, listenerSet);
-    //}
 
     static void register(ReactListener listener){
         listeners.put(listener.getMessageId(), listener);
@@ -46,6 +38,7 @@ public class MenuRegistry {
 
     static Mono<Void> removeListener(GatewayDiscordClient client, Snowflake messageId){
         return Mono.just(messageId)
+            .filter(listeners::containsKey)
             .doOnNext(e -> log.info("Removing..."))
             .map(listeners::remove)
             .map(ReactListener::getChannelId)

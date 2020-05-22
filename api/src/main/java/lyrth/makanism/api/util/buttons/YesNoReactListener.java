@@ -1,4 +1,4 @@
-package lyrth.makanism.api.util;
+package lyrth.makanism.api.util.buttons;
 
 import com.vdurmont.emoji.EmojiManager;
 import discord4j.core.event.domain.message.ReactionAddEvent;
@@ -7,12 +7,6 @@ import discord4j.core.object.entity.Message;
 import reactor.core.publisher.Mono;
 
 public class YesNoReactListener extends ReactListener {
-
-    public YesNoReactListener(){}
-
-    public YesNoReactListener(Message message) {
-        super(message);
-    }
 
     @Override
     public Mono<Void> on(ReactionAddEvent event) {

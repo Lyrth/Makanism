@@ -1,4 +1,4 @@
-package lyrth.makanism.api.util;
+package lyrth.makanism.api.util.buttons;
 
 import com.vdurmont.emoji.Emoji;
 import com.vdurmont.emoji.EmojiManager;
@@ -7,9 +7,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import reactor.util.annotation.Nullable;
 
-import java.util.Collection;
-import java.util.LinkedHashMap;
-import java.util.Optional;
+import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -22,9 +20,12 @@ public interface ReactionSet {
         return new CustomReactionSet(buttons);
     }
 
-    Collection<ReactionEmoji> getReactions();
+    static CustomReactionSet custom(ReactionEmoji... buttons){
+        return new CustomReactionSet(buttons);
+    }
 
-    LinkedHashMap<String, ReactionEmoji> getReactionMap();
+    Set<ReactionEmoji> getReactions();
+
 
     /// util
 
@@ -36,7 +37,7 @@ public interface ReactionSet {
             try {
                 long id = Long.parseLong(matcher.group(3));
                 String name = matcher.group(2);
-                boolean animated = matcher.group(1).equals("a");
+                boolean animated = "a".equals(matcher.group(1));
                 return ReactionEmoji.of(id, name, animated);
             } catch (NumberFormatException | NullPointerException e){
                 log.warn("Invalid emoji: [{}]", s);

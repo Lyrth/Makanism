@@ -16,7 +16,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Consumer;
 
-public class Reply {
+@SuppressWarnings({"unchecked", "rawtypes"})
+public class Reply<T extends Reply<T>> {
 
     //region// modified MessageCreateSpec code
 
@@ -27,38 +28,38 @@ public class Reply {
     protected final List<Tuple2<String, InputStream>> files = new ArrayList<>(1); /// Modified ///
     protected AllowedMentions allowedMentions;    /// Modified ///
 
-    public Reply setContent(String content) {
+    public T setContent(String content) {
         this.content = content == null ? "" : content;
-        return this;
+        return (T) this;
     }
 
-    public Reply setNonce(Snowflake nonce) {
+    public T setNonce(Snowflake nonce) {
         this.nonce = nonce;     /// Modified ///
-        return this;
+        return (T) this;
     }
 
-    public Reply setTts(boolean tts) {
+    public T setTts(boolean tts) {
         this.tts = tts;
-        return this;
+        return (T) this;
     }
 
-    public Reply setEmbed(Consumer<? super EmbedCreateSpec> spec) {
+    public T setEmbed(Consumer<? super EmbedCreateSpec> spec) {
         this.embedSpec = spec;  /// Modified ///
-        return this;
+        return (T) this;
     }
 
-    public Reply addFile(String fileName, InputStream file) {
+    public T addFile(String fileName, InputStream file) {
         this.files.add(Tuples.of(fileName, file));  /// Modified ///
-        return this;
+        return (T) this;
     }
 
-    public Reply addFileSpoiler(String fileName, InputStream file) {
+    public T addFileSpoiler(String fileName, InputStream file) {
         return this.addFile("SPOILER_" + fileName, file);
     }
 
-    public Reply setAllowedMentions(AllowedMentions allowedMentions) {
+    public T setAllowedMentions(AllowedMentions allowedMentions) {
         this.allowedMentions = allowedMentions;     /// Modified ///
-        return this;
+        return (T) this;
     }
 
     //endregion// modified MessageCreateSpec code
@@ -77,7 +78,7 @@ public class Reply {
     /// Modifier methods
 
     // setAllowedMentions after this method will override this.
-    public Reply blockMassMentions(){
+    public T blockMassMentions(){
         // also modify message contents? in case discord's parse break for some reason
         this.allowedMentions = AllowedMentions.builder()
             .parseType(
@@ -85,7 +86,7 @@ public class Reply {
                 AllowedMentions.Type.USER
             )
             .build();
-        return this;
+        return (T) this;
     }
 
 

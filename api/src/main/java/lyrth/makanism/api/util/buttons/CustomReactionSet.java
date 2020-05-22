@@ -1,38 +1,39 @@
-package lyrth.makanism.api.util;
+package lyrth.makanism.api.util.buttons;
 
 import discord4j.core.object.reaction.ReactionEmoji;
 
-import java.util.Collection;
-import java.util.LinkedHashMap;
+import java.util.LinkedHashSet;
+import java.util.Set;
 
 public class CustomReactionSet implements ReactionSet {
 
-    private final LinkedHashMap<String, ReactionEmoji> reactions = new LinkedHashMap<>();
+    private final LinkedHashSet<ReactionEmoji> reactions = new LinkedHashSet<>();
 
     public CustomReactionSet(String... buttons){
         for (String b : buttons) {
             ReactionEmoji emoji = ReactionSet.getReactionEmoji(b);
-            if (emoji != null) reactions.put(b, emoji);
+            if (emoji != null) reactions.add(emoji);
+        }
+    }
+    public CustomReactionSet(ReactionEmoji... buttons){
+        for (ReactionEmoji b : buttons) {
+            if (b != null) reactions.add(b);
         }
     }
 
     public CustomReactionSet(ReactionSet from){
-        reactions.putAll(from.getReactionMap());
+        reactions.addAll(from.getReactions());
     }
 
     public CustomReactionSet append(String... buttons){
         for (String b : buttons) {
             ReactionEmoji emoji = ReactionSet.getReactionEmoji(b);
-            if (emoji != null) reactions.put(b, emoji);
+            if (emoji != null) reactions.add(emoji);
         }
         return this;
     }
 
-    public Collection<ReactionEmoji> getReactions(){
-        return reactions.values();
-    }
-
-    public LinkedHashMap<String, ReactionEmoji> getReactionMap(){
+    public Set<ReactionEmoji> getReactions(){
         return reactions;
     }
 }

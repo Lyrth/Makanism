@@ -9,18 +9,18 @@ import java.time.Duration;
 
 /// A reply that deletes itself after a set amount of time.
 /// Not recommended for long runs, since the bot won't remember what should be deleted on restart.
-public class EphemeralReply extends Reply {
+public class EphemeralReply extends Reply<EphemeralReply> {
 
     private Duration duration = Duration.ZERO;
 
     /// Constructors
 
     public static EphemeralReply create(String content){
-        return (EphemeralReply) new EphemeralReply().setContent(content);
+        return new EphemeralReply().setContent(content);
     }
 
     public static EphemeralReply create(String content, Duration duration){
-        return (EphemeralReply) withDuration(duration).setContent(content);
+        return withDuration(duration).setContent(content);
     }
 
     public static EphemeralReply withDuration(Duration duration){

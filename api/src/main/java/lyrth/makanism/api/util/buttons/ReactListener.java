@@ -1,4 +1,4 @@
-package lyrth.makanism.api.util;
+package lyrth.makanism.api.util.buttons;
 
 import discord4j.core.event.domain.message.ReactionAddEvent;
 import discord4j.core.event.domain.message.ReactionRemoveEvent;
@@ -9,10 +9,11 @@ import org.slf4j.LoggerFactory;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.FluxProcessor;
 import reactor.core.publisher.Mono;
-import reactor.function.TupleUtils;
 import reactor.util.function.Tuples;
 
 import java.time.Duration;
+
+import static reactor.function.TupleUtils.function;
 
 public abstract class ReactListener {
     protected static final Logger log = LoggerFactory.getLogger(ReactListener.class);
@@ -25,15 +26,6 @@ public abstract class ReactListener {
 
     public ReactListener(){}
 
-    // should be always called in subclasses through super
-    public ReactListener(Message message){
-        this.message = message;
-        MenuRegistry.register(this);
-        this.reactionProcessor = MenuRegistry.getProcessorFor(this.message.getId(), this::cancelTask);
-
-        //this.endTime = 0;
-    }
-
     public ReactListener attach(Message message){
         this.message = message;
         MenuRegistry.register(this);
@@ -42,19 +34,24 @@ public abstract class ReactListener {
         return this;
     }
 
-    // default
+    // default, can be overriden (can also super() call)
     public Flux<ReactionEvent> cancelTask(Flux<ReactionEvent> source){
         return source.doOnNext(e -> log.info("Gets through.")).timeout(
             Mono.defer(() -> Mono.delay(Duration.ofSeconds(30))),             // Wait longer for the user's initial reaction.
             e -> Mono.delay(Duration.ofSeconds(15)),
-            Mono.fromCallable(() -> Tuples.of(message.getClient(), message.getId()))
-                .doOnNext(t -> log.info("TIMEOUT happened."))
-                .flatMap(TupleUtils.function(MenuRegistry::removeListener))
-                .then(Mono.fromRunnable(() -> reactionProcessor.onComplete()))
+            cancel()
         );
     }
 
-    public Mono<Message> start(){                      // TODO: check if message has same reaction set.
+    // Cancels the listener and removes the reactions in the message.
+    public <T> Mono<T> cancel(){
+        return Mono.fromCallable(() -> Tuples.of(message.getClient(), message.getId()))
+            .doOnNext(t -> log.info("TIMEOUT happened."))
+            .flatMap(function(MenuRegistry::removeListener))
+            .then(Mono.fromRunnable(() -> reactionProcessor.onComplete()));
+    }
+
+    public Mono<Message> start(){                   // TODO: check if message has same reaction set.
         return Mono.defer(() -> Mono.when(
             putReactions(),
             reactionProcessor
@@ -69,6 +66,7 @@ public abstract class ReactListener {
             .thenReturn(this.message));
     }
 
+    // deferred until start()
     private Mono<Void> putReactions(){              // TODO: partial addition when it has reactions already? delta
         return this.message.removeAllReactions()
             .thenMany(Flux.fromIterable(getReactionSet().getReactions()))
@@ -77,7 +75,8 @@ public abstract class ReactListener {
             .then();
     }
 
-    public abstract ReactionSet getReactionSet();
+    // fetched on start()
+    protected abstract ReactionSet getReactionSet();
 
     public abstract Mono<Void> on(ReactionAddEvent event);
     public abstract Mono<Void> on(ReactionRemoveEvent event);

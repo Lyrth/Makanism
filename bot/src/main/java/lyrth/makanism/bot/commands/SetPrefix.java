@@ -7,7 +7,7 @@ import lyrth.makanism.api.annotation.CommandInfo;
 import reactor.core.publisher.Mono;
 
 @CommandInfo(accessLevel = AccessLevel.OWNER)
-public class SetPrefix extends GuildCommand {
+public class SetPrefix extends GuildCommand {       // TODO: rename to prefix, show prefix
 
     @Override
     public Mono<Void> execute(CommandCtx ctx) {

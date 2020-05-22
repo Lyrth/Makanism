@@ -1,6 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Configuration status="INFO">
     <Appenders>
+        <Console name="errortracer" target="SYSTEM_OUT">
+            <ThresholdFilter level="ERROR" onMatch="ACCEPT" onMismatch="DENY"/>
+            <PatternLayout disableAnsi="false">
+                <pattern>
+                    %highlight{[%-5level]} %style{D%d{dd-HH:mm:ss.SSS}{GMT+8}}{dim,white} %style{[%16.16t]}{blue} %style{ \/ origin %l}{cyan} %ex{none}%n
+                </pattern>
+            </PatternLayout>
+        </Console>
         <Console name="utillog" target="SYSTEM_OUT">
             <PatternLayout disableAnsi="false">
                 <pattern>
@@ -35,12 +43,14 @@
     </Appenders>
     <Loggers>
         <Logger name="lyrth.makanism" level="debug">
-            <AppenderRef ref="utillog"/>
-        </Logger>
-        <Logger name="SaveHandler" level="debug"> <!-- test: debug, prod: info -->
+            <AppenderRef ref="errortracer"/>
             <AppenderRef ref="utillog"/>
         </Logger>
         <Logger name="makanism.module" level="debug">
+            <AppenderRef ref="errortracer"/>
+            <AppenderRef ref="utillog"/>
+        </Logger>
+        <Logger name="SaveHandler" level="debug"> <!-- test: debug, prod: info -->
             <AppenderRef ref="utillog"/>
         </Logger>
         <Logger name="discord4j.voice" level="info"><!-- info -->

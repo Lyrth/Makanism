@@ -1,4 +1,4 @@
-package lyrth.makanism.api.util;
+package lyrth.makanism.api.util.buttons;
 
 import discord4j.core.GatewayDiscordClient;
 import discord4j.core.event.domain.message.ReactionAddEvent;
