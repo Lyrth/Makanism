@@ -11,7 +11,7 @@ import reactor.core.publisher.Mono;
 /// TODO: Persistence between restarts, 10 passive (non-command related) listeners per guild
 public class MenuMessage extends Reply<MenuMessage> {
 
-    private ReactListener listener = new NoopReactListener();
+    protected ReactListener listener = new NoopReactListener();
 
     public static MenuMessage create(String content){
         return new MenuMessage().setContent(content);

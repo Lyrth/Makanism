@@ -8,10 +8,9 @@ import java.util.Set;
 public enum ReactionSets implements ReactionSet {
 
     DIR_OK("arrow_up","arrow_down","arrow_left","arrow_right","ok"),
-    PAGE_NAV("rewind","fast_forward"),
-    PAGE_NAV_ADV("black_left_pointing_double_triangle_with_vertical_bar","rewind","fast_forward","black_right_pointing_double_triangle_with_vertical_bar","1234"),
-    // v "track_previous","play_pause","track_next","stop_button"
-    PLAYER("black_left_pointing_double_triangle_with_vertical_bar","black_right_pointing_triangle_with_double_vertical_bar","black_right_pointing_double_triangle_with_vertical_bar","black_square_for_stop"),
+    PAGE_NAV("arrow_backward","arrow_forward"),
+    PAGE_NAV_ADV("previous_track_button","arrow_backward","arrow_forward","next_track_button","1234"),
+    PLAYER("previous_track_button","play_or_pause_button","next_track_button","stop_button"),
     NUM_TEN("one","two","three","four","five","six","seven","eight","nine","keycap_ten"),
     YES_NO("white_check_mark","x"),
     NONE(),
