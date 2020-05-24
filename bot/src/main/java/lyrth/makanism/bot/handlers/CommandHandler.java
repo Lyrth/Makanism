@@ -61,6 +61,7 @@ public class CommandHandler {
                 content.startsWith(config.getDefaultPrefix()));     // not gonna check mention in dms lol
     }
 
+    // TODO: too complex
     private static Mono<?> checkCommand(MessageCreateEvent event, BotConfig config, Map<String, Command> commands){
         String[] words = event.getMessage().getContent().split("\\s+", 3);
         String second = words.length > 1 ? words[1] : "";

@@ -1,11 +1,16 @@
 package lyrth.makanism.api.util.buttons;
 
+import discord4j.common.util.Snowflake;
 import discord4j.core.event.domain.message.ReactionAddEvent;
 import discord4j.core.event.domain.message.ReactionRemoveEvent;
 import emoji4j.EmojiUtils;
 import reactor.core.publisher.Mono;
 
 public class YesNoReactListener extends ReactListener {     // TODO: lol actually add some functionality.
+
+    public YesNoReactListener(Snowflake invoker) {
+        super(invoker);
+    }
 
     @Override
     public Mono<?> on(ReactionAddEvent event) {

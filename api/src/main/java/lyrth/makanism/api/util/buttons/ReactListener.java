@@ -21,10 +21,19 @@ public abstract class ReactListener {
     private transient FluxProcessor<ReactionEvent, ReactionEvent> reactionProcessor;
 
     protected Message message;
+    protected final Snowflake invoker;      // User id of the initiator of the menu
+    protected boolean invokerOnly = true;   // Whether to receive events from the invoker only or from everyone
 
     // private final long endTime;   // how to implement- ;-;
 
-    public ReactListener(){}
+    public ReactListener(Snowflake invoker){
+        this.invoker = invoker;
+    }
+
+    public ReactListener allowAllInteract(){    // allows everyone to interact with the reactions
+        this.invokerOnly = false;
+        return this;
+    }
 
     public ReactListener attach(Message message){
         this.message = message;
@@ -54,6 +63,7 @@ public abstract class ReactListener {
         return Mono.defer(() -> Mono.when(
             putReactions(),
             reactionProcessor
+                .flatMap(this::removeIfNotAllowed)
                 .flatMap(reactionEvent ->
                     reactionEvent.isAddEvent() ?
                         this.on(reactionEvent.getAddEvent()) :
@@ -61,6 +71,16 @@ public abstract class ReactListener {
                 .then()
             )
             .thenReturn(this.message));
+    }
+
+    // Pass-through if reactor is allowed to react, becomes empty if isn't and removes the reaction.
+    private Mono<ReactionEvent> removeIfNotAllowed(ReactionEvent reactionEvent){
+        return Mono.just(reactionEvent)
+            .filter(e -> !invokerOnly || e.getReactorId().equals(invoker))
+            .switchIfEmpty(reactionEvent.getMessage()
+                .flatMap(msg -> msg.removeReaction(reactionEvent.getEmoji(), reactionEvent.getReactorId()))
+                .then(Mono.empty())
+            );
     }
 
     // deferred until start()

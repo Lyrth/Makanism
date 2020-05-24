@@ -13,7 +13,7 @@ public class Test extends GuildCommand {
     @Override
     public Mono<?> execute(CommandCtx ctx) {
         /*
-        ReactListener menuListener = new MenuReactListener()
+        ReactListener menuListener = new MenuReactListener(ctx.getAuthorId().orElse(Snowflake.of(0L)))
             .addAction("one", e -> ctx.sendReply("It's a one!"))
             .addAction("two", e -> ctx.sendReply("It's a two!"))
             .addAction("six", e -> ctx.sendReply("It's a six!"))
@@ -23,7 +23,7 @@ public class Test extends GuildCommand {
         return MenuMessage.create("1264xb", menuListener).send(ctx);
         */
 
-        SimplePaginator paginator = SimplePaginator.create()
+        SimplePaginator paginator = SimplePaginator.create(ctx)
             .addPage(spec -> spec
                 .setTitle("First page tho")
                 .setDescription("lol")

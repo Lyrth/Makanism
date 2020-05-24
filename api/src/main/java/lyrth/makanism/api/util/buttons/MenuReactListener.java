@@ -1,5 +1,6 @@
 package lyrth.makanism.api.util.buttons;
 
+import discord4j.common.util.Snowflake;
 import discord4j.core.event.domain.message.ReactionAddEvent;
 import discord4j.core.event.domain.message.ReactionRemoveEvent;
 import discord4j.core.object.reaction.ReactionEmoji;
@@ -12,6 +13,10 @@ import java.util.function.Function;
 public class MenuReactListener extends ReactListener {  // TODO setDuration
 
     private final LinkedHashMap<ReactionEmoji, Action> actions = new LinkedHashMap<>();
+
+    public MenuReactListener(Snowflake invoker) {
+        super(invoker);
+    }
 
     /// Note that addAction methods will replace previously added entries.
     // default toggle = off: reaction auto-removed.

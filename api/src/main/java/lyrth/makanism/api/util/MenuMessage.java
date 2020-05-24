@@ -1,5 +1,6 @@
 package lyrth.makanism.api.util;
 
+import discord4j.common.util.Snowflake;
 import discord4j.core.object.entity.Message;
 import discord4j.core.object.entity.channel.MessageChannel;
 import lyrth.makanism.api.util.buttons.NoopReactListener;
@@ -13,16 +14,28 @@ public class MenuMessage extends Reply<MenuMessage> {
 
     protected ReactListener listener = new NoopReactListener();
 
-    public static MenuMessage create(String content){
-        return new MenuMessage().setContent(content);
+    protected MenuMessage(Snowflake invokerUser) {
+        super(invokerUser);
     }
 
-    public static MenuMessage create(String content, ReactListener listener){
-        return withListener(listener).setContent(content);
+    protected MenuMessage(CommandCtx invokerCtx) {
+        super(invokerCtx);
     }
 
-    public static MenuMessage withListener(ReactListener listener){
-        return new MenuMessage().setListener(listener);
+    public static MenuMessage create(Snowflake invokerUser, String content){
+        return new MenuMessage(invokerUser).setContent(content);
+    }
+
+    public static MenuMessage create(CommandCtx invokerCtx, String content){
+        return new MenuMessage(invokerCtx).setContent(content);
+    }
+
+    public static MenuMessage create(Snowflake invokerUser, String content, ReactListener listener){
+        return new MenuMessage(invokerUser).setListener(listener).setContent(content);
+    }
+
+    public static MenuMessage create(CommandCtx invokerCtx, String content, ReactListener listener){
+        return new MenuMessage(invokerCtx).setListener(listener).setContent(content);
     }
 
 

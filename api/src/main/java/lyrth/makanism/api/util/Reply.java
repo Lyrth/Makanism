@@ -67,24 +67,41 @@ public class Reply<T extends Reply<T>> {
 
     /// Constructors
 
-    public static Reply create(String content){
-        return new Reply().setContent(content);
+    protected final Snowflake invoker;        // The user who initiated the command.
+
+    protected Reply(Snowflake invokerUser){
+        this.invoker = invokerUser;
     }
 
-    public static Reply fromEmbed(Consumer<? super EmbedCreateSpec> spec){
-        return new Reply().setEmbed(spec);
+    protected Reply(CommandCtx invokerCtx){
+        this.invoker = invokerCtx.getAuthorId().orElse(Snowflake.of(0L));
     }
+
+    public static Reply create(Snowflake invokerUser){
+        return new Reply(invokerUser);
+    }
+
+    public static Reply create(CommandCtx invokerCtx){
+        return new Reply(invokerCtx);
+    }
+
+    public static Reply fromEmbed(Snowflake invokerUser, Consumer<? super EmbedCreateSpec> spec){
+        return new Reply(invokerUser).setEmbed(spec);
+    }
+
 
     /// Modifier methods
 
+    // Makes the mentions within the message not ping any role or user, except for the invoker's.
     // setAllowedMentions after this method will override this.
     public T blockMassMentions(){
-        // also modify message contents? in case discord's parse break for some reason
+        // todo: also modify message contents? in case discord's parser break for some reason
         this.allowedMentions = AllowedMentions.builder()
             .parseType(
                 AllowedMentions.Type.ROLE,
                 AllowedMentions.Type.USER
             )
+            .allowUser(invoker)
             .build();
         return (T) this;
     }

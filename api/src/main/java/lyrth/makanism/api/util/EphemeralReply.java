@@ -1,5 +1,6 @@
 package lyrth.makanism.api.util;
 
+import discord4j.common.util.Snowflake;
 import discord4j.core.object.entity.Message;
 import discord4j.core.object.entity.channel.MessageChannel;
 import reactor.core.publisher.Mono;
@@ -15,16 +16,28 @@ public class EphemeralReply extends Reply<EphemeralReply> {
 
     /// Constructors
 
-    public static EphemeralReply create(String content){
-        return new EphemeralReply().setContent(content);
+    protected EphemeralReply(Snowflake invokerUser) {
+        super(invokerUser);
     }
 
-    public static EphemeralReply create(String content, Duration duration){
-        return withDuration(duration).setContent(content);
+    protected EphemeralReply(CommandCtx invokerCtx) {
+        super(invokerCtx);
     }
 
-    public static EphemeralReply withDuration(Duration duration){
-        return new EphemeralReply().setDuration(duration);
+    public static EphemeralReply create(Snowflake invokerUser, String content){
+        return new EphemeralReply(invokerUser).setContent(content);
+    }
+
+    public static EphemeralReply create(CommandCtx invokerCtx, String content){
+        return new EphemeralReply(invokerCtx).setContent(content);
+    }
+
+    public static EphemeralReply create(Snowflake invokerUser, String content, Duration duration){
+        return new EphemeralReply(invokerUser).setDuration(duration).setContent(content);
+    }
+
+    public static EphemeralReply create(CommandCtx invokerCtx, String content, Duration duration){
+        return new EphemeralReply(invokerCtx).setDuration(duration).setContent(content);
     }
 
 

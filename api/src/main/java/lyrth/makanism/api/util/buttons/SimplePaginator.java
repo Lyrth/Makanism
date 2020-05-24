@@ -1,8 +1,10 @@
 package lyrth.makanism.api.util.buttons;
 
+import discord4j.common.util.Snowflake;
 import discord4j.core.event.domain.message.ReactionAddEvent;
 import discord4j.core.object.entity.Message;
 import discord4j.core.spec.EmbedCreateSpec;
+import lyrth.makanism.api.util.CommandCtx;
 import lyrth.makanism.api.util.MenuMessage;
 import reactor.core.publisher.Mono;
 import reactor.util.annotation.Nullable;
@@ -22,8 +24,9 @@ public class SimplePaginator extends MenuMessage {
     Consumer<EmbedCreateSpec> endPage = null;
     private final AtomicInteger pageNumber = new AtomicInteger(0);
 
-    private SimplePaginator(){
-        this.listener = new MenuReactListener()
+    private SimplePaginator(Snowflake invokerUser){
+        super(invokerUser);
+        this.listener = new MenuReactListener(invokerUser)
             .addAction("previous_track_button", this::firstPage)
             .addAction("arrow_backward", this::previousPage)
             .addAction("arrow_forward", this::nextPage)
@@ -31,15 +34,18 @@ public class SimplePaginator extends MenuMessage {
             .addAction("x", this::end);
     }
 
-    public static SimplePaginator create(){
-        return new SimplePaginator();
+    public static SimplePaginator create(Snowflake invokerUser){
+        return new SimplePaginator(invokerUser);
+    }
+
+    public static SimplePaginator create(CommandCtx invokerCtx){
+        return new SimplePaginator(invokerCtx.getAuthorId().orElse(Snowflake.of(0L)));
     }
 
     public SimplePaginator addPage(Consumer<EmbedCreateSpec> page){
         if (page != null){
-            if (pages.size() == 0){
+            if (pages.size() == 0)
                 this.setContent("").setEmbed(page);     // set first page to send
-            }
             this.pages.add(page);
         }
         return this;

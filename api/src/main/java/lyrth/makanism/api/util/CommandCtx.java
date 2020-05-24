@@ -12,6 +12,7 @@ import discord4j.common.util.Snowflake;
 import lyrth.makanism.common.util.file.config.BotConfig;
 import lyrth.makanism.common.util.file.config.GuildConfig;
 import reactor.core.publisher.Mono;
+import reactor.util.annotation.Nullable;
 
 import java.time.Instant;
 import java.util.Optional;
@@ -80,6 +81,12 @@ public class CommandCtx {
 
     public Optional<User> getUser(){
         return event.getMessage().getAuthor();
+    }
+
+    public Optional<Snowflake> getAuthorId(){       // Empty if user is invalid
+        return getMember().map(User::getId).or(
+            () -> getUser().map(User::getId)
+        );
     }
 
     public Instant getTimestamp(){

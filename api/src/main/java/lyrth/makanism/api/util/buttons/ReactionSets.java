@@ -7,6 +7,7 @@ import java.util.Set;
 
 public enum ReactionSets implements ReactionSet {
 
+    // Mostly just for reference for now.
     DIR_OK("arrow_up","arrow_down","arrow_left","arrow_right","ok"),
     PAGE_NAV("arrow_backward","arrow_forward"),
     PAGE_NAV_ADV("previous_track_button","arrow_backward","arrow_forward","next_track_button","1234"),
