@@ -7,14 +7,15 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import reactor.util.annotation.Nullable;
 
-import java.util.*;
+import java.util.Optional;
+import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public interface ReactionSet {
     Logger log = LoggerFactory.getLogger(ReactionSet.class);
 
-    Pattern customEmojiPattern = Pattern.compile("<(a?):([A-Za-z0-9_]+):(\\d+)>");
+    Pattern customEmojiPat = Pattern.compile("<(a?):([A-Za-z0-9_]+):(\\d+)>");
 
 
     CustomReactionSet append(String... buttons);
@@ -34,7 +35,7 @@ public interface ReactionSet {
 
     @Nullable
     static ReactionEmoji getReactionEmoji(String s){
-        Matcher matcher = customEmojiPattern.matcher(s);
+        Matcher matcher = customEmojiPat.matcher(s);
         if (matcher.find()){
             try {
                 long id = Long.parseLong(matcher.group(3));

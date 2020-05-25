@@ -4,15 +4,13 @@ import com.sedmelluq.discord.lavaplayer.player.AudioPlayerManager;
 import com.sedmelluq.discord.lavaplayer.player.DefaultAudioPlayerManager;
 import com.sedmelluq.discord.lavaplayer.source.AudioSourceManagers;
 import com.sedmelluq.discord.lavaplayer.track.playback.NonAllocatingAudioFrameBuffer;
+import discord4j.common.util.Snowflake;
 import discord4j.core.object.VoiceState;
 import discord4j.core.object.entity.Member;
-import discord4j.common.util.Snowflake;
 import discord4j.voice.VoiceConnection;
 import lyrth.makanism.api.GuildModule;
 import lyrth.makanism.api.annotation.GuildModuleInfo;
 import lyrth.makanism.common.util.file.config.GuildConfig;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import reactor.core.publisher.Mono;
 
 import java.util.concurrent.ConcurrentHashMap;
