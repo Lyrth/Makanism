@@ -1,6 +1,7 @@
 package lyrth.makanism.bot.handlers;
 
 import discord4j.core.GatewayDiscordClient;
+import lyrth.makanism.api.util.AccessLevel;
 import lyrth.makanism.bot.util.BotProps;
 import lyrth.makanism.common.util.file.SourceProvider;
 import lyrth.makanism.common.util.file.config.BotConfig;
@@ -48,6 +49,7 @@ public class GatewayHandler {
             .doOnNext(appInfo -> botConfig.setIds(appInfo.getId(), appInfo.getOwnerId()))
             .then(botConfig.update())
             .cache()
+            .doOnNext(config -> AccessLevel.setBotOwnerId(config.getOwnerId()))
             .doOnNext(config -> log.info("Loaded bot config."));
     }
 }

@@ -17,11 +17,11 @@ import java.util.function.Function;
 
 public class SimplePaginator extends MenuMessage {
 
-    private static final String PAGE_INFO_TEMPLATE = "Page **%d** of %d.";
+    private static final String PAGE_INFO = "Page **%d** of %d.";
 
     private final List<Consumer<EmbedCreateSpec>> pages = new ArrayList<>();
     @Nullable
-    Consumer<EmbedCreateSpec> endPage = null;
+    private Consumer<EmbedCreateSpec> endPage = null;
     private final AtomicInteger pageNumber = new AtomicInteger(0);
 
     private SimplePaginator(Snowflake invokerUser){
@@ -44,7 +44,7 @@ public class SimplePaginator extends MenuMessage {
 
     public SimplePaginator addPage(Consumer<EmbedCreateSpec> page){
         if (page != null){
-            if (pages.size() == 0)
+            if (pages.isEmpty())
                 this.setContent("").setEmbed(page);     // set first page to send
             this.pages.add(page);
         }
@@ -102,7 +102,7 @@ public class SimplePaginator extends MenuMessage {
     }
 
     private String pageInfo(){
-        return String.format(PAGE_INFO_TEMPLATE, pageNumber.get() + 1, pages.size());
+        return String.format(PAGE_INFO, pageNumber.get() + 1, pages.size());
     }
 
 

@@ -25,7 +25,7 @@ import java.util.concurrent.ConcurrentHashMap;
     }
 )
 public class Music extends GuildModule {
-    private static final Logger log = LoggerFactory.getLogger(Music.class);
+    // private static final Logger log = LoggerFactory.getLogger(Music.class);
 
     // Most code taken from:
     // https://github.com/sedmelluq/lavaplayer

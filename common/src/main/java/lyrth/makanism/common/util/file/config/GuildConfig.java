@@ -19,9 +19,9 @@ public class GuildConfig {    // TODO not null fields
     private transient Props props;
 
     private HashSet<String> enabledModules;
-    private HashSet<String> enabledSubModules;      // submodules has module.submodule notation, no effect when parent module is disabled
-    private HashSet<String> blacklistedCommands;
-    private HashSet<String> whitelistedCommands;    // Whitelist has precedence.
+    // private HashSet<String> enabledSubModules;      // submodules has module.submodule notation, no effect when parent module is disabled
+    private HashSet<String> commandBlacklist;
+    private HashSet<String> commandWhitelist;    // Whitelist has precedence.
 
     private Snowflake guildId;
     private String prefix;
@@ -43,12 +43,12 @@ public class GuildConfig {    // TODO not null fields
                 .setPrefix(config.getPrefix() == null ?
                     props.get("bot.prefix") :
                     config.getPrefix())
-                .setWhitelistedCommands(config.getWhitelistedCommands() == null ?
+                .setCommandWhitelist(config.getCommandWhitelist() == null ?
                     new HashSet<>() :
-                    config.getWhitelistedCommands())
-                .setBlacklistedCommands(config.getBlacklistedCommands() == null ?
+                    config.getCommandWhitelist())
+                .setCommandBlacklist(config.getCommandBlacklist() == null ?
                     new HashSet<>() :
-                    config.getBlacklistedCommands())
+                    config.getCommandBlacklist())
                 .setEnabledModules(config.getEnabledModules() == null ?
                     new HashSet<>() :
                     config.getEnabledModules())
@@ -86,13 +86,13 @@ public class GuildConfig {    // TODO not null fields
         return this;
     }
 
-    private GuildConfig setBlacklistedCommands(HashSet<String> blacklistedCommands) {
-        this.blacklistedCommands = blacklistedCommands;
+    private GuildConfig setCommandBlacklist(HashSet<String> commandBlacklist) {
+        this.commandBlacklist = commandBlacklist;
         return this;
     }
 
-    private GuildConfig setWhitelistedCommands(HashSet<String> whitelistedCommands) {
-        this.whitelistedCommands = whitelistedCommands;
+    private GuildConfig setCommandWhitelist(HashSet<String> commandWhitelist) {
+        this.commandWhitelist = commandWhitelist;
         return this;
     }
 
@@ -135,12 +135,12 @@ public class GuildConfig {    // TODO not null fields
         return enabledModules;
     }
 
-    public HashSet<String> getBlacklistedCommands() {
-        return blacklistedCommands;
+    public HashSet<String> getCommandBlacklist() {
+        return commandBlacklist;
     }
 
-    public HashSet<String> getWhitelistedCommands() {
-        return whitelistedCommands;
+    public HashSet<String> getCommandWhitelist() {
+        return commandWhitelist;
     }
 
     public String getPrefix() {

@@ -14,6 +14,9 @@ import java.util.regex.Pattern;
 public interface ReactionSet {
     Logger log = LoggerFactory.getLogger(ReactionSet.class);
 
+    Pattern customEmojiPattern = Pattern.compile("<(a?):([A-Za-z0-9_]+):(\\d+)>");
+
+
     CustomReactionSet append(String... buttons);
 
     static CustomReactionSet custom(String... buttons){
@@ -29,7 +32,6 @@ public interface ReactionSet {
 
     /// util
 
-    Pattern customEmojiPattern = Pattern.compile("<(a?):([A-Za-z0-9_]+):(\\d+)>");
     @Nullable
     static ReactionEmoji getReactionEmoji(String s){
         Matcher matcher = customEmojiPattern.matcher(s);

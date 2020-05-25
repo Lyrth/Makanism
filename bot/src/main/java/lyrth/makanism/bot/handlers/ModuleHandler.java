@@ -22,7 +22,7 @@ public class ModuleHandler  implements IModuleHandler {
 
     // lowercase keys is enforced, both maps should be unmodifiable
     private final Map<String, GuildModule> guildModules;
-    private final Map<String, GuildModuleCommand<GuildModule>> guildModuleCommands;
+    private final Map<String, GuildModuleCommand<GuildModule>> guildModuleCmds;
 
     public static Mono<ModuleHandler> load(){   // once, should be called first, should be quick-completing
         ServiceLoader<GuildModule> loader = ServiceLoader.load(GuildModule.class);
@@ -42,7 +42,7 @@ public class ModuleHandler  implements IModuleHandler {
     }
 
     public Mono<?> handleCommand(MessageCreateEvent event, BotConfig config, String invokedName){
-        GuildModuleCommand<GuildModule> command = guildModuleCommands.get(invokedName.toLowerCase());
+        GuildModuleCommand<GuildModule> command = guildModuleCmds.get(invokedName.toLowerCase());
         if (command == null) return Mono.empty();
 
         GuildModule module = guildModules.get(command.getParentModuleName().toLowerCase());
@@ -78,7 +78,7 @@ public class ModuleHandler  implements IModuleHandler {
                 }
             }
         }
-        this.guildModuleCommands = Collections.unmodifiableMap(guildModuleCommands);
+        this.guildModuleCmds = Collections.unmodifiableMap(guildModuleCommands);
     }
 
     public void setupModulesFor(GuildConfig config){  // called in GuildConfigs orGuildHandler, once

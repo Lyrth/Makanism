@@ -13,6 +13,8 @@ import reactor.core.scheduler.Schedulers;
 
 import java.io.*;
 import java.lang.reflect.Modifier;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.Arrays;
 
 public class FileSourceProvider implements SourceProvider {    // TODO : Caches
@@ -37,7 +39,7 @@ public class FileSourceProvider implements SourceProvider {    // TODO : Caches
     public <T> Mono<T> read(String name, Class<T> clazz) {
         String fileName = root + (name.endsWith(".json") ? name : name + ".json");
         Mono<T> read = Mono.fromCallable(() -> {
-                FileReader reader = new FileReader(fileName);
+                BufferedReader reader = Files.newBufferedReader(Paths.get(fileName));
                 T t = gson.fromJson(reader, clazz);
                 if (t == null) t = gson.fromJson("{}", clazz);
                 reader.close();
@@ -54,7 +56,7 @@ public class FileSourceProvider implements SourceProvider {    // TODO : Caches
     public <T> Mono<T> read(String name, TypeToken<T> type) {
         String fileName = root + (name.endsWith(".json") ? name : name + ".json");
         Mono<T> read = Mono.fromCallable(() -> {
-            FileReader reader = new FileReader(fileName);
+            BufferedReader reader = Files.newBufferedReader(Paths.get(fileName));
             T t = gson.fromJson(reader, type.getType());
             if (t == null) t = gson.fromJson("{}", type.getType());
             reader.close();
@@ -72,7 +74,7 @@ public class FileSourceProvider implements SourceProvider {    // TODO : Caches
     public <T> Mono<?> write(String name, T t) {
         String fileName = root + (name.endsWith(".json") ? name : name + ".json");
         Mono<?> write = Mono.fromCallable(() -> {
-                FileWriter writer = new FileWriter(fileName);
+                BufferedWriter writer = Files.newBufferedWriter(Paths.get(fileName));
                 gson.toJson(t, writer);
                 writer.close();
                 return 1;

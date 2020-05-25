@@ -1,5 +1,6 @@
 package lyrth.makanism.api.util;
 
+import discord4j.common.util.Snowflake;
 import discord4j.core.object.entity.Member;
 import discord4j.core.object.entity.User;
 import discord4j.rest.util.Permission;
@@ -32,6 +33,8 @@ public enum AccessLevel {  // TODO roles and more custom
     ;
 
     private static final Logger log = LoggerFactory.getLogger(AccessLevel.class);
+
+    private static Snowflake ownerId = Snowflake.of(0L);
 
     private boolean botOwnerOnly;   // default true
     private boolean any = true;  // any permission or all perms
@@ -68,6 +71,10 @@ public enum AccessLevel {  // TODO roles and more custom
         return accessLevel;
     }
 
+    public static void setBotOwnerId(Snowflake botOwnerId){
+        ownerId = Snowflake.of(botOwnerId.asLong());    // create a copy
+    }
+
     public boolean isBotOwnerOnly() {
         return botOwnerOnly;
     }
@@ -87,8 +94,8 @@ public enum AccessLevel {  // TODO roles and more custom
     public Mono<Boolean> allows(@Nullable Member member){
         if (member == null) return Mono.empty();
         if (botOwnerOnly)
-            return Mono.just(member.getId().asLong() == 368727799189733376L); //TODO: get ID from storage
-        if (permissions.size() == 0)
+            return Mono.just(member.getId().equals(ownerId)); //TODO: get ID from storage
+        if (permissions.isEmpty())
             return Mono.just(true);
         return member.getBasePermissions()
             .flatMapIterable(PermissionSet::asEnumSet)
@@ -101,7 +108,7 @@ public enum AccessLevel {  // TODO roles and more custom
     public Mono<Boolean> allows(@Nullable User user){
         if (user == null) return Mono.empty();
         if (botOwnerOnly)
-            return Mono.just(user.getId().asLong() == 368727799189733376L); //TODO: get ID from storage
-        return Mono.just(permissions.size() == 0);
+            return Mono.just(user.getId().equals(ownerId)); //TODO: get ID from storage
+        return Mono.just(permissions.isEmpty());
     }
 }
