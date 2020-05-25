@@ -34,15 +34,13 @@ public final class BotProps implements Props {
 
     public static class D4JProps {
 
-        private static Properties props;
+        private static final Properties props = GitProperties.getProperties();
 
         public static String get(String name){
             return get(name,null);
         }
 
         public static String get(String name, String defaultValue){
-            if (props == null)
-                props = GitProperties.getProperties();
             return props.getProperty(name, defaultValue);
         }
     }

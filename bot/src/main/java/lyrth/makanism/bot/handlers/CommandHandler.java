@@ -3,6 +3,7 @@ package lyrth.makanism.bot.handlers;
 import discord4j.core.GatewayDiscordClient;
 import discord4j.core.event.domain.message.MessageCreateEvent;
 import discord4j.core.object.entity.User;
+import discord4j.core.object.entity.channel.MessageChannel;
 import discord4j.rest.http.client.ClientException;
 import lyrth.makanism.api.Command;
 import lyrth.makanism.api.util.CommandCtx;
@@ -12,11 +13,15 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import reactor.core.publisher.Mono;
 
-import java.util.*;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.stream.Stream;
 
 public class CommandHandler {
     private static final Logger log = LoggerFactory.getLogger(CommandHandler.class);
+
+    private static final String ERROR_MSG = "Oh no, an error has occurred! ```%s```";
+    private static final String DISALLOWED_MSG = "You are not allowed to run this!";
 
     public static Mono<?> handle(GatewayDiscordClient client, BotConfig config){
 
@@ -63,20 +68,7 @@ public class CommandHandler {
 
     // TODO: too complex
     private static Mono<?> checkCommand(MessageCreateEvent event, BotConfig config, Map<String, Command> commands){
-        String[] words = event.getMessage().getContent().split("\\s+", 3);
-        String second = words.length > 1 ? words[1] : "";
-        boolean inGuild = event.getGuildId().isPresent();
-        String invokedName;
-        if (inGuild) {   // Guild
-            if (words[0].equals("<@!" + config.getBotId().asString() + ">") ||
-                words[0].equals("<@" + config.getBotId().asString() + ">"))         // @User command
-                invokedName = second;
-            else {                                                                  // ;command or ; command
-                String prefix = config.getGuildConfig(event.getGuildId().get()).getPrefix();
-                invokedName = words[0].equals(prefix) ? second : words[0].substring(prefix.length());
-            }
-        } else  invokedName = words[0].equals(config.getDefaultPrefix()) ?          // ;command or ; command
-            second : words[0].substring(config.getDefaultPrefix().length());
+        String invokedName = getInvokedName(event, config);
 
         // Prefix only, or command disabled.
         if (invokedName.isEmpty() || config.isCommandDisabled(invokedName)) return Mono.empty();
@@ -91,14 +83,38 @@ public class CommandHandler {
             .allows(event.getMember().orElse(null), event.getMessage().getAuthor().orElse(null))
             .flatMap(allowed -> allowed ?
                 command.execute(CommandCtx.from(event, config, invokedName.toLowerCase())) :
-                event.getMessage().getChannel().flatMap(ch -> ch.createMessage("You are not allowed to run this!"))
+                event.getMessage().getChannel().flatMap(ch -> ch.createMessage(DISALLOWED_MSG))
             )
             .doOnError(t -> log.error("CAUgHt eWWoW!", t))
             .onErrorResume(t -> event.getMessage().getChannel()
-                .flatMap(ch -> ch.createMessage("Oh no, an error has occurred! ``` " + (            // TODO: better error reporting.
-                    (t instanceof ClientException) ?
-                        ((ClientException)t).getStatus().toString() + ": " + ((ClientException)t).getErrorResponse().map(r -> r.getFields().get("message")).orElse("") :
-                        t.toString()
-                    ) + "```")));
+                .flatMap(ch -> sendError(t, ch)));
+    }
+
+    private static String getInvokedName(MessageCreateEvent event, BotConfig config){
+        String[] words = event.getMessage().getContent().split("\\s+", 3);
+        String second = words.length > 1 ? words[1] : "";
+        boolean inGuild = event.getGuildId().isPresent();
+        if (inGuild) {   // Guild
+            if (words[0].equals("<@!" + config.getBotId().asString() + ">") ||
+                words[0].equals("<@" + config.getBotId().asString() + ">"))         // @User command
+                return second;
+            else {                                                                  // ;command or ; command
+                String prefix = config.getGuildConfig(event.getGuildId().get()).getPrefix();
+                return words[0].equals(prefix) ? second : words[0].substring(prefix.length());
+            }
+        } else  return words[0].equals(config.getDefaultPrefix()) ?          // ;command or ; command
+            second : words[0].substring(config.getDefaultPrefix().length());
+    }
+
+    private static Mono<?> sendError(Throwable t, MessageChannel channel){
+        String errorMessage;
+        if (t instanceof ClientException){
+            ClientException ex = ((ClientException)t);
+            errorMessage = ex.getStatus().toString() + ": " +
+                ex.getErrorResponse().map(resp -> resp.getFields().get("message")).orElse("<no content>");
+        } else {
+            errorMessage = t.toString();
+        }
+        return channel.createMessage(String.format(ERROR_MSG, errorMessage));
     }
 }

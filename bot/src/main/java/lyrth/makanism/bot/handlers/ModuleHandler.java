@@ -1,11 +1,11 @@
 package lyrth.makanism.bot.handlers;
 
+import discord4j.common.util.Snowflake;
 import discord4j.core.GatewayDiscordClient;
 import discord4j.core.event.domain.message.MessageCreateEvent;
-import discord4j.common.util.Snowflake;
-import lyrth.makanism.api.util.CommandCtx;
 import lyrth.makanism.api.GuildModule;
 import lyrth.makanism.api.GuildModuleCommand;
+import lyrth.makanism.api.util.CommandCtx;
 import lyrth.makanism.common.util.file.IModuleHandler;
 import lyrth.makanism.common.util.file.config.BotConfig;
 import lyrth.makanism.common.util.file.config.GuildConfig;
@@ -62,7 +62,7 @@ public class ModuleHandler  implements IModuleHandler {
 
     public ModuleHandler(Map<String,GuildModule> guildModules){
         this.guildModules = Collections.unmodifiableMap(guildModules);
-        Map<String, GuildModuleCommand<GuildModule>> guildModuleCommands = new HashMap<>();
+        Map<String, GuildModuleCommand<GuildModule>> guildModuleCmds = new HashMap<>();
         for (GuildModule module : guildModules.values()) {
             for (Class<GuildModuleCommand<GuildModule>> commandClass : module.getModuleCommands()) {
                 GuildModuleCommand<GuildModule> command;
@@ -72,13 +72,13 @@ public class ModuleHandler  implements IModuleHandler {
                     log.error("Error instantiating {} from {}! {}", commandClass.getSimpleName(), module.getName(), e.getMessage());
                     continue;
                 }
-                guildModuleCommands.putIfAbsent(command.getName().toLowerCase(), command);
+                guildModuleCmds.putIfAbsent(command.getName().toLowerCase(), command);
                 for (String name : command.getAliases()){
-                    guildModuleCommands.putIfAbsent(name.toLowerCase(), command);
+                    guildModuleCmds.putIfAbsent(name.toLowerCase(), command);
                 }
             }
         }
-        this.guildModuleCmds = Collections.unmodifiableMap(guildModuleCommands);
+        this.guildModuleCmds = Collections.unmodifiableMap(guildModuleCmds);
     }
 
     public void setupModulesFor(GuildConfig config){  // called in GuildConfigs orGuildHandler, once
