@@ -14,11 +14,11 @@ import java.util.function.Function;
 
 // todo: Map names to listeners to allow persistence.
 public class MenuRegistry {
-    private static final Logger log = LoggerFactory.getLogger(MenuRegistry.class);
+    // private static final Logger log = LoggerFactory.getLogger(MenuRegistry.class);
 
     // stores messageId - listener pairs.
     private transient static final ConcurrentHashMap<Snowflake, ReactListener> listeners = new ConcurrentHashMap<>();
-    private transient static final FluxProcessor<ReactionEvent, ReactionEvent> processor = DirectProcessor.create();
+    private transient static final DirectProcessor<ReactionEvent> processor = DirectProcessor.create();
     private transient static final FluxSink<ReactionEvent> sink = processor.sink(FluxSink.OverflowStrategy.DROP);
 
     protected static void register(ReactListener listener){

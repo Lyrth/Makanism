@@ -36,7 +36,6 @@ public class Music extends GuildModule {
     private final AudioPlayerManager playerManager;
 
     public Music(){
-        super();
         playerManager = new DefaultAudioPlayerManager();
         playerManager.getConfiguration().setFrameBufferFactory(NonAllocatingAudioFrameBuffer::new);
         AudioSourceManagers.registerRemoteSources(playerManager);           // Online sources

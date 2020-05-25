@@ -6,6 +6,7 @@ import lyrth.makanism.api.annotation.GuildModuleInfo;
 import lyrth.makanism.common.util.file.config.BotConfig;
 import lyrth.makanism.common.util.file.config.GuildConfig;
 import reactor.core.publisher.DirectProcessor;
+import reactor.core.publisher.FluxSink;
 import reactor.core.publisher.Mono;
 
 import java.util.concurrent.ConcurrentHashMap;
@@ -15,20 +16,15 @@ public abstract class GuildModule implements IModule {
 
     private final GuildModuleInfo moduleInfo = this.getClass().getAnnotation(GuildModuleInfo.class);
 
-    protected final ConcurrentHashMap<Snowflake, GuildConfig> enabledGuilds;  // enforce concurrency
+    protected final ConcurrentHashMap<Snowflake, GuildConfig> enabledGuilds = new ConcurrentHashMap<>();  // enforce concurrency
 
     protected BotConfig config;
     protected GatewayDiscordClient client;
 
-    private final DirectProcessor<GuildConfig> registerProcessor;
-    private final DirectProcessor<GuildConfig> removeProcessor;
-
-    // 0-arg constructor for ServiceLoader, do not use by itself?
-    public GuildModule(){
-        registerProcessor = DirectProcessor.create();
-        removeProcessor = DirectProcessor.create();
-        enabledGuilds = new ConcurrentHashMap<>();
-    }
+    private final DirectProcessor<GuildConfig> registerProcessor = DirectProcessor.create();
+    private final DirectProcessor<GuildConfig> removeProcessor   = DirectProcessor.create();
+    private final FluxSink<GuildConfig> registerSink = registerProcessor.sink(FluxSink.OverflowStrategy.BUFFER);
+    private final FluxSink<GuildConfig> removeSink   = removeProcessor  .sink(FluxSink.OverflowStrategy.BUFFER);
 
     @Override
     public Mono<?> init(GatewayDiscordClient client, BotConfig config){
@@ -57,7 +53,7 @@ public abstract class GuildModule implements IModule {
     public boolean register(GuildConfig config) {
         if (!enabledGuilds.containsKey(config.getId())) {
             enabledGuilds.put(config.getId(), config);
-            registerProcessor.onNext(config);
+            registerSink.next(config);
             return true;    // successfully enabled
         }
         return false;   // already enabled
@@ -65,7 +61,7 @@ public abstract class GuildModule implements IModule {
 
     public boolean remove(Snowflake guildId) {
         if (enabledGuilds.containsKey(guildId)) {
-            removeProcessor.onNext(enabledGuilds.remove(guildId));
+            removeSink.next(enabledGuilds.remove(guildId));
             return true;    // successfully disabled
         }
         return false;   // already disabled
