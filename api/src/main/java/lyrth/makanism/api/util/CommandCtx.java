@@ -1,5 +1,6 @@
 package lyrth.makanism.api.util;
 
+import discord4j.common.util.Snowflake;
 import discord4j.core.GatewayDiscordClient;
 import discord4j.core.event.domain.message.MessageCreateEvent;
 import discord4j.core.object.entity.Guild;
@@ -8,7 +9,6 @@ import discord4j.core.object.entity.Message;
 import discord4j.core.object.entity.User;
 import discord4j.core.object.entity.channel.MessageChannel;
 import discord4j.gateway.ShardInfo;
-import discord4j.common.util.Snowflake;
 import lyrth.makanism.common.util.file.config.BotConfig;
 import lyrth.makanism.common.util.file.config.GuildConfig;
 import reactor.core.publisher.Mono;
@@ -100,6 +100,10 @@ public class CommandCtx {
         return (args == null) ?
             args = new Args(getContent().substring(getContent().toLowerCase().indexOf(invokedName))) :
             args;
+    }
+
+    public String getArg(int index) {
+        return getArgs().get(index);
     }
 
     public <T> Mono<T> sendReply(String message){        // TODO: Checking?

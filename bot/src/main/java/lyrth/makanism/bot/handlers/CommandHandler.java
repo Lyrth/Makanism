@@ -26,7 +26,7 @@ public class CommandHandler {
     public static Mono<?> handle(GatewayDiscordClient client, BotConfig config){
 
         // Not going to modify, no need for concurrent
-        HashMap<String, Command> commands = Stream.of(
+        final HashMap<String, Command> commands = Stream.of(
 
             new Ping(),
             new Mrawr(),

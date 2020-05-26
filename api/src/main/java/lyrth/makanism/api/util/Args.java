@@ -3,6 +3,7 @@ package lyrth.makanism.api.util;
 import java.util.Arrays;
 import java.util.List;
 
+// Index zero is the invoked command name
 public class Args {
 
     private final String raw;
@@ -32,7 +33,7 @@ public class Args {
     // fromIndex is inclusive.
     /*  - fromIndex = 2
         0   1   2   3   4   5
-        aaa bbb ccc ddd eee ff
+        cmd bbb ccc ddd eee ff
         - Returns:
         ccc ddd eee ff
      */
@@ -50,18 +51,20 @@ public class Args {
         return Arrays.asList(split);
     }
 
-    public boolean matchesAt(String regex, int index){
+    public boolean matchesAt(int index, String regex){
         if (index < 0) throw new IllegalArgumentException("Index cannot be less than 0.");
-        return (index < split.length) && split[index].matches(regex);
+        return (index < split.length) && split[index].toLowerCase().matches(regex);
     }
 
-    public boolean equalsAt(String str, int index){
+    public boolean equalsAt(int index, String str){
         if (index < 0) throw new IllegalArgumentException("Index cannot be less than 0.");
-        return (index < split.length) && split[index].equals(str);
+        return (index < split.length) && split[index].equalsIgnoreCase(str);
     }
 
+    // Returns true if command has no actual args, e.g.:
+    // ;ping
     public boolean isEmpty(){
-        return split.length == 1 && split[0].isEmpty();
+        return split.length == 1;
     }
 
     public boolean isNotEmpty(){
@@ -69,6 +72,6 @@ public class Args {
     }
 
     public int getCount(){
-        return split.length;
+        return split.length - 1;    // exclude the command name
     }
 }

@@ -29,7 +29,6 @@ public class GatewayHandler {
                     System.out.println("Shutting down.");
                 }));
 
-                // todo: config save timer
                 return Mono.when(
                     ReadyHandler.handle(client),
                     GuildHandler.handle(client, botConfig),

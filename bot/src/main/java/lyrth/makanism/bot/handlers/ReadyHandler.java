@@ -13,7 +13,7 @@ public class ReadyHandler {
 
     public static Mono<?> handle(GatewayDiscordClient client){
         return client.on(ReadyEvent.class)
-            .takeUntil(ready -> ready.getShardInfo().getIndex() == ready.getShardInfo().getCount() - 1)
+            //.takeUntil(ready -> ready.getShardInfo().getIndex() == ready.getShardInfo().getCount() - 1)
             .doOnNext(ready -> log.info("Logged in as {}#{}", ready.getSelf().getUsername(), ready.getSelf().getDiscriminator()))
             .doOnNext(ready -> log.info("Shard [#{} total], in {} guilds", ready.getShardInfo().format(), ready.getGuilds().size()))
             .flatMap(ready -> ready.getClient().updatePresence(Presence.online(Activity.listening("you~"))))    // haha what
