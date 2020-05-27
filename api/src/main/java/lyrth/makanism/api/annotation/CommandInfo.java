@@ -1,7 +1,7 @@
 package lyrth.makanism.api.annotation;
 
-import lyrth.makanism.api.util.AccessLevel;
 import lyrth.makanism.api.IModule;
+import lyrth.makanism.api.object.AccessLevel;
 
 import java.lang.annotation.*;
 
@@ -15,6 +15,5 @@ public @interface CommandInfo {     // TODO: Make it so that this is only applie
     String category() default "\0";
     String desc() default "";
     String usage() default "\0";
-    int minArgs() default 0;
     Class<? extends IModule> parentModule() default IModule.class;
 }

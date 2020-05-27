@@ -1,11 +1,11 @@
 package lyrth.makanism.bot.handlers;
 
 import discord4j.core.GatewayDiscordClient;
-import lyrth.makanism.api.util.AccessLevel;
+import lyrth.makanism.api.object.AccessLevel;
 import lyrth.makanism.bot.util.BotProps;
-import lyrth.makanism.common.util.file.SourceProvider;
-import lyrth.makanism.common.util.file.config.BotConfig;
-import lyrth.makanism.common.util.file.impl.FileSourceProvider;
+import lyrth.makanism.common.file.SourceProvider;
+import lyrth.makanism.common.file.config.BotConfig;
+import lyrth.makanism.common.file.impl.FileSourceProvider;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import reactor.core.publisher.Mono;

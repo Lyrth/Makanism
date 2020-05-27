@@ -1,7 +1,7 @@
 package lyrth.makanism.api;
 
 import discord4j.core.GatewayDiscordClient;
-import lyrth.makanism.common.util.file.config.BotConfig;
+import lyrth.makanism.common.file.config.BotConfig;
 import reactor.core.publisher.Mono;
 
 public interface IModule {

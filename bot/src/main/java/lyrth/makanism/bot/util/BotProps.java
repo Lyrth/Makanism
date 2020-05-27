@@ -1,7 +1,7 @@
 package lyrth.makanism.bot.util;
 
 import discord4j.common.GitProperties;
-import lyrth.makanism.common.util.file.Props;
+import lyrth.makanism.common.file.Props;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

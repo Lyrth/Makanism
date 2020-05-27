@@ -1,14 +1,14 @@
-import lyrth.makanism.common.util.file.SourceProvider;
-import lyrth.makanism.common.util.file.impl.FileSourceProvider;
+import lyrth.makanism.common.file.SourceProvider;
+import lyrth.makanism.common.file.impl.FileSourceProvider;
 
 @SuppressWarnings("JavaRequiresAutoModule")
 module lyrth.makanism.common {
 
-    exports lyrth.makanism.common.util;
-    exports lyrth.makanism.common.util.file;
-    exports lyrth.makanism.common.util.file.config;
-    exports lyrth.makanism.common.util.file.impl;
-    exports lyrth.makanism.common.util.reactor;
+    exports lyrth.makanism.common;
+    exports lyrth.makanism.common.file;
+    exports lyrth.makanism.common.file.config;
+    exports lyrth.makanism.common.file.impl;
+    exports lyrth.makanism.common.reactor;
 
     // the replacement to META-INF/services
     provides SourceProvider
@@ -16,6 +16,7 @@ module lyrth.makanism.common {
 
 
     // Export heck below.
+    requires transitive com.fasterxml.jackson.annotation;   // just for the warnings
     requires transitive com.google.gson;
     requires transitive discord4j.common;
     requires transitive discord4j.core;

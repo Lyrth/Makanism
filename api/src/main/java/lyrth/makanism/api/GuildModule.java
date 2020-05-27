@@ -1,10 +1,10 @@
 package lyrth.makanism.api;
 
-import discord4j.core.GatewayDiscordClient;
 import discord4j.common.util.Snowflake;
+import discord4j.core.GatewayDiscordClient;
 import lyrth.makanism.api.annotation.GuildModuleInfo;
-import lyrth.makanism.common.util.file.config.BotConfig;
-import lyrth.makanism.common.util.file.config.GuildConfig;
+import lyrth.makanism.common.file.config.BotConfig;
+import lyrth.makanism.common.file.config.GuildConfig;
 import reactor.core.publisher.DirectProcessor;
 import reactor.core.publisher.FluxSink;
 import reactor.core.publisher.Mono;

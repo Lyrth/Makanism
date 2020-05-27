@@ -1,7 +1,7 @@
 package lyrth.makanism.bot.handlers;
 
 import discord4j.core.GatewayDiscordClient;
-import lyrth.makanism.common.util.file.config.BotConfig;
+import lyrth.makanism.common.file.config.BotConfig;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import reactor.core.publisher.Flux;

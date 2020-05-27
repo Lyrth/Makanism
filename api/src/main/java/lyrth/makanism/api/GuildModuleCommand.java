@@ -1,7 +1,7 @@
 package lyrth.makanism.api;
 
 import lyrth.makanism.api.annotation.CommandInfo;
-import lyrth.makanism.api.util.CommandCtx;
+import lyrth.makanism.api.object.CommandCtx;
 import reactor.core.publisher.Mono;
 
 @CommandInfo()

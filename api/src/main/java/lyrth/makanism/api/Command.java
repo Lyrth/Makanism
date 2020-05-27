@@ -3,8 +3,8 @@ package lyrth.makanism.api;
 import discord4j.core.object.entity.Member;
 import discord4j.core.object.entity.User;
 import lyrth.makanism.api.annotation.CommandInfo;
-import lyrth.makanism.api.util.AccessLevel;
-import lyrth.makanism.api.util.CommandCtx;
+import lyrth.makanism.api.object.AccessLevel;
+import lyrth.makanism.api.object.CommandCtx;
 import reactor.core.publisher.Mono;
 import reactor.util.annotation.Nullable;
 
@@ -38,10 +38,6 @@ public abstract class Command {
 
     public String getUsage(){
         return commandInfo.usage().equals("\0") ? getName() : commandInfo.usage();
-    }
-
-    public int getMinArgs(){
-        return commandInfo.minArgs();
     }
 
     // Returns the name of the parent module with proper capitalization

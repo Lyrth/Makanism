@@ -10,7 +10,10 @@ import discord4j.core.object.entity.Member;
 import discord4j.voice.VoiceConnection;
 import lyrth.makanism.api.GuildModule;
 import lyrth.makanism.api.annotation.GuildModuleInfo;
-import lyrth.makanism.common.util.file.config.GuildConfig;
+import lyrth.makanism.common.file.config.GuildConfig;
+import makanism.module.music.commands.JoinCmd;
+import makanism.module.music.commands.LeaveCmd;
+import makanism.module.music.commands.PlayCmd;
 import reactor.core.publisher.Mono;
 
 import java.util.concurrent.ConcurrentHashMap;

@@ -2,8 +2,8 @@ package lyrth.makanism.bot.handlers;
 
 import discord4j.core.GatewayDiscordClient;
 import discord4j.core.event.domain.guild.GuildCreateEvent;
-import lyrth.makanism.common.util.file.config.BotConfig;
-import lyrth.makanism.common.util.file.config.GuildConfig;
+import lyrth.makanism.common.file.config.BotConfig;
+import lyrth.makanism.common.file.config.GuildConfig;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import reactor.core.publisher.Mono;

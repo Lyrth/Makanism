@@ -8,6 +8,7 @@ module Music {
     uses GuildModule;
 
     exports makanism.module.music;
+    exports makanism.module.music.commands;
 
     provides GuildModule
         with Music;
