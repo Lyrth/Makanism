@@ -11,18 +11,18 @@ import discord4j.voice.VoiceConnection;
 import lyrth.makanism.api.GuildModule;
 import lyrth.makanism.api.annotation.GuildModuleInfo;
 import lyrth.makanism.common.file.config.GuildConfig;
-import makanism.module.music.commands.JoinCmd;
-import makanism.module.music.commands.LeaveCmd;
-import makanism.module.music.commands.PlayCmd;
+import makanism.module.music.commands.Join;
+import makanism.module.music.commands.Leave;
+import makanism.module.music.commands.Play;
 import reactor.core.publisher.Mono;
 
 import java.util.concurrent.ConcurrentHashMap;
 
 @GuildModuleInfo(
     commands = {
-        PlayCmd.class,
-        JoinCmd.class,
-        LeaveCmd.class
+        Play.class,
+        Join.class,
+        Leave.class
     }
 )
 public class Music extends GuildModule {

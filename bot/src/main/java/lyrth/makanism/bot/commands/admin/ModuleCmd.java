@@ -15,7 +15,9 @@ import static java.util.function.Predicate.not;
 @CommandInfo(
     name = "Module",
     aliases = {"mods", "modules"},
-    accessLevel = AccessLevel.OWNER
+    accessLevel = AccessLevel.OWNER,
+    desc = "Enables or disables a guild module, or lists the enabled ones.",
+    usage = "[enable|disable <module name>]"
 )
 public class ModuleCmd extends GuildCommand {
 

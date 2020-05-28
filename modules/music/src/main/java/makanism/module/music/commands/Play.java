@@ -8,20 +8,22 @@ import makanism.module.music.Music;
 import reactor.core.publisher.Mono;
 
 @CommandInfo(
-    name = "Join",
     accessLevel = AccessLevel.OWNER,
-    parentModule = Music.class
+    desc = "Play a track.",
+    usage = "(<url>)"
 )
-public class JoinCmd extends GuildModuleCommand<Music> {
+public class Play extends GuildModuleCommand<Music> {
 
     @Override
     public Mono<?> execute(CommandCtx ctx, Music module) {
         if (ctx.getGuildId().isEmpty() || ctx.getMember().isEmpty()) return Mono.empty();
+        if (ctx.getArgs().isEmpty())
+            return ctx.getChannel().flatMap(ch -> ch.createMessage("Invalid args.")).then();
 
-        return module.join(ctx.getGuildId().get(), ctx.getMember().get())
+        return module.play(ctx.getGuildId().get(),ctx.getArgs().getRest(1),ctx.getMember().get())
             .map(b -> b ?
-                "joined" :
-                "already joined"
+                "playing" :
+                "invalid music"
             )
             .defaultIfEmpty("you're not in a voice channel")
             .flatMap(ctx::sendReply);

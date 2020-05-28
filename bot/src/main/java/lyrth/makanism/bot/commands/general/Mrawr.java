@@ -6,7 +6,10 @@ import lyrth.makanism.api.object.AccessLevel;
 import lyrth.makanism.api.object.CommandCtx;
 import reactor.core.publisher.Mono;
 
-@CommandInfo(accessLevel = AccessLevel.OWNER)
+@CommandInfo(
+    accessLevel = AccessLevel.OWNER,
+    desc = "Mrawr!"
+)
 public class Mrawr extends GuildCommand {
 
     @Override

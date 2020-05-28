@@ -12,7 +12,8 @@ import java.util.Optional;
 
 @CommandInfo(
     accessLevel = AccessLevel.GENERAL,
-    aliases = {"profile", "me"}
+    aliases = {"profile", "me"},
+    desc = "Prints out some information about the invoking member."
 )
 @SuppressWarnings("StringBufferReplaceableByString")
 public class UserInfo extends GuildCommand {

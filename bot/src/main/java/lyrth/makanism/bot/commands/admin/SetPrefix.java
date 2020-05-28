@@ -6,7 +6,12 @@ import lyrth.makanism.api.object.AccessLevel;
 import lyrth.makanism.api.object.CommandCtx;
 import reactor.core.publisher.Mono;
 
-@CommandInfo(accessLevel = AccessLevel.OWNER)
+@CommandInfo(
+    aliases = {"prefix"},
+    accessLevel = AccessLevel.OWNER,
+    desc = "Sets the server's command prefix.",
+    usage = "(<prefix>)"
+)
 public class SetPrefix extends GuildCommand {       // TODO: rename to prefix, show prefix
 
     @Override

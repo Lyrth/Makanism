@@ -6,7 +6,11 @@ import lyrth.makanism.api.object.AccessLevel;
 import lyrth.makanism.api.object.CommandCtx;
 import reactor.core.publisher.Mono;
 
-@CommandInfo(accessLevel = AccessLevel.OWNER)
+@CommandInfo(
+    accessLevel = AccessLevel.OWNER,
+    desc = "Repeats what it is told to.",
+    usage = "[<text>...]"
+)
 public class Echo extends GuildCommand {
 
     @Override

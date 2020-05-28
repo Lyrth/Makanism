@@ -8,11 +8,10 @@ import makanism.module.music.Music;
 import reactor.core.publisher.Mono;
 
 @CommandInfo(
-    name = "Leave",
     accessLevel = AccessLevel.OWNER,
-    parentModule = Music.class
+    desc = "Makes the bot leave the voice channel it is in."
 )
-public class LeaveCmd extends GuildModuleCommand<Music> {
+public class Leave extends GuildModuleCommand<Music> {
 
     @Override
     public Mono<?> execute(CommandCtx ctx, Music module) {

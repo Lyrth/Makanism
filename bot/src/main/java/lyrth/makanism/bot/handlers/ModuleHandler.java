@@ -48,7 +48,7 @@ public class ModuleHandler  implements IModuleHandler {
         GuildModule module = guildModules.get(command.getParentModuleName().toLowerCase());
         if (module == null) return Mono.empty();
 
-        return command    // todo check # of args
+        return command
             .allows(event.getMember().orElse(null), null)       // Only allow in a guild.
             .filter(b -> event.getGuildId().map(module::isEnabledFor).orElse(false))
             .flatMap(allowed -> allowed ?
@@ -57,7 +57,7 @@ public class ModuleHandler  implements IModuleHandler {
             )
             .doOnError(t -> log.error("CAUgHt eWWoW!", t))
             .onErrorResume(t -> event.getMessage().getChannel()
-                .flatMap(ch -> ch.createMessage("Oh no, an error has occurred! ``` " + t.toString() + "```")));
+                .flatMap(ch -> CommandHandler.sendError(t, ch)));
     }
 
     public ModuleHandler(Map<String,GuildModule> guildModules){

@@ -6,7 +6,10 @@ import lyrth.makanism.api.object.AccessLevel;
 import lyrth.makanism.api.object.CommandCtx;
 import reactor.core.publisher.Mono;
 
-@CommandInfo(accessLevel = AccessLevel.GENERAL)
+@CommandInfo(
+    accessLevel = AccessLevel.GENERAL,
+    desc = "How fast can the bot respond?"
+)
 public class Ping extends BotCommand {
 
     @Override

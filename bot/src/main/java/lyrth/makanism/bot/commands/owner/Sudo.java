@@ -20,13 +20,17 @@ import reactor.core.publisher.Mono;
 
 import java.util.Optional;
 
-@CommandInfo(accessLevel = AccessLevel.OWNER)
+@CommandInfo(
+    accessLevel = AccessLevel.OWNER,
+    desc = "Simulates a message from a specified user.",
+    usage = "(<@User|user id> <message content>)"
+)
 public class Sudo extends BotCommand {
     private static final Logger log = LoggerFactory.getLogger(Sudo.class);
 
     @Override
     public Mono<?> execute(CommandCtx ctx) {        // TODO: fix mess
-        return Mono.just(ctx.getArgs().get(1).replaceAll("(<@!?)?(\\d{12,})>?","$2"))
+        return Mono.just(ctx.getArg(1).replaceAll("(<@!?)?(\\d{12,})>?","$2"))
             .flatMap(strId -> Mono.fromCallable(() -> Long.parseLong(strId)))
             .flatMap(id ->
                 ctx.getGuild().flatMap(guild -> guild.getMemberById(Snowflake.of(id))).cast(User.class)

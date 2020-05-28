@@ -22,28 +22,41 @@ public abstract class Command {
     }
 
     public AccessLevel getPerms(){
-        // TODO: complain when there are perms for bot commands
+        // TODO: complain when there are perms for bot commands?
         return commandInfo.accessLevel();
     }
 
     public String getCategory(){
-        return commandInfo.category().equals("\0") ?
-            (this.getParentModuleName().isEmpty() ? "General" : this.getParentModuleName()) :
-            commandInfo.category();
+        if (commandInfo.category().equals("\0")){       // auto-generate
+            if (!this.getParentModuleName().isEmpty()){     // is a module command?
+                return this.getParentModuleName();
+            } else {                                        // generate from package name
+                String packageName = this.getClass().getPackageName();
+                if (packageName.endsWith(".commands")){     // not in any subpackage
+                    return "General";
+                } else {                                    // is in subpackage, get its name and capitalize
+                    String subpackage = packageName.substring(packageName.lastIndexOf(".") + 1);
+                    return subpackage.substring(0,1).toUpperCase() + subpackage.substring(1);
+                }
+            }
+        } else {
+            return commandInfo.category();              // information exists
+        }
     }
 
     public String getDesc(){
         return commandInfo.desc();
     }
 
-    public String getUsage(){
-        return commandInfo.usage().equals("\0") ? getName() : commandInfo.usage();
+    public String getUsage(){       // returns a string without the prefix.
+        return getName() + " " + commandInfo.usage();
     }
 
     // Returns the name of the parent module with proper capitalization
     public String getParentModuleName(){
-        return commandInfo.parentModule().getSimpleName().equals("IModule") ?
-            "" : commandInfo.parentModule().getSimpleName();
+        return commandInfo.parentModule().equals(IModule.class) ?
+            "" :
+            commandInfo.parentModule().getSimpleName();
     }
 
     public String getFormattedUsage(){

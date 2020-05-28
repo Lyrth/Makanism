@@ -8,7 +8,10 @@ import lyrth.makanism.api.object.CommandCtx;
 import lyrth.makanism.api.reply.SimplePaginator;
 import reactor.core.publisher.Mono;
 
-@CommandInfo(accessLevel = AccessLevel.OWNER)
+@CommandInfo(
+    accessLevel = AccessLevel.OWNER,
+    desc = "Tests something."
+)
 public class Test extends GuildCommand {
 
     @Override

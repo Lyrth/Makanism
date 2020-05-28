@@ -65,15 +65,6 @@ public class CommandHandler {
             .then();
     }
 
-    private static boolean checkPrefix(MessageCreateEvent event, String content, BotConfig config){    // just checks prefix
-        return event.getGuildId().map(guildId ->    // Guild
-            content.startsWith(config.getGuildConfig(guildId).getPrefix()) ||
-                content.startsWith("<@!" + config.getBotId().asString() + "> ") ||
-                content.startsWith("<@" + config.getBotId().asString() + "> "))
-            .orElseGet(() ->     // DMs
-                content.startsWith(config.getDefaultPrefix()));     // not gonna check mention in dms lol
-    }
-
     // TODO: too complex
     private static Mono<?> checkCommand(MessageCreateEvent event, BotConfig config, Map<String, Command> commands){
         String invokedName = getInvokedName(event, config);
@@ -98,7 +89,16 @@ public class CommandHandler {
                 .flatMap(ch -> sendError(t, ch)));
     }
 
-    private static String getInvokedName(MessageCreateEvent event, BotConfig config){
+    protected static boolean checkPrefix(MessageCreateEvent event, String content, BotConfig config){    // just checks prefix
+        return event.getGuildId().map(guildId ->    // Guild
+            content.startsWith(config.getGuildConfig(guildId).getPrefix()) ||
+                content.startsWith("<@!" + config.getBotId().asString() + "> ") ||
+                content.startsWith("<@" + config.getBotId().asString() + "> "))
+            .orElseGet(() ->     // DMs
+                content.startsWith(config.getDefaultPrefix()));     // not gonna check mention in dms lol
+    }
+
+    protected static String getInvokedName(MessageCreateEvent event, BotConfig config){
         String[] words = event.getMessage().getContent().split("\\s+", 3);
         String second = words.length > 1 ? words[1] : "";
         boolean inGuild = event.getGuildId().isPresent();
@@ -114,7 +114,7 @@ public class CommandHandler {
             second : words[0].substring(config.getDefaultPrefix().length());
     }
 
-    private static Mono<?> sendError(Throwable t, MessageChannel channel){
+    protected static Mono<?> sendError(Throwable t, MessageChannel channel){
         String errorMessage;
         if (t instanceof ClientException){
             ClientException ex = ((ClientException)t);

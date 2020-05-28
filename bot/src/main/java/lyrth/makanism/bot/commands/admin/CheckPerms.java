@@ -8,7 +8,10 @@ import lyrth.makanism.api.object.AccessLevel;
 import lyrth.makanism.api.object.CommandCtx;
 import reactor.core.publisher.Mono;
 
-@CommandInfo(accessLevel = AccessLevel.ADMINISTRATOR)
+@CommandInfo(
+    accessLevel = AccessLevel.ADMINISTRATOR,
+    desc = "Gets the base permissions of the member that invoked this."
+)
 public class CheckPerms extends GuildCommand {
 
     @Override
