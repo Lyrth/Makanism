@@ -53,7 +53,10 @@
         <Logger name="SaveHandler" level="debug"> <!-- test: debug, prod: info -->
             <AppenderRef ref="utillog"/>
         </Logger>
-        <Logger name="discord4j.voice" level="info"><!-- info -->
+        <Logger name="discord4j.voice" level="error"><!-- info -->
+            <AppenderRef ref="debug"/>
+        </Logger>
+        <Logger name="discord4j.gateway" level="info"><!-- info -->
             <AppenderRef ref="debug"/>
         </Logger>
         <Logger name="discord4j.discordjson" level="info"><!-- info -->

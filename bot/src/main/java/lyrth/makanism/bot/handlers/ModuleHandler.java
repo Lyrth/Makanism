@@ -20,7 +20,7 @@ import java.util.*;
 public class ModuleHandler  implements IModuleHandler {
     private static final Logger log = LoggerFactory.getLogger(ModuleHandler.class);
 
-    // lowercase keys is enforced, both maps should be unmodifiable
+    // lowercase keys is enforced, both maps are unmodifiable
     private final Map<String, GuildModule> guildModules;
     private final Map<String, GuildModuleCommand<GuildModule>> guildModuleCmds;
 
@@ -73,9 +73,8 @@ public class ModuleHandler  implements IModuleHandler {
                     continue;
                 }
                 guildModuleCmds.putIfAbsent(command.getName().toLowerCase(), command);
-                for (String name : command.getAliases()){
+                for (String name : command.getAliases())
                     guildModuleCmds.putIfAbsent(name.toLowerCase(), command);
-                }
             }
         }
         this.guildModuleCmds = Collections.unmodifiableMap(guildModuleCmds);
@@ -98,5 +97,15 @@ public class ModuleHandler  implements IModuleHandler {
         log.debug("Disabling {} for {}", moduleName, guildId.asString());
         return Optional.ofNullable(guildModules.get(moduleName.toLowerCase()))
             .map(guildModules -> guildModules.remove(guildId));
+    }
+
+    // Lowercase keys.
+    public Map<String, GuildModule> getGuildModules() {
+        return guildModules;
+    }
+
+    // Lowercase keys.
+    public Map<String, GuildModuleCommand<GuildModule>> getGuildModuleCmds() {
+        return guildModuleCmds;
     }
 }

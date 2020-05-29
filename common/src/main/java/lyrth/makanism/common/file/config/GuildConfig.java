@@ -131,6 +131,7 @@ public class GuildConfig {    // TODO not null fields
         return this;
     }
 
+    // Lowercase keys.
     public HashSet<String> getEnabledModules() {
         return enabledModules;
     }

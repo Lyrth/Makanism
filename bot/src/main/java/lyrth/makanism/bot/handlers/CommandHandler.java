@@ -11,7 +11,9 @@ import lyrth.makanism.bot.commands.admin.CheckPerms;
 import lyrth.makanism.bot.commands.admin.ModuleCmd;
 import lyrth.makanism.bot.commands.admin.SetPrefix;
 import lyrth.makanism.bot.commands.botstats.Ping;
+import lyrth.makanism.bot.commands.general.CommandsCmd;
 import lyrth.makanism.bot.commands.general.Echo;
+import lyrth.makanism.bot.commands.general.Help;
 import lyrth.makanism.bot.commands.general.Mrawr;
 import lyrth.makanism.bot.commands.info.UserInfo;
 import lyrth.makanism.bot.commands.owner.Sudo;
@@ -21,6 +23,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import reactor.core.publisher.Mono;
 
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.stream.Stream;
@@ -31,10 +34,10 @@ public class CommandHandler {
     private static final String ERROR_MSG = "Oh no, an error has occurred! ```%s```";
     private static final String DISALLOWED_MSG = "You are not allowed to run this!";
 
-    public static Mono<?> handle(GatewayDiscordClient client, BotConfig config){
+    private static final Map<String, Command> commands;
 
-        // Not going to modify, no need for concurrent
-        final HashMap<String, Command> commands = Stream.of(
+    static {
+        commands = Collections.unmodifiableMap(Stream.of(
 
             new Ping(),
             new Mrawr(),
@@ -44,7 +47,9 @@ public class CommandHandler {
             new Sudo(),
             new Test(),
             new UserInfo(),
-            new ModuleCmd()
+            new ModuleCmd(),
+            new Help(),
+            new CommandsCmd()
 
         ).collect(
             HashMap::new,
@@ -54,19 +59,21 @@ public class CommandHandler {
                     for (String alias : cmd.getAliases()) map.putIfAbsent(alias.toLowerCase(), cmd);
             },
             (a,b) -> {}
-        );
+        ));
+    }
 
+    public static Mono<?> handle(GatewayDiscordClient client, BotConfig config){
         // This part should be fast.
         return client.on(MessageCreateEvent.class)
             .filter(event -> !event.getMessage().getContent().isEmpty()                     // Empty check
                 && !event.getMessage().getAuthor().map(User::isBot).orElse(true)            // Is bot?
                 && checkPrefix(event, event.getMessage().getContent(), config))             // Prefix check
-            .flatMap(event -> checkCommand(event, config, commands))                        // Command check
+            .flatMap(event -> checkCommand(event, config))                        // Command check
             .then();
     }
 
-    // TODO: too complex
-    private static Mono<?> checkCommand(MessageCreateEvent event, BotConfig config, Map<String, Command> commands){
+    // TODO: too complex?
+    private static Mono<?> checkCommand(MessageCreateEvent event, BotConfig config){
         String invokedName = getInvokedName(event, config);
 
         // Prefix only, or command disabled.
@@ -124,5 +131,10 @@ public class CommandHandler {
             errorMessage = t.toString();
         }
         return channel.createMessage(String.format(ERROR_MSG, errorMessage));
+    }
+
+    // Lowercase keys.
+    public static Map<String, Command> getCommands() {
+        return commands;
     }
 }

@@ -28,17 +28,18 @@ public class ModuleCmd extends GuildCommand {
     @Override
     public Mono<?> execute(CommandCtx ctx) {
         if (ctx.getArgs().isEmpty()){       // return list of enabled modules
-            return Flux.fromIterable(
+            return Flux.fromIterable(                           // Gets the list of enabled modules for the guild
                     ctx.getBotConfig()
                         .getGuildConfig(ctx.getGuildId().orElse(Snowflake.of(0L)))
                         .getEnabledModules())
-                .sort()
-                .map("\n"::concat)
-                .collect(StringBuilder::new, StringBuilder::append)
-                .map(StringBuilder::toString)
-                .filter(not(String::isBlank))
-                .map(s -> String.format(MODULE_LIST_MSG, s))
-                .defaultIfEmpty("There are no enabled modules.")
+                .map(s -> s.substring(0,1).toUpperCase() + s.substring(1))      // Capitalize first letter
+                .sort()                                                         // Sort alphabetically
+                .map("\n"::concat)                                              // Add newline before each item
+                .collect(StringBuilder::new, StringBuilder::append)             // Append all items into a StringBuilder
+                .map(StringBuilder::toString)                                   // Convert to String
+                .filter(not(String::isBlank))                                   // Ensure it isn't blank
+                .map(s -> String.format(MODULE_LIST_MSG, s))                    // Format
+                .defaultIfEmpty("There are no enabled modules.")                // No items in getEnabledModules
                 .flatMap(ctx::sendReply);
         }
 

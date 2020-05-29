@@ -8,6 +8,7 @@ import discord4j.core.object.entity.Member;
 import discord4j.core.object.entity.Message;
 import discord4j.core.object.entity.User;
 import discord4j.core.object.entity.channel.MessageChannel;
+import discord4j.core.spec.EmbedCreateSpec;
 import discord4j.gateway.ShardInfo;
 import lyrth.makanism.common.file.config.BotConfig;
 import lyrth.makanism.common.file.config.GuildConfig;
@@ -15,6 +16,7 @@ import reactor.core.publisher.Mono;
 
 import java.time.Instant;
 import java.util.Optional;
+import java.util.function.Consumer;
 
 public class CommandCtx {
 
@@ -43,6 +45,12 @@ public class CommandCtx {
 
     public GuildConfig getGuildConfig(){
         return getGuildId().isPresent() ? config.getGuildConfig(getGuildId().get()) : null;
+    }
+
+    public String getPrefix(){
+        GuildConfig config = getGuildConfig();
+        if (config != null) return config.getPrefix();
+        else return getBotConfig().getDefaultPrefix();
     }
 
     public GuildConfig setModuleSetting(String module, String key, String value){
@@ -88,6 +96,10 @@ public class CommandCtx {
         );
     }
 
+    public String getAuthorIdText(){
+        return getAuthorId().map(Snowflake::asString).orElse("Invalid user.");
+    }
+
     public Instant getTimestamp(){
         return event.getMessage().getTimestamp();
     }
@@ -109,6 +121,12 @@ public class CommandCtx {
     public <T> Mono<T> sendReply(String message){        // TODO: Checking?
         return getChannel()
             .flatMap(channel -> channel.createMessage(message))
+            .then(Mono.empty());
+    }
+
+    public <T> Mono<T> sendReply(Consumer<EmbedCreateSpec> embed){
+        return getChannel()
+            .flatMap(channel -> channel.createMessage(spec -> spec.setEmbed(embed)))
             .then(Mono.empty());
     }
 }

@@ -8,13 +8,26 @@ import lyrth.makanism.api.object.CommandCtx;
 import reactor.core.publisher.Mono;
 import reactor.util.annotation.Nullable;
 
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.Set;
+
 @CommandInfo()
 public abstract class Command {
 
     private final CommandInfo commandInfo = this.getClass().getAnnotation(CommandInfo.class);
+    private static final Set<String> categories = new HashSet<>();
+
+    {
+        if (!commandInfo.category().equals("\0") || this.getParentModuleName().isEmpty()) { // non-module
+            categories.add(this.getCategory());
+
+        }
+    }
+
 
     public String getName(){
-        return commandInfo.name().equals("\0") ? this.getClass().getSimpleName().toLowerCase() : commandInfo.name();
+        return commandInfo.name().equals("\0") ? this.getClass().getSimpleName() : commandInfo.name();
     }
 
     public String[] getAliases(){
@@ -44,6 +57,10 @@ public abstract class Command {
         }
     }
 
+    public Set<String> getAllCategories(){
+        return Collections.unmodifiableSet(categories);
+    }
+
     public String getDesc(){
         return commandInfo.desc();
     }
@@ -53,6 +70,7 @@ public abstract class Command {
     }
 
     // Returns the name of the parent module with proper capitalization
+    // Is empty if not module command (or just not specified for non-GuildModule commands)
     public String getParentModuleName(){
         return commandInfo.parentModule().equals(IModule.class) ?
             "" :
