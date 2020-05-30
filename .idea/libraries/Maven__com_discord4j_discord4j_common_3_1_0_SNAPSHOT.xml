@@ -1,13 +1,13 @@
 <component name="libraryTable">
   <library name="Maven: com.discord4j:discord4j-common:3.1.0-SNAPSHOT">
     <CLASSES>
-      <root url="jar://$MAVEN_REPOSITORY$/com/discord4j/discord4j-common/3.1.0-SNAPSHOT/discord4j-common-3.1.0-20200526.144903-215.jar!/" />
+      <root url="jar://$MAVEN_REPOSITORY$/com/discord4j/discord4j-common/3.1.0-SNAPSHOT/discord4j-common-3.1.0-20200528.020839-217.jar!/" />
     </CLASSES>
     <JAVADOC>
-      <root url="jar://$MAVEN_REPOSITORY$/com/discord4j/discord4j-common/3.1.0-SNAPSHOT/discord4j-common-3.1.0-20200526.144903-215-javadoc.jar!/" />
+      <root url="jar://$MAVEN_REPOSITORY$/com/discord4j/discord4j-common/3.1.0-SNAPSHOT/discord4j-common-3.1.0-20200528.020839-217-javadoc.jar!/" />
     </JAVADOC>
     <SOURCES>
-      <root url="jar://$MAVEN_REPOSITORY$/com/discord4j/discord4j-common/3.1.0-SNAPSHOT/discord4j-common-3.1.0-20200526.144903-215-sources.jar!/" />
+      <root url="jar://$MAVEN_REPOSITORY$/com/discord4j/discord4j-common/3.1.0-SNAPSHOT/discord4j-common-3.1.0-20200528.020839-217-sources.jar!/" />
     </SOURCES>
   </library>
 </component>

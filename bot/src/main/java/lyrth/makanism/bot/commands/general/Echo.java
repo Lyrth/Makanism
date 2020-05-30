@@ -15,7 +15,6 @@ public class Echo extends GuildCommand {
 
     @Override
     public Mono<?> execute(CommandCtx ctx) {
-        return Mono.just(ctx.getArgs().getRest(1).replace('@', '%'))
-            .flatMap(ctx::sendReply);
+        return ctx.sendReply(ctx.getArgs().getRest(1));
     }
 }

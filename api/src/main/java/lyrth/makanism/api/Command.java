@@ -39,6 +39,7 @@ public abstract class Command {
         return commandInfo.accessLevel();
     }
 
+    // Uppercase initial.
     public String getCategory(){
         if (commandInfo.category().equals("\0")){       // auto-generate
             if (!this.getParentModuleName().isEmpty()){     // is a module command?

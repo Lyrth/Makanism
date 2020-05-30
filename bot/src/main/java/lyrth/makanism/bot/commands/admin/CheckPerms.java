@@ -22,6 +22,7 @@ public class CheckPerms extends GuildCommand {
             .map(perm -> perm.name() + " " + perm.getValue() + "\n")
             .collect(StringBuilder::new, StringBuilder::append)
             .map(StringBuilder::toString)
+            .map(s -> "``` " + s + "```")
             .flatMap(ctx::sendReply);
     }
 }

@@ -4,7 +4,7 @@ import lyrth.makanism.common.file.impl.FileSourceProvider;
 @SuppressWarnings("JavaRequiresAutoModule")
 module lyrth.makanism.common {
 
-    exports lyrth.makanism.common;
+    //exports lyrth.makanism.common;
     exports lyrth.makanism.common.file;
     exports lyrth.makanism.common.file.config;
     exports lyrth.makanism.common.file.impl;

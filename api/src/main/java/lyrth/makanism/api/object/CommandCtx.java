@@ -119,14 +119,23 @@ public class CommandCtx {
     }
 
     public <T> Mono<T> sendReply(String message){        // TODO: Checking?
-        return getChannel()
-            .flatMap(channel -> channel.createMessage(message))
-            .then(Mono.empty());
+        return sendReply(message, true);
     }
 
     public <T> Mono<T> sendReply(Consumer<EmbedCreateSpec> embed){
         return getChannel()
             .flatMap(channel -> channel.createMessage(spec -> spec.setEmbed(embed)))
+            .then(Mono.empty());
+    }
+
+    public <T> Mono<T> sendReply(String message, boolean filtered){
+        return getChannel()
+            .flatMap(channel -> channel.createMessage(
+                filtered ?
+                    message.replace("@everyone", "@\u200Beveryone")
+                        .replace("@here", "@\u200Bhere") :
+                    message
+            ))
             .then(Mono.empty());
     }
 }

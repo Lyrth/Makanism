@@ -19,21 +19,21 @@ import java.util.function.Consumer;
     desc = "Shows some help?",
     usage = "[<command name>]"
 )
-public class Help extends BotCommand {              // FIXME: just do imperative lmao
+public class Help extends BotCommand {
 
     @Override
     public Mono<?> execute(CommandCtx ctx) {
 
         // A: no args: list the command categories. would essentially be equivalent to CommandsCmd
         if (ctx.getArgs().isEmpty()){       // return list of categories
-            return CommandsCmd.getCategories(ctx, getAllCategories());
-        } else {
-            return Mono.justOrEmpty(    // smol todo: fuzzy search
-                    getCommand(ctx.getArg(1), ((ModuleHandler) ctx.getBotConfig().getModuleHandler())))
-                .map(cmd -> buildHelp(cmd, ctx))
-                .switchIfEmpty(ctx.sendReply("Command not found."))
-                .flatMap(ctx::sendReply);
+            return CommandsCmd.sendCategories(ctx, getAllCategories());
         }
+
+        return Mono.justOrEmpty(    // smol todo: fuzzy search
+                getCommand(ctx.getArg(1), ((ModuleHandler) ctx.getBotConfig().getModuleHandler())))
+            .map(cmd -> buildHelp(cmd, ctx))
+            .switchIfEmpty(ctx.sendReply("Command not found."))
+            .flatMap(ctx::sendReply);
     }
 
     private static Optional<Command> getCommand(String name, ModuleHandler moduleHandler){
@@ -53,7 +53,12 @@ public class Help extends BotCommand {              // FIXME: just do imperative
             else
                 embed.addField("Category:", command.getCategory(), true);
             embed.addField("Access level:", command.getPerms().name(), true);
-            embed.setFooter("help - " + ctx.getAuthorIdText(), null);
+            embed.setFooter(
+                    "[<...>] - arg is optional \n" +
+                    "(<...>) - arg is required \n" +
+                    "aaa|bbb - arg is either aaa or bbb \n" +
+                    "help : " + ctx.getAuthorIdText(),
+                null);
         };
     }
 }

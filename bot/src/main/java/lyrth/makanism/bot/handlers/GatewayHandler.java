@@ -9,8 +9,8 @@ import lyrth.makanism.common.file.impl.FileSourceProvider;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import reactor.core.publisher.Mono;
-import reactor.core.scheduler.Schedulers;
 
+import java.time.Duration;
 import java.util.HashMap;
 
 public class GatewayHandler {
@@ -25,7 +25,9 @@ public class GatewayHandler {
 
                 Runtime.getRuntime().addShutdownHook(new Thread(() -> {
                     log.info("Shutdown initiated. Saving...");
-                    botConfig.saveAll().and(client.logout()).subscribeOn(Schedulers.immediate()).block();
+                    botConfig.saveAll()             // TODO: disable modules
+                        .and(client.logout().timeout(Duration.ofMinutes(2)).retry(3))
+                        .block();
                     System.out.println("Shutting down.");
                 }));
 

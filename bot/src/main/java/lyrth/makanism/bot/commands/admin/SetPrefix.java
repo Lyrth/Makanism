@@ -9,16 +9,25 @@ import reactor.core.publisher.Mono;
 @CommandInfo(
     aliases = {"prefix"},
     accessLevel = AccessLevel.OWNER,
-    desc = "Sets the server's command prefix.",
-    usage = "(<prefix>)"
+    desc = "Set or get the server's command prefix.",
+    usage = "[<prefix>]"
 )
-public class SetPrefix extends GuildCommand {       // TODO: rename to prefix, show prefix
+public class SetPrefix extends GuildCommand {
+
+    private static final String GET_PREFIX_MSG = "The server prefix is `%s`.";
+    private static final String SET_PREFIX_MSG = "Server command prefix changed to `%s`.";
+
 
     @Override
     public Mono<?> execute(CommandCtx ctx) {
-        return Mono.just(ctx.getArgs().getRest(1).replace(' ', '_')) // todo not empty
-            .doOnNext(prefix -> ctx.getGuildConfig().setPrefix(prefix))
-            .map(prefix -> "Server command prefix changed to `" + prefix + "`.")
-            .flatMap(ctx::sendReply);
+
+        if (ctx.getArgs().isEmpty()){
+            return ctx.sendReply(String.format(GET_PREFIX_MSG, ctx.getGuildConfig().getPrefix()));
+        }
+
+        String newPrefix = ctx.getArgs().getRest(1).replace(' ', '_');
+        ctx.getGuildConfig().setPrefix(newPrefix);
+
+        return ctx.sendReply(String.format(SET_PREFIX_MSG, newPrefix));
     }
 }

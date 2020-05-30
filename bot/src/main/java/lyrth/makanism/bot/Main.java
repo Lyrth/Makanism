@@ -5,6 +5,8 @@ import discord4j.core.DiscordClientBuilder;
 import discord4j.core.event.EventDispatcher;
 import discord4j.core.object.presence.Activity;
 import discord4j.core.object.presence.Presence;
+import discord4j.gateway.intent.Intent;
+import discord4j.gateway.intent.IntentSet;
 import discord4j.store.api.service.StoreService;
 import discord4j.store.redis.RedisStoreService;
 import io.lettuce.core.RedisException;
@@ -53,11 +55,16 @@ public class Main {
             BotProps.D4JProps.get("git.commit.time")
         );
 
-        DiscordClientBuilder.create(token).build()
-            .gateway()
+        DiscordClientBuilder.create(token).build().gateway()
             .setStoreService(getStoreService())
-            .setInitialStatus(shardInfo -> Presence.doNotDisturb(Activity.listening("initialization sounds.")))
             .setEventDispatcher(EventDispatcher.replayingWithSize(16))
+            .setDisabledIntents(IntentSet.of(
+                Intent.GUILD_PRESENCES,
+                Intent.GUILD_MEMBERS,
+                Intent.GUILD_MESSAGE_TYPING,
+                Intent.DIRECT_MESSAGE_TYPING
+            ))
+            .setInitialStatus(shardInfo -> Presence.doNotDisturb(Activity.listening("initialization sounds.")))
             .withGateway(GatewayHandler::create)
             .block();
 

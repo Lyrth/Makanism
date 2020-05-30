@@ -29,7 +29,7 @@ public class Sudo extends BotCommand {
     private static final Logger log = LoggerFactory.getLogger(Sudo.class);
 
     @Override
-    public Mono<?> execute(CommandCtx ctx) {        // TODO: fix mess
+    public Mono<?> execute(CommandCtx ctx) {
         return Mono.just(ctx.getArg(1).replaceAll("(<@!?)?(\\d{12,})>?","$2"))
             .flatMap(strId -> Mono.fromCallable(() -> Long.parseLong(strId)))
             .flatMap(id ->
