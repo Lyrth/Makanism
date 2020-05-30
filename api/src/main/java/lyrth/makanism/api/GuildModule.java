@@ -3,16 +3,23 @@ package lyrth.makanism.api;
 import discord4j.common.util.Snowflake;
 import discord4j.core.GatewayDiscordClient;
 import lyrth.makanism.api.annotation.GuildModuleInfo;
+import lyrth.makanism.api.object.CommandCtx;
 import lyrth.makanism.common.file.config.BotConfig;
 import lyrth.makanism.common.file.config.GuildConfig;
+import lyrth.makanism.common.file.config.ModuleConfig;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import reactor.core.publisher.DirectProcessor;
 import reactor.core.publisher.FluxSink;
 import reactor.core.publisher.Mono;
 
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.ParameterizedType;
 import java.util.concurrent.ConcurrentHashMap;
 
 @GuildModuleInfo()
-public abstract class GuildModule implements IModule {
+public abstract class GuildModule<T extends ModuleConfig> implements IModule {
+    private static final Logger log = LoggerFactory.getLogger(GuildModule.class);
 
     private final GuildModuleInfo moduleInfo = this.getClass().getAnnotation(GuildModuleInfo.class);
 
@@ -80,7 +87,35 @@ public abstract class GuildModule implements IModule {
     }
 
     @SuppressWarnings("unchecked")      // because this works fine
-    public Class<GuildModuleCommand<GuildModule>>[] getModuleCommands(){
-        return (Class<GuildModuleCommand<GuildModule>>[]) moduleInfo.commands();
+    public Class<GuildModuleCommand<GuildModule<?>>>[] getModuleCommands(){
+        return (Class<GuildModuleCommand<GuildModule<?>>>[]) moduleInfo.commands();
+    }
+
+    public T getConfig(Snowflake guildId){
+        if (!isEnabledFor(guildId)) return null;
+
+        T config = enabledGuilds.get(guildId).getModuleConfig(this.getName().toLowerCase(), getConfigClass());
+        if (config == null){
+            T newConfig;
+            try {
+                newConfig = getConfigClass().getConstructor().newInstance();
+            } catch (InstantiationException | IllegalAccessException | InvocationTargetException | NoSuchMethodException e) {
+                log.error("Error instantiating {} for {}! {}", getConfigClass().getSimpleName(), this.getName(), e.getMessage());
+                return null;
+            }
+            enabledGuilds.get(guildId).putModuleConfig(this.getName().toLowerCase(), newConfig);
+            return newConfig;
+        }
+        return config;
+    }
+
+    public T getConfig(CommandCtx ctx){
+        return getConfig(ctx.getGuildId().orElse(Snowflake.of(0L)));
+    }
+
+    @SuppressWarnings("unchecked")
+    public Class<T> getConfigClass(){
+        return (Class<T>) ((ParameterizedType) this.getClass().getGenericSuperclass())
+            .getActualTypeArguments()[0];
     }
 }

@@ -83,7 +83,7 @@ public class CommandsCmd extends BotCommand {
         return ctx.sendReply(String.format(CAT_LIST_MSG, categories, ctx.getPrefix()));
     }
 
-    private static Collection<GuildModuleCommand<GuildModule>> getCommands(ModuleHandler moduleHandler){
+    private static Collection<GuildModuleCommand<GuildModule<?>>> getCommands(ModuleHandler moduleHandler){
         return moduleHandler.getGuildModuleCmds().values();
     }
 }

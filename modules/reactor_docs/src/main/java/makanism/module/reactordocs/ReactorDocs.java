@@ -1,16 +1,17 @@
 package makanism.module.reactordocs;
 
 import lyrth.makanism.api.GuildModule;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import reactor.core.publisher.Mono;
+
 //import org.apache.batik.transcoder.TranscoderException;
 //import org.apache.batik.transcoder.TranscoderInput;
 //import org.apache.batik.transcoder.TranscoderOutput;
 //import org.apache.batik.transcoder.image.JPEGTranscoder;
 //import org.jsoup.Jsoup;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import reactor.core.publisher.Mono;
 
-public class ReactorDocs extends GuildModule {
+public class ReactorDocs extends GuildModule<DocsConfig> {
     private static final Logger log = LoggerFactory.getLogger(ReactorDocs.class);
     /*
     public static void main(String[] args) throws IOException, TranscoderException {

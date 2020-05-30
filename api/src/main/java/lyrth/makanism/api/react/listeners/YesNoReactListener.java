@@ -21,7 +21,7 @@ public class YesNoReactListener extends ReactListener {     // TODO: lol actuall
                 if (emoji.getRaw().equals(EmojiUtils.getEmoji("white_check_mark").getEmoji()))
                     return event.getChannel().flatMap(ch -> ch.createMessage("check! :o"));
                 if (emoji.getRaw().equals(EmojiUtils.getEmoji("x").getEmoji()))
-                    return cancel();     // FIXME: don't delete, cancel instead.
+                    return cancel();
                 return Mono.empty();
             });
     }

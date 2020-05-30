@@ -72,7 +72,6 @@ public class CommandHandler {
             .then();
     }
 
-    // TODO: too complex?
     private static Mono<?> checkCommand(MessageCreateEvent event, BotConfig config){
         String invokedName = getInvokedName(event, config);
 
@@ -85,7 +84,7 @@ public class CommandHandler {
         if (command == null)            // Command not found: delegate to ModuleHandler
             return config.getModuleHandler().handleCommand(event,config,invokedName);
 
-        return command    // todo check # of args, filter if guildCommand? (already filtered?)
+        return command
             .allows(event.getMember().orElse(null), event.getMessage().getAuthor().orElse(null))
             .flatMap(allowed -> allowed ?
                 command.execute(CommandCtx.from(event, config, invokedName.toLowerCase())) :

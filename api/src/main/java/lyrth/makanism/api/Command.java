@@ -35,7 +35,6 @@ public abstract class Command {
     }
 
     public AccessLevel getPerms(){
-        // TODO: complain when there are perms for bot commands?
         return commandInfo.accessLevel();
     }
 

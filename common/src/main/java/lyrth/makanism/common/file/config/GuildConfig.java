@@ -10,10 +10,10 @@ import reactor.util.annotation.Nullable;
 import java.util.HashMap;
 import java.util.HashSet;
 
-public class GuildConfig {    // TODO not null fields
+public class GuildConfig {
 
-    private transient HashMap<String, HashMap<String,String>> modulesSettings;  // <Module, <[Submodule.]SettingName,Value>> TODO, jsonify V
-    private transient static final TypeToken<HashMap<String, HashMap<String,String>>> MOD_SETTINGS_TYPE = new TypeToken<>(){};
+    private transient HashMap<String, ModuleConfig> moduleConfigs;
+    private transient static final TypeToken<HashMap<String, ModuleConfig>> MOD_CONFIGS_TYPE = new TypeToken<>(){};
 
     private transient SourceProvider source;
     private transient Props props;
@@ -32,8 +32,8 @@ public class GuildConfig {    // TODO not null fields
         String path = "guilds/" + guildId.asString() + "/";
         return Mono.zip(
             source.read(path + "guild", GuildConfig.class),
-            source.read(path + "module_settings", MOD_SETTINGS_TYPE),
-            GuildConfig::setModulesSettings
+            source.read(path + "module_settings", MOD_CONFIGS_TYPE),    // TODO separate!!! mAKE V SPECIFIC TO A MODULE! CHECK MODULES TOO
+            GuildConfig::setModuleConfigs
         ).map(config ->
             config.setSource(source)
                 .setProps(props)
@@ -60,7 +60,7 @@ public class GuildConfig {    // TODO not null fields
         String path = "guilds/" + guildId.asString() + "/";
         return Mono.when(
             source.write(path + "guild", this),
-            source.write(path + "module_settings", modulesSettings)
+            source.write(path + "module_settings", moduleConfigs)       // TODO separate
         ).thenReturn(this);
     }
     public GuildConfig setPrefix(String prefix) {
@@ -74,6 +74,11 @@ public class GuildConfig {    // TODO not null fields
 
     public void removeEnabledModule(String moduleName) {
         this.enabledModules.remove(moduleName.toLowerCase());
+    }
+
+    public <T extends ModuleConfig> GuildConfig putModuleConfig(String moduleName, T config){
+        moduleConfigs.put(moduleName, config);
+        return this;
     }
 
     private GuildConfig setId(Snowflake id){
@@ -106,6 +111,17 @@ public class GuildConfig {    // TODO not null fields
         return this;
     }
 
+    private GuildConfig setModuleConfigs(HashMap<String, ModuleConfig> configs){
+        this.moduleConfigs = configs;
+        return this;
+    }
+
+    @Nullable
+    public <T extends ModuleConfig> T getModuleConfig(String moduleName, Class<T> type){
+        return type.cast(moduleConfigs.get(moduleName));
+    }
+
+    /*
     private GuildConfig setModulesSettings(HashMap<String, HashMap<String,String>> map){
         this.modulesSettings = map;
         return this;
@@ -130,6 +146,7 @@ public class GuildConfig {    // TODO not null fields
         getModuleSettings(moduleName).put(settingName, value);
         return this;
     }
+     */
 
     // Lowercase keys.
     public HashSet<String> getEnabledModules() {

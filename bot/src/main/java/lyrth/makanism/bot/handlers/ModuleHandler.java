@@ -9,6 +9,7 @@ import lyrth.makanism.api.object.CommandCtx;
 import lyrth.makanism.common.file.IModuleHandler;
 import lyrth.makanism.common.file.config.BotConfig;
 import lyrth.makanism.common.file.config.GuildConfig;
+import lyrth.makanism.common.file.config.ModuleConfig;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import reactor.core.publisher.Flux;
@@ -21,18 +22,21 @@ public class ModuleHandler  implements IModuleHandler {
     private static final Logger log = LoggerFactory.getLogger(ModuleHandler.class);
 
     // lowercase keys is enforced, both maps are unmodifiable
-    private final Map<String, GuildModule> guildModules;
-    private final Map<String, GuildModuleCommand<GuildModule>> guildModuleCmds;
+    private final Map<String, GuildModule<?>> guildModules;
+    private final Map<String, GuildModuleCommand<GuildModule<?>>> guildModuleCmds;
 
+    @SuppressWarnings({"rawtypes", "unchecked"})
     public static Mono<ModuleHandler> load(){   // once, should be called first, should be quick-completing
         ServiceLoader<GuildModule> loader = ServiceLoader.load(GuildModule.class);
 
         return Flux.fromIterable(loader)    // Wow didn't know that I can do this... ServiceLoader is an iterable!?
             .collectMap(                    // Oh and so ServiceLoader also instantiates the classes already? :o
                 /* Key */ module -> module.getName().toLowerCase(),             // *happy dragon noises*
-                /* Val */ module -> module,
+                /* Val */ module -> (GuildModule<ModuleConfig>) module,
                 /* Supplier*/ HashMap::new
-            ).map(ModuleHandler::new);
+            )
+            .doOnNext(map -> log.debug("Loaded {} modules.", map.size()))
+            .map(ModuleHandler::new);
     }
 
     public Mono<?> handle(GatewayDiscordClient client, BotConfig config){
@@ -42,10 +46,10 @@ public class ModuleHandler  implements IModuleHandler {
     }
 
     public Mono<?> handleCommand(MessageCreateEvent event, BotConfig config, String invokedName){
-        GuildModuleCommand<GuildModule> command = guildModuleCmds.get(invokedName.toLowerCase());
+        GuildModuleCommand<GuildModule<?>> command = guildModuleCmds.get(invokedName.toLowerCase());
         if (command == null) return Mono.empty();
 
-        GuildModule module = guildModules.get(command.getParentModuleName().toLowerCase());
+        GuildModule<?> module = guildModules.get(command.getParentModuleName().toLowerCase());
         if (module == null) return Mono.empty();
 
         return command
@@ -60,12 +64,12 @@ public class ModuleHandler  implements IModuleHandler {
                 .flatMap(ch -> CommandHandler.sendError(t, ch)));
     }
 
-    public ModuleHandler(Map<String,GuildModule> guildModules){
+    public ModuleHandler(Map<String,GuildModule<ModuleConfig>> guildModules){
         this.guildModules = Collections.unmodifiableMap(guildModules);
-        Map<String, GuildModuleCommand<GuildModule>> guildModuleCmds = new HashMap<>();
-        for (GuildModule module : guildModules.values()) {
-            for (Class<GuildModuleCommand<GuildModule>> commandClass : module.getModuleCommands()) {
-                GuildModuleCommand<GuildModule> command;
+        Map<String, GuildModuleCommand<GuildModule<?>>> guildModuleCmds = new HashMap<>();
+        for (GuildModule<?> module : guildModules.values()) {
+            for (Class<GuildModuleCommand<GuildModule<?>>> commandClass : module.getModuleCommands()) {
+                GuildModuleCommand<GuildModule<?>> command;
                 try {
                      command = commandClass.getConstructor().newInstance();
                 } catch (InstantiationException | IllegalAccessException | InvocationTargetException | NoSuchMethodException e) {
@@ -100,12 +104,12 @@ public class ModuleHandler  implements IModuleHandler {
     }
 
     // Lowercase keys.
-    public Map<String, GuildModule> getGuildModules() {
+    public Map<String, GuildModule<?>> getGuildModules() {
         return guildModules;
     }
 
     // Lowercase keys.
-    public Map<String, GuildModuleCommand<GuildModule>> getGuildModuleCmds() {
+    public Map<String, GuildModuleCommand<GuildModule<?>>> getGuildModuleCmds() {
         return guildModuleCmds;
     }
 }

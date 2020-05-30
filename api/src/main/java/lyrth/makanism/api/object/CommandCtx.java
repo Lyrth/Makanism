@@ -53,10 +53,11 @@ public class CommandCtx {
         else return getBotConfig().getDefaultPrefix();
     }
 
+    /* TODO: AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
     public GuildConfig setModuleSetting(String module, String key, String value){
         return getGuildId().isPresent() ?
             config.getGuildConfig(getGuildId().get()).setModuleSetting(module, key, value) : null;
-    }
+    }*/
 
     public Message getMessage() {
         return event.getMessage();
@@ -118,7 +119,7 @@ public class CommandCtx {
         return getArgs().get(index);
     }
 
-    public <T> Mono<T> sendReply(String message){        // TODO: Checking?
+    public <T> Mono<T> sendReply(String message){
         return sendReply(message, true);
     }
 

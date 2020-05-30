@@ -96,7 +96,9 @@ public class Reply<T extends Reply<T>> {
     // Makes the mentions within the message not ping any role or user, except for the invoker's.
     // setAllowedMentions after this method will override this.
     public T blockMassMentions(){
-        // todo: also modify message contents? in case discord's parser break for some reason
+        this.content = this.content
+            .replace("@everyone", "@\u200Beveryone")
+            .replace("@here", "@\u200Bhere");
         this.allowedMentions = AllowedMentions.builder()
             .parseType(
                 AllowedMentions.Type.ROLE,

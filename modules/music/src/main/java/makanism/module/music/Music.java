@@ -25,7 +25,7 @@ import java.util.concurrent.ConcurrentHashMap;
         Leave.class
     }
 )
-public class Music extends GuildModule {
+public class Music extends GuildModule<MusicConfig> {
     // private static final Logger log = LoggerFactory.getLogger(Music.class);
 
     // Most code taken from:
