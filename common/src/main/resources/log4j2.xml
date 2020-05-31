@@ -12,7 +12,7 @@
         <Console name="utillog" target="SYSTEM_OUT">
             <PatternLayout disableAnsi="false">
                 <pattern>
-                    %highlight{[%-5level]} %style{D%d{dd-HH:mm:ss.SSS}{GMT+8}}{dim,white} %style{[%16.16t]}{blue} %-35.35style{%c{1.}}{cyan} %highlight{%2level{ERROR=!&gt;, WARN=&gt;&gt;, INFO=&gt;, length=0} %msg%n%throwable}
+                    %highlight{[%-5level]} %style{D%d{dd-HH:mm:ss.SSS}{GMT+8}}{dim,white} %style{[%16.16t]}{blue} %style{%-27.27c{1.}}{cyan} %highlight{%2level{ERROR=!&gt;, WARN=&gt;&gt;, INFO=&gt;, length=0} %msg%n%throwable}
                 </pattern>
             </PatternLayout>
         </Console>

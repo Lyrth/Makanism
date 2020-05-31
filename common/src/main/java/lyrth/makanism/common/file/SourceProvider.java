@@ -6,8 +6,10 @@ import reactor.core.publisher.Mono;
 
 public interface SourceProvider {
 
-    <T> Mono<T>       read(String name, Class<T> clazz);
-    <T> Mono<T>       read(String name, TypeToken<T> clazz);
+    <T> Mono<T>       read(String name, Class<T> clazz);        // default createIfMissing true
+    <T> Mono<T>       read(String name, TypeToken<T> type);
+    <T> Mono<T>       read(String name, Class<T> clazz, boolean createIfMissing);
+    <T> Mono<T>       read(String name, TypeToken<T> type, boolean createIfMissing);
     <T> Mono<?>      write(String name, T t);
 
     Flux<String> listItems(String path);
@@ -23,8 +25,10 @@ public interface SourceProvider {
         |   `-- bot.json
         `-- guilds/
             `-- {guildID}/
-               |-- guild.json
-               `-- module_settings.json
+                |-- guild.json
+                `-- {moduleName}/
+                    |-- config.json
+                    `-- <other module files>
 
     Database structure:
     Makanism_config (database) [root]

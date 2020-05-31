@@ -2,21 +2,23 @@ package lyrth.makanism.common.file.config;
 
 import com.google.gson.reflect.TypeToken;
 import discord4j.common.util.Snowflake;
-import lyrth.makanism.common.file.Props;
 import lyrth.makanism.common.file.SourceProvider;
+import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.util.annotation.Nullable;
 
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Map;
+import java.util.Optional;
 
 public class GuildConfig {
 
-    private transient HashMap<String, ModuleConfig> moduleConfigs;
     private transient static final TypeToken<HashMap<String, ModuleConfig>> MOD_CONFIGS_TYPE = new TypeToken<>(){};
+    private transient final HashMap<String, ModuleConfig> moduleConfigs = new HashMap<>();
 
     private transient SourceProvider source;
-    private transient Props props;
+    private transient BotConfig botConfig;
 
     private HashSet<String> enabledModules;
     // private HashSet<String> enabledSubModules;      // submodules has module.submodule notation, no effect when parent module is disabled
@@ -28,31 +30,28 @@ public class GuildConfig {
 
 
     // Read from resource
-    public static Mono<GuildConfig> load(Snowflake guildId, SourceProvider source, Props props){
+    public static Mono<GuildConfig> load(Snowflake guildId, SourceProvider source, BotConfig botConfig){
         String path = "guilds/" + guildId.asString() + "/";
-        return Mono.zip(
-            source.read(path + "guild", GuildConfig.class),
-            source.read(path + "module_settings", MOD_CONFIGS_TYPE),    // TODO separate!!! mAKE V SPECIFIC TO A MODULE! CHECK MODULES TOO
-            GuildConfig::setModuleConfigs
-        ).map(config ->
-            config.setSource(source)
-                .setProps(props)
-                .setId(config.getId() == null ?
-                    guildId :
-                    config.getId())
-                .setPrefix(config.getPrefix() == null ?
-                    props.get("bot.prefix") :
-                    config.getPrefix())
-                .setCommandWhitelist(config.getCommandWhitelist() == null ?
-                    new HashSet<>() :
-                    config.getCommandWhitelist())
-                .setCommandBlacklist(config.getCommandBlacklist() == null ?
-                    new HashSet<>() :
-                    config.getCommandBlacklist())
-                .setEnabledModules(config.getEnabledModules() == null ?
-                    new HashSet<>() :
-                    config.getEnabledModules())
-        );
+        return source.read(path + "guild", GuildConfig.class)
+            .map(config -> config.setSource(source).setBotConfig(botConfig))
+            .flatMap(c -> c.readModuleConfigs(path))
+            .map(config ->
+                config.setId(config.getId() == null ?
+                        guildId :
+                        config.getId())
+                    .setPrefix(config.getPrefix() == null ?
+                        botConfig.getDefaultPrefix() :
+                        config.getPrefix())
+                    .setCommandWhitelist(config.getCommandWhitelist() == null ?
+                        new HashSet<>() :
+                        config.getCommandWhitelist())
+                    .setCommandBlacklist(config.getCommandBlacklist() == null ?
+                        new HashSet<>() :
+                        config.getCommandBlacklist())
+                    .setEnabledModules(config.getEnabledModules() == null ?
+                        new HashSet<>() :
+                        config.getEnabledModules())
+            );
     }
 
     // Write to resource
@@ -60,25 +59,44 @@ public class GuildConfig {
         String path = "guilds/" + guildId.asString() + "/";
         return Mono.when(
             source.write(path + "guild", this),
-            source.write(path + "module_settings", moduleConfigs)       // TODO separate
+            writeModuleConfigs(path, moduleConfigs)
         ).thenReturn(this);
     }
+
+    @SuppressWarnings("ReactiveStreamsNullableInLambdaInTransform")
+    private Mono<GuildConfig> readModuleConfigs(String path){
+        return Flux.fromIterable(botConfig.getModuleHandler().getModuleNames())
+            .map(String::toLowerCase)
+            .flatMap(moduleName ->  // createIfMissing false: don't create folders for unused modules
+                source.read(path + moduleName + "/config", botConfig.getModuleHandler().getModuleConfigClass(moduleName), false)
+                    .doOnNext(config -> moduleConfigs.put(moduleName, config)))
+            .then()
+            .thenReturn(this);
+    }
+
+    private Mono<Void> writeModuleConfigs(String path, Map<String, ModuleConfig> configs){
+        return Flux.fromIterable(configs.entrySet())
+            .flatMap(entry ->
+                source.write(path + entry.getKey() + "/config", entry.getValue()))
+            .then();
+    }
+
+
     public GuildConfig setPrefix(String prefix) {
         this.prefix = prefix.replace(' ', '_');
         return this;
     }
 
-    public void addEnabledModule(String moduleName) {
-        this.enabledModules.add(moduleName.toLowerCase());
+    public Optional<Boolean> enableModule(String moduleName){
+        return botConfig.enableGuildModule(moduleName, this.guildId);
     }
 
-    public void removeEnabledModule(String moduleName) {
-        this.enabledModules.remove(moduleName.toLowerCase());
+    public Optional<Boolean> disableModule(String moduleName){
+        return botConfig.disableGuildModule(moduleName, this.guildId);
     }
 
-    public <T extends ModuleConfig> GuildConfig putModuleConfig(String moduleName, T config){
+    public <T extends ModuleConfig> void putModuleConfig(String moduleName, T config){
         moduleConfigs.put(moduleName, config);
-        return this;
     }
 
     private GuildConfig setId(Snowflake id){
@@ -106,13 +124,8 @@ public class GuildConfig {
         return this;
     }
 
-    private GuildConfig setProps(Props props){
-        this.props = props;
-        return this;
-    }
-
-    private GuildConfig setModuleConfigs(HashMap<String, ModuleConfig> configs){
-        this.moduleConfigs = configs;
+    private GuildConfig setBotConfig(BotConfig botConfig){
+        this.botConfig = botConfig;
         return this;
     }
 
@@ -169,7 +182,11 @@ public class GuildConfig {
         return guildId;
     }
 
-    public Props getProps() {
-        return props;
+    public BotConfig getBotConfig() {
+        return botConfig;
+    }
+
+    public HashMap<String, ModuleConfig> getModuleConfigs() {
+        return moduleConfigs;
     }
 }

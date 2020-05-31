@@ -45,15 +45,15 @@ public class Main {
     private Main(String token, BotProps props){
         log.info("{} version {} starting.",
             props.get("bot.name"),
-            props.get("bot.version")
-        );
-        log.info("On Java version {}", System.getProperty("java.runtime.version"));
-        log.info("Running on Discord4J version {} (Git {}:{} built on {}).",
+            props.get("bot.version"));
+        log.info("On Java version {}",
+            System.getProperty("java.runtime.version"));
+        log.info("Running on Discord4J version {} (Git {}:{})",
             props.get("d4j.version"),
             BotProps.D4JProps.get(GitProperties.APPLICATION_VERSION),
-            BotProps.D4JProps.get("git.commit.id.abbrev"),
-            BotProps.D4JProps.get("git.commit.time")
-        );
+            BotProps.D4JProps.get("git.commit.id.abbrev"));
+        log.info("| built on {}.",
+            BotProps.D4JProps.get("git.commit.time"));
 
         DiscordClientBuilder.create(token).build().gateway()
             .setStoreService(getStoreService())
@@ -65,7 +65,7 @@ public class Main {
                 Intent.DIRECT_MESSAGE_TYPING
             ))
             .setInitialStatus(shardInfo -> Presence.doNotDisturb(Activity.listening("initialization sounds.")))
-            .withGateway(GatewayHandler::create)
+            .withGateway(GatewayHandler::create)        // TODO: Use withEventDispatcher for some events.
             .block();
 
         log.info("ded!");

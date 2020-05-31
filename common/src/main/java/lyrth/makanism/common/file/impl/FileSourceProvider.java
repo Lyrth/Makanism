@@ -32,14 +32,20 @@ public class FileSourceProvider implements SourceProvider {    // TODO : Caches
     }
 
     public FileSourceProvider(String root){
-        gson = new GsonBuilder().setPrettyPrinting().excludeFieldsWithModifiers(Modifier.TRANSIENT, Modifier.STATIC).create();
+        gson = new GsonBuilder()
+            .serializeNulls()
+            .setPrettyPrinting()
+            .excludeFieldsWithModifiers(Modifier.TRANSIENT, Modifier.STATIC)
+            .create();
         scheduler = Schedulers.boundedElastic();  // TODO: find a fitting scheduler. newBoundedElastic??
         this.root = root.endsWith("/") ? root : root + "/";
     }
 
-    // Gets T from a json file. Creates it when it doesn't exist and returns an empty/null-fields object;
+    // Gets T from a json file.
+    // Creates it when it doesn't exist and returns an empty/null-fields object;
+    // If createIfMissing is false, will return an empty Mono instead when file doesn't exist.
     @Override
-    public <T> Mono<T> read(String name, Class<T> clazz) {
+    public <T> Mono<T> read(String name, Class<T> clazz, boolean createIfMissing) {
         String fileName = root + (name.endsWith(".json") ? name : name + ".json");
         Mono<T> read = Mono.fromCallable(() -> {
                 BufferedReader reader = Files.newBufferedReader(Paths.get(fileName));
@@ -49,14 +55,21 @@ public class FileSourceProvider implements SourceProvider {    // TODO : Caches
                 return t;
             })
             .subscribeOn(scheduler)
+            .onErrorResume(t -> t instanceof IOException && !createIfMissing, t -> Mono.empty())
             .doOnError(err -> log.error("Error in reading file {}! ({})", fileName, err.getMessage()));
-            //.onErrorResume($ -> Mono.empty());
-        return createFile(fileName).then(read);
+        return createIfMissing ? createFile(fileName).then(read) : read;
+    }
+
+    @Override
+    public <T> Mono<T> read(String name, Class<T> clazz) {
+        return read(name, clazz, true);
     }
 
     // Gets T from a json file
+    // Creates it when it doesn't exist and returns an empty/null-fields object;
+    // If createIfMissing is false, will return an empty Mono instead when file doesn't exist.
     @Override
-    public <T> Mono<T> read(String name, TypeToken<T> type) {
+    public <T> Mono<T> read(String name, TypeToken<T> type, boolean createIfMissing) {
         String fileName = root + (name.endsWith(".json") ? name : name + ".json");
         Mono<T> read = Mono.fromCallable(() -> {
             BufferedReader reader = Files.newBufferedReader(Paths.get(fileName));
@@ -66,9 +79,14 @@ public class FileSourceProvider implements SourceProvider {    // TODO : Caches
             return t;
         })
             .subscribeOn(scheduler)
+            .onErrorResume(t -> t instanceof IOException && !createIfMissing, t -> Mono.empty())
             .doOnError(err -> log.error("Error in reading file {}! ({})", fileName, err.getMessage()));
-        //.onErrorResume($ -> Mono.empty());
-        return createFile(fileName).then(read);
+        return createIfMissing ? createFile(fileName).then(read) : read;
+    }
+
+    @Override
+    public <T> Mono<T> read(String name, TypeToken<T> type) {
+        return read(name, type, true);
     }
 
 
@@ -85,7 +103,7 @@ public class FileSourceProvider implements SourceProvider {    // TODO : Caches
             .subscribeOn(scheduler)
             .doOnError(err -> log.error("Error in writing to file {}! ({})", fileName, err.getMessage()));
             //.onErrorResume($ -> Mono.empty());
-        return moveBackup(fileName).then(write);
+        return moveBackup(fileName).then(createFile(fileName)).then(write);
     }
 
     // Creates a file if and only if it doesn't exist.
@@ -105,6 +123,7 @@ public class FileSourceProvider implements SourceProvider {    // TODO : Caches
         return Mono.fromCallable(() -> {
             File current = new File(fileName);
             File backup  = new File(fileName + ".bak");
+            if (!current.exists()) return 1;
             if (backup.exists() && !backup.delete())
                 log.warn("Cannot delete backup file {}.", fileName);
             if (!current.renameTo(backup))

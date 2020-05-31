@@ -63,7 +63,7 @@ public class Music extends GuildModule<MusicConfig> {
                     client.getVoiceConnectionRegistry()
                         .getVoiceConnection(vc.getGuildId())                // get current guild VoiceConnection
                         .flatMap(VoiceConnection::getChannelId)             // get what channel it is on
-                        .map(vc.getId()::equals)                            // make sure it's not the same channel
+                        .map(channelId -> !channelId.equals(vc.getId()))    // make sure it's not the same channel
                         .defaultIfEmpty(true)                               // connection is empty, so not in channel
                 )
                 .flatMap(vc -> vc.join(spec -> spec.setProvider(manager.provider)))

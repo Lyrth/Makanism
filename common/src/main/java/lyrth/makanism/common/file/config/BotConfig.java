@@ -59,7 +59,10 @@ public class BotConfig {
         return Optional.of(guildConfigs.get(guildId))   // this should never be null
             .flatMap(guildConfig ->
                 moduleHandler.enable(moduleName, guildConfig).map(b -> {
-                    if (b) guildConfig.addEnabledModule(moduleName);
+                    if (b) {
+                        guildConfig.getEnabledModules().add(moduleName.toLowerCase());
+                        guildConfig.getModuleConfigs().putIfAbsent(moduleName.toLowerCase(), null);
+                    }
                     return b;
                 })
             );
@@ -69,7 +72,7 @@ public class BotConfig {
         return Optional.of(guildConfigs.get(guildId))   // this should never be null
             .flatMap(guildConfig ->
                 moduleHandler.disable(moduleName, guildId).map(b -> {
-                    if (b) guildConfig.removeEnabledModule(moduleName);
+                    if (b) guildConfig.getEnabledModules().remove(moduleName.toLowerCase());
                     return b;
                 })
             );
@@ -96,7 +99,7 @@ public class BotConfig {
     }
 
     private BotConfig setModuleHandler(IModuleHandler handler) {
-        moduleHandler = handler;
+        this.moduleHandler = handler;
         return this;
     }
 

@@ -19,8 +19,7 @@ public class GatewayHandler {
     public static Mono<Void> create(GatewayDiscordClient client){
         final SourceProvider source = new FileSourceProvider("config");     // pick a SourceProvider impl
 
-        return ModuleHandler.load()
-            .flatMap(moduleHandler -> BotConfig.load(source, new HashMap<>(), new BotProps(), moduleHandler))
+        return BotConfig.load(source, new HashMap<>(), new BotProps(), new ModuleHandler())
             .flatMap(botConfig -> {
 
                 Runtime.getRuntime().addShutdownHook(new Thread(() -> {

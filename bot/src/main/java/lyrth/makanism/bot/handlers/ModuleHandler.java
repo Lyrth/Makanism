@@ -22,29 +22,46 @@ public class ModuleHandler  implements IModuleHandler {
     private static final Logger log = LoggerFactory.getLogger(ModuleHandler.class);
 
     // lowercase keys is enforced, both maps are unmodifiable
-    private final Map<String, GuildModule<?>> guildModules;
-    private final Map<String, GuildModuleCommand<GuildModule<?>>> guildModuleCmds;
+    private static final Map<String, GuildModule<?>> guildModules;
+    private static final Map<String, GuildModuleCommand<GuildModule<?>>> guildModuleCmds;
 
-    @SuppressWarnings({"rawtypes", "unchecked"})
-    public static Mono<ModuleHandler> load(){   // once, should be called first, should be quick-completing
+    static {
+        @SuppressWarnings("rawtypes")
         ServiceLoader<GuildModule> loader = ServiceLoader.load(GuildModule.class);
 
-        return Flux.fromIterable(loader)    // Wow didn't know that I can do this... ServiceLoader is an iterable!?
-            .collectMap(                    // Oh and so ServiceLoader also instantiates the classes already? :o
-                /* Key */ module -> module.getName().toLowerCase(),             // *happy dragon noises*
-                /* Val */ module -> (GuildModule<ModuleConfig>) module,
-                /* Supplier*/ HashMap::new
-            )
-            .doOnNext(map -> log.debug("Loaded {} modules.", map.size()))
-            .map(ModuleHandler::new);
+        Map<String,GuildModule<?>> guildModuleMap = loader.stream().map(ServiceLoader.Provider::get)
+            .collect(HashMap::new, (map, module) -> map.put(module.getName().toLowerCase(), module), (a,b)->{});
+
+        log.debug("Loaded {} modules.", guildModuleMap.size());
+
+        Map<String, GuildModuleCommand<GuildModule<?>>> guildModuleCmdsMap = new HashMap<>();
+        for (GuildModule<?> module : guildModuleMap.values()) {
+            for (Class<GuildModuleCommand<GuildModule<?>>> commandClass : module.getModuleCommands()) {
+                GuildModuleCommand<GuildModule<?>> command;
+                try {
+                    command = commandClass.getConstructor().newInstance();
+                } catch (InstantiationException | IllegalAccessException | InvocationTargetException | NoSuchMethodException e) {
+                    log.error("Error instantiating {} from {}! {}", commandClass.getSimpleName(), module.getName(), e.getMessage());
+                    continue;
+                }
+                guildModuleCmdsMap.putIfAbsent(command.getName().toLowerCase(), command);
+                for (String name : command.getAliases())
+                    guildModuleCmdsMap.putIfAbsent(name.toLowerCase(), command);
+            }
+        }
+
+        guildModules = Collections.unmodifiableMap(guildModuleMap);
+        guildModuleCmds = Collections.unmodifiableMap(guildModuleCmdsMap);
     }
 
+    @Override
     public Mono<?> handle(GatewayDiscordClient client, BotConfig config){
         return Flux.fromIterable(guildModules.values())
             .flatMap(guildModule -> guildModule.init(client, config))
             .then();
     }
 
+    @Override
     public Mono<?> handleCommand(MessageCreateEvent event, BotConfig config, String invokedName){
         GuildModuleCommand<GuildModule<?>> command = guildModuleCmds.get(invokedName.toLowerCase());
         if (command == null) return Mono.empty();
@@ -64,39 +81,24 @@ public class ModuleHandler  implements IModuleHandler {
                 .flatMap(ch -> CommandHandler.sendError(t, ch)));
     }
 
-    public ModuleHandler(Map<String,GuildModule<ModuleConfig>> guildModules){
-        this.guildModules = Collections.unmodifiableMap(guildModules);
-        Map<String, GuildModuleCommand<GuildModule<?>>> guildModuleCmds = new HashMap<>();
-        for (GuildModule<?> module : guildModules.values()) {
-            for (Class<GuildModuleCommand<GuildModule<?>>> commandClass : module.getModuleCommands()) {
-                GuildModuleCommand<GuildModule<?>> command;
-                try {
-                     command = commandClass.getConstructor().newInstance();
-                } catch (InstantiationException | IllegalAccessException | InvocationTargetException | NoSuchMethodException e) {
-                    log.error("Error instantiating {} from {}! {}", commandClass.getSimpleName(), module.getName(), e.getMessage());
-                    continue;
-                }
-                guildModuleCmds.putIfAbsent(command.getName().toLowerCase(), command);
-                for (String name : command.getAliases())
-                    guildModuleCmds.putIfAbsent(name.toLowerCase(), command);
-            }
-        }
-        this.guildModuleCmds = Collections.unmodifiableMap(guildModuleCmds);
-    }
-
+    @Override
     public void setupModulesFor(GuildConfig config){  // called in GuildConfigs orGuildHandler, once
         config.getEnabledModules().forEach(moduleName ->
-            enable(moduleName, config).ifPresentOrElse(b -> {}, () -> log.warn("{} module not found", moduleName)));
+            config.enableModule(moduleName).ifPresentOrElse(b -> {}, () -> log.warn("{} module not found", moduleName)));
     }
 
     // returns true: success, false: already enabled, empty: module not found
+    // WARNING: use BotConfig/GuildConfig#disable(Guild)Module instead.
+    @Override
     public Optional<Boolean> enable(String moduleName, GuildConfig config){  // can pass module.submodule notation
         log.debug("Enabling {} for {}", moduleName, config.getId().asString());
         return Optional.ofNullable(guildModules.get(moduleName.toLowerCase()))
             .map(guildModules -> guildModules.register(config));
     }
 
-    // returns true: success, false: already enabled, empty: module not found
+    // returns true: success, false: already disabled, empty: module not found
+    // WARNING: use BotConfig/GuildConfig#disable(Guild)Module instead.
+    @Override
     public Optional<Boolean> disable(String moduleName, Snowflake guildId){
         log.debug("Disabling {} for {}", moduleName, guildId.asString());
         return Optional.ofNullable(guildModules.get(moduleName.toLowerCase()))
@@ -111,5 +113,15 @@ public class ModuleHandler  implements IModuleHandler {
     // Lowercase keys.
     public Map<String, GuildModuleCommand<GuildModule<?>>> getGuildModuleCmds() {
         return guildModuleCmds;
+    }
+
+    @Override
+    public Class<? extends ModuleConfig> getModuleConfigClass(String moduleName) {
+        return guildModules.get(moduleName.toLowerCase()).getConfigClass();
+    }
+
+    @Override
+    public Set<String> getModuleNames() {
+        return guildModules.keySet();
     }
 }
