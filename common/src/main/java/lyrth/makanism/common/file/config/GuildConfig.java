@@ -30,7 +30,8 @@ public class GuildConfig {
 
 
     // Read from resource
-    public static Mono<GuildConfig> load(Snowflake guildId, SourceProvider source, BotConfig botConfig){
+    public static Mono<GuildConfig> load(Snowflake guildId, BotConfig botConfig){
+        SourceProvider source = botConfig.getSourceProvider();
         String path = "guilds/" + guildId.asString() + "/";
         return source.read(path + "guild", GuildConfig.class)
             .map(config -> config.setSource(source).setBotConfig(botConfig))

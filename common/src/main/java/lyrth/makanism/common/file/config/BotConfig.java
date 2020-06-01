@@ -88,9 +88,10 @@ public class BotConfig {
     }
 
 
-    public void setIds(Snowflake botId, Snowflake ownerId) {
+    public BotConfig setIds(Snowflake botId, Snowflake ownerId) {
         this.botId = botId;
         this.ownerId = ownerId;
+        return this;
     }
 
     private BotConfig setSource(SourceProvider source){

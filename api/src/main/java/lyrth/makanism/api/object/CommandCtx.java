@@ -123,13 +123,13 @@ public class CommandCtx {
         return sendReply(message, true);
     }
 
-    public <T> Mono<T> sendReply(Consumer<EmbedCreateSpec> embed){
+    public <T> Mono<T> sendReply(Consumer<EmbedCreateSpec> embed){      // TODO: check length
         return getChannel()
             .flatMap(channel -> channel.createMessage(spec -> spec.setEmbed(embed)))
             .then(Mono.empty());
     }
 
-    public <T> Mono<T> sendReply(String message, boolean filtered){
+    public <T> Mono<T> sendReply(String message, boolean filtered){     // TODO: check length
         return getChannel()
             .flatMap(channel -> channel.createMessage(
                 filtered ?

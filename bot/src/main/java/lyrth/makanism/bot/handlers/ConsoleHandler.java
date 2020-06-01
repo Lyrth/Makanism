@@ -1,6 +1,5 @@
 package lyrth.makanism.bot.handlers;
 
-import discord4j.core.GatewayDiscordClient;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import reactor.core.publisher.Flux;
@@ -13,7 +12,7 @@ import java.io.InputStreamReader;
 public class ConsoleHandler {
     private static final Logger log = LoggerFactory.getLogger(ConsoleHandler.class);
 
-    public static Mono<?> handle(GatewayDiscordClient client){
+    public static Mono<?> handle(){
         return Flux.fromStream(new BufferedReader(new InputStreamReader(System.in)).lines())    // console lines
             .flatMap(ConsoleHandler::handleConsoleCommand)
             .subscribeOn(Schedulers.newSingle("console"))   // subscribe on a different thread to not block the main thread

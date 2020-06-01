@@ -1,6 +1,6 @@
 package lyrth.makanism.bot.handlers;
 
-import discord4j.core.GatewayDiscordClient;
+import discord4j.core.event.EventDispatcher;
 import discord4j.core.event.domain.lifecycle.ReadyEvent;
 import discord4j.core.object.presence.Activity;
 import discord4j.core.object.presence.Presence;
@@ -11,8 +11,8 @@ import reactor.core.publisher.Mono;
 public class ReadyHandler {
     private static final Logger log = LoggerFactory.getLogger(ReadyHandler.class);
 
-    public static Mono<?> handle(GatewayDiscordClient client){
-        return client.on(ReadyEvent.class)
+    public static Mono<?> handle(EventDispatcher dispatcher){
+        return dispatcher.on(ReadyEvent.class)
             //.takeUntil(ready -> ready.getShardInfo().getIndex() == ready.getShardInfo().getCount() - 1)
             .doOnNext(ready -> log.info("Logged in as {}#{}", ready.getSelf().getUsername(), ready.getSelf().getDiscriminator()))
             .doOnNext(ready -> log.info("Shard [#{} total], in {} guilds", ready.getShardInfo().format(), ready.getGuilds().size()))

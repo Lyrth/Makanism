@@ -1,11 +1,11 @@
 package lyrth.makanism.bot.handlers;
 
 import discord4j.core.GatewayDiscordClient;
+import discord4j.core.event.EventDispatcher;
 import lyrth.makanism.api.object.AccessLevel;
-import lyrth.makanism.bot.util.BotProps;
+import lyrth.makanism.common.file.Props;
 import lyrth.makanism.common.file.SourceProvider;
 import lyrth.makanism.common.file.config.BotConfig;
-import lyrth.makanism.common.file.impl.FileSourceProvider;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import reactor.core.publisher.Mono;
@@ -16,38 +16,42 @@ import java.util.HashMap;
 public class GatewayHandler {
     private static final Logger log = LoggerFactory.getLogger(GatewayHandler.class);
 
-    public static Mono<Void> create(GatewayDiscordClient client){
-        final SourceProvider source = new FileSourceProvider("config");     // pick a SourceProvider impl
+    public static Mono<BotConfig> init(SourceProvider source, Props props){
+        // Only load ModuleHandler once subscribed to, to not block main thread
+        return Mono.defer(() -> BotConfig.load(source, new HashMap<>(), props, new ModuleHandler())).cache();
+    }
 
-        return BotConfig.load(source, new HashMap<>(), new BotProps(), new ModuleHandler())
-            .flatMap(botConfig -> {
+    public static Mono<Void> onSetup(EventDispatcher dispatcher, Mono<BotConfig> config){
+        return Mono.when(
+            GuildHandler.handle(dispatcher, config),
+            ReadyHandler.handle(dispatcher),
+            ConsoleHandler.handle()
+        );
+    }
 
-                Runtime.getRuntime().addShutdownHook(new Thread(() -> {
-                    log.info("Shutdown initiated. Saving...");
-                    botConfig.saveAll()             // TODO: disable modules
-                        .and(client.logout().timeout(Duration.ofMinutes(2)).retry(3))
-                        .block();
-                    System.out.println("Shutting down.");
-                }));
+    public static Mono<Void> onConnect(GatewayDiscordClient client, BotConfig config){
+        Runtime.getRuntime().addShutdownHook(new Thread(() -> {
+            log.info("Shutdown initiated. Saving...");
+            config.saveAll()             // TODO: disable modules
+                .and(client.logout().timeout(Duration.ofMinutes(2)).retry(3))
+                .block();
+            System.out.println("Shutting down.");
+        }));
 
-                return Mono.when(
-                    ReadyHandler.handle(client),
-                    GuildHandler.handle(client, botConfig),
-                    botConfig.getModuleHandler().handle(client, botConfig),
-                    ConsoleHandler.handle(client),
-                    SaveHandler.handle(client, botConfig),
-                    ReactionHandler.handle(client, botConfig),
-                    updateAndLoadConfig(client, botConfig)
-                        .flatMap(config -> CommandHandler.handle(client, config))
-                        .onErrorContinue((t, $) -> log.error("CAUgHt eWWoW!", t))
-                );
-            });
+        return Mono.when(
+            config.getModuleHandler().handle(client, config),   // Initializing each guild module
+            ReactionHandler.handle(client, config),
+            SaveHandler.handle(client, config),
+            updateAndLoadConfig(client, config)
+                .then(CommandHandler.handle(client, config))
+                .onErrorContinue((t, $) -> log.error("CAUgHt eWWoW!", t))
+        );
     }
 
     private static Mono<BotConfig> updateAndLoadConfig(GatewayDiscordClient client, BotConfig botConfig){
         return client.getApplicationInfo()
-            .doOnNext(appInfo -> botConfig.setIds(appInfo.getId(), appInfo.getOwnerId()))
-            .then(botConfig.update())
+            .map(appInfo -> botConfig.setIds(appInfo.getId(), appInfo.getOwnerId()))
+            .flatMap(BotConfig::update)
             .cache()
             .doOnNext(config -> AccessLevel.setBotOwnerId(config.getOwnerId()))
             .doOnNext(config -> log.info("Loaded bot config."));
