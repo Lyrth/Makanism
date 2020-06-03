@@ -5,6 +5,9 @@ module Music {
 
     requires lyrth.makanism.api;
 
+    requires lava.common;
+    requires lavaplayer;
+
     uses GuildModule;
 
     exports makanism.module.music;

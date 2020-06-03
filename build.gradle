@@ -1,0 +1,109 @@
+
+apply from: 'dependencies.gradle'
+
+ext {
+    jdk = '1.11'
+
+    artifact_group = 'lyrth.makanism'
+    project_version = '1.0.0-SNAPSHOT'
+
+    // deployment
+    deployDir = "$rootDir/__build" as String
+    deployLibDir = "$deployDir/lib" as String
+    deployModuleDir = "$deployDir/modules" as String
+    deployModuleLibDir = "$deployDir/modules" as String
+}
+
+allprojects {
+    apply plugin: 'java'
+
+    sourceCompatibility = jdk
+    targetCompatibility = jdk
+
+    group = artifact_group
+    version = project_version
+}
+
+subprojects {
+    archivesBaseName = "makanism-$project.name"
+
+    jar {
+        manifest {
+            attributes(
+                    'Implementation-Title': archivesBaseName,
+                    'Implementation-Version': archiveVersion
+            )
+        }
+    }
+}
+
+dependencies {
+    implementation project(':api')
+    implementation project(':common')
+    runtimeOnly project(':bot')
+}
+
+def FINAL_TASKS = 'Finalizing tasks'
+task copyDeps { group = FINAL_TASKS
+
+    println "a."
+
+    mkdir deployLibDir
+    inputs .dir(deployLibDir)
+    outputs.dir(deployLibDir)
+    doLast {
+        println "Copying dependencies into ${deployLibDir}..."
+        copy {  // copy the dependencies
+            from configurations.runtimeClasspath
+            into deployLibDir
+        }
+    }
+}
+
+task removeUnneeded { group = FINAL_TASKS
+    shouldRunAfter(copyDeps)
+    inputs .dir(deployLibDir)
+    outputs.dir(deployLibDir)
+    doLast {
+        Collection<String> inDir = layout.files {
+            file(deployLibDir).listFiles()
+        }.collect { it.name }
+
+        Collection<String> required = configurations.runtimeClasspath.collect { it.name }
+
+        Collection<String> toDelete = (inDir - required).collect { "$deployLibDir/$it" as String }
+
+        println 'Deleting unneeded files...'
+        toDelete.each { println "- $it" }
+        delete {
+            delete toDelete
+        }
+    }
+}
+
+task moveMainJar { group = FINAL_TASKS
+    dependsOn(':bot:build')
+    shouldRunAfter(removeUnneeded)
+    inputs .dir(deployLibDir)
+    outputs.dir(deployLibDir)
+    doLast {
+        String jarName = project(':bot').property('bot_archive_name')
+        if (jarName.blank){
+            println("jarName is blank!")
+            return
+        }
+        copy {
+            from "$deployLibDir/$jarName"
+            into deployDir
+        }
+        delete {
+            delete "$deployLibDir/$jarName"
+        }
+    }
+}
+
+tasks.findAll { it.group == FINAL_TASKS }.each {
+    it.dependsOn(build)
+    subprojects.each { pr -> it.dependsOn(":${pr.name}:build") }
+    build.finalizedBy(it)
+}

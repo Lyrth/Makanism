@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<module org.jetbrains.idea.maven.project.MavenProjectsManager.isMavenModule="true" type="JAVA_MODULE" version="4">
+<module type="JAVA_MODULE" version="4">
   <component name="NewModuleRootManager" LANGUAGE_LEVEL="JDK_11">
     <output url="file://$MODULE_DIR$/target/classes" />
     <output-test url="file://$MODULE_DIR$/target/test-classes" />
@@ -11,7 +11,7 @@
     </content>
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />
-    <orderEntry type="module" module-name="MakanismApi" />
+    <orderEntry type="library" name="Maven: lyrth.makanism:makanism-api:0.1.0-SNAPSHOT" level="project" />
     <orderEntry type="module" module-name="MakanismCommon" />
     <orderEntry type="library" name="Maven: io.projectreactor.netty:reactor-netty:0.9.7.RELEASE" level="project" />
     <orderEntry type="library" name="Maven: io.netty:netty-codec-http:4.1.49.Final" level="project" />

@@ -1,3 +1,17 @@
+
+# crash logs
+hs_err_pid*
+
+# Build
 */target/**
 *.class
-_build/
+*.jar
+build/*
+/_build/
+/__build/
+
+# Gradle
+.gradle
+/build/
+!*.gradle
+!gradle-wrapper.jar

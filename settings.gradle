@@ -1,0 +1,6 @@
+
+rootProject.name = 'Makanism'
+
+include 'api'
+include 'bot'
+include 'common'

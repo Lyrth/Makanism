@@ -1,17 +1,15 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
+  <component name="ExternalStorageConfigurationManager" enabled="true" />
+  <component name="FrameworkDetectionExcludesConfiguration">
+    <file type="web" url="file://$PROJECT_DIR$" />
+  </component>
   <component name="MavenProjectsManager">
     <option name="originalFiles">
       <list>
         <option value="$PROJECT_DIR$/../src/common/pom.xml" />
         <option value="$PROJECT_DIR$/../src/bot/pom.xml" />
-        <option value="$PROJECT_DIR$/api/pom.xml" />
         <option value="$PROJECT_DIR$/modules/test/pom.xml" />
-        <option value="$PROJECT_DIR$/common/pom.xml" />
-        <option value="$PROJECT_DIR$/bot/pom.xml" />
-        <option value="$PROJECT_DIR$/modules/music/pom.xml" />
-        <option value="$PROJECT_DIR$/modules/reactor_docs/pom.xml" />
-        <option value="$PROJECT_DIR$/modules/module-template/pom.xml" />
       </list>
     </option>
   </component>

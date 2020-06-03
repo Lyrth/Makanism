@@ -1,0 +1,83 @@
+
+ext {
+    // Discord related
+    discord4j_version = '3.1.0-SNAPSHOT'
+    lavaplayer_version = '1.3.47'
+
+    // Reactor related
+    r2dbc_postgres_version = '0.8.2.RELEASE'
+    blockhound_version = '1.0.3.RELEASE'
+
+    // Utilities
+    gson_version = '2.8.6'
+    classgraph_version = '4.8.80'
+    emoji4j_version = '6.0'
+
+    // Logging
+    jansi_version = '1.18'
+    slf4j_api_version = '1.7.30'
+    log4j_slf4j_impl_version = '2.12.1'
+}
+
+allprojects {
+    apply plugin: 'java-library'
+    apply plugin: 'extra-java-module-info'
+
+    dependencies {
+        // api deps are exposed to dependents
+        api "com.discord4j:discord4j-core:$discord4j_version"
+        api "io.r2dbc:r2dbc-postgresql:$r2dbc_postgres_version"
+
+        api "com.google.code.gson:gson:$gson_version"
+        api "io.github.classgraph:classgraph:$classgraph_version"
+        api "com.kcthota:emoji4j:$emoji4j_version"
+
+        api "org.slf4j:slf4j-api:$slf4j_api_version"
+
+        // implementation deps are for internal use
+        implementation "com.discord4j:stores-redis:$discord4j_version"
+
+        implementation "io.projectreactor.tools:blockhound:$blockhound_version"
+
+        implementation "org.fusesource.jansi:jansi:$jansi_version"
+        implementation "org.apache.logging.log4j:log4j-slf4j-impl:$log4j_slf4j_impl_version"
+    }
+
+    java {
+        modularity.inferModulePath = true
+    }
+
+    extraJavaModuleInfo {
+        automaticModule("emoji4j-${emoji4j_version}.jar", 'emoji4j')
+        module("classgraph-${classgraph_version}.jar", 'io.github.classgraph', classgraph_version) {
+            exports 'io.github.classgraph'
+        }
+
+        automaticModule("simple-fsm-1.0.1.jar", 'com.discord4j.fsm')
+        automaticModule("Servicer-1.0.2.jar", 'com.austinv11.servicer')
+
+        automaticModule("client-2.1.jar", 'com.ongres.scram.client')
+        automaticModule("common-2.1.jar", 'com.ongres.scram.common')
+        automaticModule("lambdaj-2.3.3.jar", 'ch.lambdaj')
+        automaticModule("hamcrest-all-1.1.jar", 'org.hamcrest')
+        automaticModule("objenesis-1.2.jar", 'org.objenesis')
+        automaticModule("cglib-nodep-2.2.jar", 'net.sf.cglib')
+        automaticModule("saslprep-1.1.jar", 'com.ongres.saslprep')
+        automaticModule("stringprep-1.1.jar", 'com.ongres.stringprep')
+        automaticModule("log4j-slf4j-impl-2.12.1.jar", 'org.apache.logging.log4j.impl')
+    }
+
+    repositories {
+        mavenCentral()
+        jcenter()
+        maven { url 'https://jitpack.io' }
+        maven {
+            url 'https://oss.sonatype.org/content/repositories/snapshots'
+            mavenContent { snapshotsOnly() }
+        }
+        maven {
+            url 'https://repo.spring.io/milestone'
+            mavenContent { releasesOnly() }
+        }
+    }
+}
