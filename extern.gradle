@@ -1,0 +1,18 @@
+
+ext {
+    artifact_group = 'lyrth.makanism'
+    project_version = '1.0.0'
+
+    // deployment
+    outputDir = 'output'
+    outputLibDir = 'lib'    // concat with outputDir
+
+    // bot-specific
+    bot_name = 'Makanism'
+    bot_version = project_version
+
+    bot_main_package = "${artifact_group}.bot" as String
+    bot_main_class = "${bot_main_package}.Main" as String
+
+    bot_archive_name = "${bot_name}.jar" as String
+}

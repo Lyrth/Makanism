@@ -1,17 +1,12 @@
 
 apply from: 'dependencies.gradle'
+apply from: 'extern.gradle'
 
 ext {
     jdk = '1.11'
-
-    artifact_group = 'lyrth.makanism'
-    project_version = '1.0.0-SNAPSHOT'
-
-    // deployment
-    deployDir = "$rootDir/__build" as String
-    deployLibDir = "$deployDir/lib" as String
-    deployModuleDir = "$deployDir/modules" as String
-    deployModuleLibDir = "$deployDir/modules" as String
+    
+    absoluteOutputDir = "$rootDir/$outputDir" as String
+    absoluteOutputLibDir = "$absoluteOutputDir/$outputLibDir" as String
 }
 
 allprojects {
@@ -45,33 +40,30 @@ dependencies {
 
 def FINAL_TASKS = 'Finalizing tasks'
 task copyDeps { group = FINAL_TASKS
-
-    println "a."
-
-    mkdir deployLibDir
-    inputs .dir(deployLibDir)
-    outputs.dir(deployLibDir)
+    mkdir absoluteOutputDir
+    mkdir absoluteOutputLibDir
+    inputs .dir(absoluteOutputLibDir)
+    outputs.dir(absoluteOutputLibDir)
     doLast {
-        println "Copying dependencies into ${deployLibDir}..."
+        println "Copying dependencies into ${absoluteOutputLibDir}..."
         copy {  // copy the dependencies
             from configurations.runtimeClasspath
-            into deployLibDir
+            into absoluteOutputLibDir
         }
     }
 }
 
 task removeUnneeded { group = FINAL_TASKS
     shouldRunAfter(copyDeps)
-    inputs .dir(deployLibDir)
-    outputs.dir(deployLibDir)
+    inputs .dir(absoluteOutputLibDir)   // always run
     doLast {
         Collection<String> inDir = layout.files {
-            file(deployLibDir).listFiles()
+            file(absoluteOutputLibDir).listFiles()
         }.collect { it.name }
 
         Collection<String> required = configurations.runtimeClasspath.collect { it.name }
 
-        Collection<String> toDelete = (inDir - required).collect { "$deployLibDir/$it" as String }
+        Collection<String> toDelete = (inDir - required).collect { "$absoluteOutputLibDir/$it" as String }
 
         println 'Deleting unneeded files...'
         toDelete.each { println "- $it" }
@@ -84,20 +76,22 @@ task removeUnneeded { group = FINAL_TASKS
 task moveMainJar { group = FINAL_TASKS
     dependsOn(':bot:build')
     shouldRunAfter(removeUnneeded)
-    inputs .dir(deployLibDir)
-    outputs.dir(deployLibDir)
+    inputs .dir(absoluteOutputLibDir)   // always run
     doLast {
-        String jarName = project(':bot').property('bot_archive_name')
-        if (jarName.blank){
+        String jarName = bot_archive_name
+        if (jarName == null || jarName.blank){
             println("jarName is blank!")
             return
         }
+        if (!file("$absoluteOutputLibDir/$jarName").exists()){
+            return
+        }
         copy {
-            from "$deployLibDir/$jarName"
-            into deployDir
+            from "$absoluteOutputLibDir/$jarName"
+            into absoluteOutputDir
         }
         delete {
-            delete "$deployLibDir/$jarName"
+            delete "$absoluteOutputLibDir/$jarName"
         }
     }
 }

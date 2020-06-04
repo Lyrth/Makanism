@@ -3,16 +3,6 @@ plugins {
     id 'java-library'
 }
 
-ext {
-    bot_name = 'Makanism'
-    bot_version = '1.0.0'
-
-    bot_main_package = "${project.group}.bot" as String
-    bot_main_class = "${bot_main_package}.Main" as String
-
-    bot_archive_name = "${bot_name}.jar" as String
-}
-
 dependencies {
     implementation project(':api')
     implementation project(':common')

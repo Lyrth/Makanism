@@ -6,9 +6,9 @@ hs_err_pid*
 */target/**
 *.class
 *.jar
+/output/
 build/*
 /_build/
-/__build/
 
 # Gradle
 .gradle
