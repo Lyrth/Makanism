@@ -1,23 +1,26 @@
 package lyrth.makanism.api.object;
 
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.regex.Pattern;
 
 // Index zero is the invoked command name
 public class Args {
 
+    private static final Pattern FLAG_PATTERN = Pattern.compile("(\\G|\\s+|^)/\\w(=\\S*)?(\\s+|$)");
+
+    private Map<Character, String> flags;
+
+    private final String original;
     private final String raw;
     private final String[] split;
 
-    public Args(String raw){
-        this.raw = raw;
-        this.split = raw.split("\\s+", 8);
-    }
-
-    // count: # of items that would appear in the array.
-    public Args(String raw, int count){
-        this.raw = raw;
-        this.split = raw.split("\\s+",count);
+    public Args(String input){
+        this.original = input;
+        this.raw = removeFlags(input);
+        this.split = this.raw.split("\\s+", 8);     // fixme? \s not equiv to Character.isWhitespace?
     }
 
     public String getRaw() {
@@ -26,21 +29,35 @@ public class Args {
 
     // 0 is always the command name.
     public String get(int index) {
-        if (index < 0) throw new IllegalArgumentException("Index cannot be less than 0.");
-        return (index < split.length) ? split[index] : "";
+        return checkIndex(index) ? split[index] : "";
     }
 
     // fromIndex is inclusive.
     /*  - fromIndex = 2
         0   1   2   3   4   5
-        cmd bbb ccc ddd eee ff
+        ;aa bbb ccc ddd eee ff
         - Returns:
         ccc ddd eee ff
      */
     public String getRest(int fromIndex){
-        if (fromIndex < 0) throw new IllegalArgumentException("Index cannot be less than 0.");
+        if (fromIndex < 0) throw new IndexOutOfBoundsException("Index cannot be less than 0.");
         String[] split = raw.split("\\s+", fromIndex + 1);
         return (fromIndex < split.length) ? split[fromIndex] : "";
+    }
+
+    public boolean hasFlag(char name){
+        if (!isValidFlag(name)) throw new IllegalArgumentException("Character is not a valid switch name.");
+        return getFlags().containsKey(name);
+    }
+
+    public String getFlagValue(char name){
+        if (!isValidFlag(name)) throw new IllegalArgumentException("Character is not a valid switch name.");
+        return getFlags().get(name);
+    }
+
+    public Map<Character, String> getFlags() {
+        if (this.flags == null) this.flags = parseFlags(original);  // lazy parse
+        return this.flags;
     }
 
     public String[] asArray(){
@@ -52,13 +69,11 @@ public class Args {
     }
 
     public boolean matchesAt(int index, String regex){
-        if (index < 0) throw new IllegalArgumentException("Index cannot be less than 0.");
-        return (index < split.length) && split[index].toLowerCase().matches(regex);
+        return checkIndex(index) && split[index].toLowerCase().matches(regex);
     }
 
     public boolean equalsAt(int index, String str){
-        if (index < 0) throw new IllegalArgumentException("Index cannot be less than 0.");
-        return (index < split.length) && split[index].equalsIgnoreCase(str);
+        return checkIndex(index) && split[index].equalsIgnoreCase(str);
     }
 
     // Returns true if command has no actual args, e.g.:
@@ -73,5 +88,62 @@ public class Args {
 
     public int getCount(){
         return split.length - 1;    // exclude the command name
+    }
+
+
+    // Utilities
+
+    // returns true if index is within split array length (max 8)
+    // false if it isn't
+    // throws an exception instead if the index is less than zero.
+    private boolean checkIndex(int index) throws IndexOutOfBoundsException {
+        if (index < 0) throw new IndexOutOfBoundsException("Index cannot be less than 0.");
+        return index < split.length;
+    }
+
+    private static String removeFlags(String in){
+        return FLAG_PATTERN.matcher(in).replaceAll(" ");
+    }
+
+    private static Map<Character, String> parseFlags(String in){
+        Map<Character, String> map = new HashMap<>();
+        int pos = -1;
+        while ((pos = in.indexOf('/', pos + 1)) != -1){
+            boolean hasEqual = (in.charAt(pos + 2) == '=');
+            if (!(Character.isWhitespace(in.charAt(pos + 2)) || hasEqual) ||
+                !(pos == 0 || Character.isWhitespace(in.charAt(pos - 1))) ||
+                !isValidFlag(in.charAt(pos + 1))
+            ) continue;
+
+            if (hasEqual){
+                if (pos + 3 >= in.length()){
+                    map.put(in.charAt(pos + 1), "");
+                    continue;
+                }
+                for (int i = pos + 3; i < in.length(); i++) {
+                    if (Character.isWhitespace(in.charAt(i))) {
+                        map.put(in.charAt(pos + 1), in.substring(pos + 3, i));
+                        pos = i;    // begin on match end to save resources
+                        break;
+                    }
+                    if (i == in.length() - 1){      // we've reached the end
+                        System.out.println("end");
+                        map.put(in.charAt(pos + 1), in.substring(pos + 3));
+                        pos = in.length();      // we're done
+                    }
+                }
+            } else {
+                map.put(in.charAt(pos + 1), "");
+                pos += 2;
+            }
+        }
+        return map;
+    }
+
+    private static boolean isValidFlag(char c) {
+        return (c >= 'A' && c <= 'Z') ||
+            (c >= 'a' && c <= 'z') ||
+            (c >= '0' && c <= '9') ||
+            (c == '_');     // yeah _ would be a switch
     }
 }
