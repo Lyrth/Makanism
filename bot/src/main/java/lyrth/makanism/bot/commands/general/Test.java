@@ -1,22 +1,51 @@
-package lyrth.makanism.bot.commands.owner;
+package lyrth.makanism.bot.commands.general;
 
+import discord4j.common.util.Snowflake;
 import discord4j.rest.util.Color;
 import lyrth.makanism.api.GuildCommand;
 import lyrth.makanism.api.annotation.CommandInfo;
 import lyrth.makanism.api.object.AccessLevel;
 import lyrth.makanism.api.object.CommandCtx;
+import lyrth.makanism.api.react.listeners.MenuReactListener;
+import lyrth.makanism.api.react.listeners.ReactListener;
+import lyrth.makanism.api.reply.MenuMessage;
 import lyrth.makanism.api.reply.SimplePaginator;
+import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
+import java.util.HashMap;
+import java.util.Map;
+import java.util.function.Function;
+
 @CommandInfo(
-    accessLevel = AccessLevel.OWNER,
+    accessLevel = AccessLevel.GENERAL,
     desc = "Tests something."
 )
 public class Test extends GuildCommand {
 
+    private final Map<String, Function<CommandCtx, Mono<?>>> tests = new HashMap<>();
+    {
+        tests.put("menumessage", this::menuMessageTest);
+        tests.put("pagination", this::paginationTest);
+        tests.put("flags", this::flagsTest);
+    }
+
     @Override
     public Mono<?> execute(CommandCtx ctx) {
-        /*
+        if (ctx.getArgs().isEmpty()){
+            return Flux.fromIterable(tests.keySet())
+                .map("\n"::concat)
+                .collect(StringBuilder::new, StringBuilder::append)
+                .map(StringBuilder::toString)
+                .map(s -> "Tests: (run as args to this command.) ```" + s + "```")
+                .flatMap(ctx::sendReply);
+        }
+
+        return Mono.justOrEmpty(tests.get(ctx.getArg(1).toLowerCase()))
+            .flatMap(f -> f.apply(ctx));
+    }
+
+    public Mono<?> menuMessageTest(CommandCtx ctx){
         ReactListener menuListener = new MenuReactListener(ctx.getAuthorId().orElse(Snowflake.of(0L)))
             .addAction("one", e -> ctx.sendReply("It's a one!"))
             .addAction("two", e -> ctx.sendReply("It's a two!"))
@@ -24,9 +53,10 @@ public class Test extends GuildCommand {
             .addAction("four", e -> ctx.sendReply("It's a four!"))
             .cancelOn("x")
             .addAction("b", e -> ctx.sendReply("It's a b!"));
-        return MenuMessage.create("1264xb", menuListener).send(ctx);
-        */
+        return MenuMessage.create(ctx, "1264xb", menuListener).send(ctx);
+    }
 
+    public Mono<?> paginationTest(CommandCtx ctx){
         SimplePaginator paginator = SimplePaginator.create(ctx)
             .addPage(spec -> spec
                 .setTitle("First page tho")
@@ -55,5 +85,15 @@ public class Test extends GuildCommand {
                 .setColor(Color.of(128, 86, 255))
             );
         return paginator.send(ctx);
+    }
+
+    public Mono<?> flagsTest(CommandCtx ctx){
+        return Flux.fromIterable(ctx.getArgs().getFlags().entrySet())
+            .map(entry -> entry.getKey() + ": [" + entry.getValue() + "]")
+            .map("\n"::concat)
+            .collect(StringBuilder::new, StringBuilder::append)
+            .map(StringBuilder::toString)
+            .map(s -> "Flags: ```" + s + "```")
+            .flatMap(ctx::sendReply);
     }
 }

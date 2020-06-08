@@ -109,8 +109,10 @@ public class Args {
         Map<Character, String> map = new HashMap<>();
         int pos = -1;
         while ((pos = in.indexOf('/', pos + 1)) != -1){
-            boolean hasEqual = (in.charAt(pos + 2) == '=');
-            if (!(Character.isWhitespace(in.charAt(pos + 2)) || hasEqual) ||
+            if (pos + 1 == in.length()) continue;           // end is slash
+            boolean atEdge = (pos + 2 == in.length());      // `/.$`: automatic no hasEqual
+            boolean hasEqual = !atEdge && (in.charAt(pos + 2) == '=');
+            if (!(atEdge || (Character.isWhitespace(in.charAt(pos + 2)) || hasEqual)) ||
                 !(pos == 0 || Character.isWhitespace(in.charAt(pos - 1))) ||
                 !isValidFlag(in.charAt(pos + 1))
             ) continue;
