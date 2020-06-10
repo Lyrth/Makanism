@@ -4,12 +4,13 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 // Index zero is the invoked command name
 public class Args {
 
-    private static final Pattern FLAG_PATTERN = Pattern.compile("(\\G|\\s+|^)/\\w(=\\S*)?(\\s+|$)");
+    private static final Pattern FLAG_PATTERN = Pattern.compile("\\s/(\\w)(=(\\S*))?(?!\\S)");  // todo: /+X -> X: "+", /-X=fish -> X: "-fish"; space support; escape flag; 'Succeeding is Literal' flag
 
     private Map<Character, String> flags;
 
@@ -20,9 +21,15 @@ public class Args {
     public Args(String input){
         this.original = input;
         this.raw = removeFlags(input);
-        this.split = this.raw.split("\\s+", 8);     // fixme? \s not equiv to Character.isWhitespace?
+        this.split = this.raw.split("\\s+", 8);
     }
 
+    // Raw is the original message contents.
+    public String getOriginal() {
+        return original;
+    }
+
+    // Raw is the original message contents **without the flags**.
     public String getRaw() {
         return raw;
     }
@@ -102,9 +109,28 @@ public class Args {
     }
 
     private static String removeFlags(String in){
-        return FLAG_PATTERN.matcher(in).replaceAll(" ");
+        return FLAG_PATTERN.matcher(in).replaceAll("");
     }
 
+    private static Map<Character, String> parseFlags(String in){
+        HashMap<Character, String> map = new HashMap<>();
+        Matcher mat = FLAG_PATTERN.matcher(in);
+        while (mat.find())
+            map.put(mat.group(1).charAt(0), mat.group(3) == null ? "" : mat.group(3));
+        return map;
+    }
+
+    private static boolean isValidFlag(char c) {
+        return (c >= 'A' && c <= 'Z') ||
+            (c >= 'a' && c <= 'z') ||
+            (c >= '0' && c <= '9') ||
+            (c == '_');     // yeah _ would be a switch
+    }
+}
+
+
+// Old code that's 10x faster; use if the performance is needed.
+/*
     private static Map<Character, String> parseFlags(String in){
         Map<Character, String> map = new HashMap<>();
         int pos = -1;
@@ -141,11 +167,4 @@ public class Args {
         }
         return map;
     }
-
-    private static boolean isValidFlag(char c) {
-        return (c >= 'A' && c <= 'Z') ||
-            (c >= 'a' && c <= 'z') ||
-            (c >= '0' && c <= '9') ||
-            (c == '_');     // yeah _ would be a switch
-    }
-}
+ */

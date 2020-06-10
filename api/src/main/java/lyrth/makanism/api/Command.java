@@ -13,7 +13,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 @CommandInfo()
-public abstract class Command {
+public abstract class Command {         // TODO: subCommands and help (?)
 
     private final CommandInfo commandInfo = this.getClass().getAnnotation(CommandInfo.class);
     private static final Set<String> categories = new HashSet<>();
