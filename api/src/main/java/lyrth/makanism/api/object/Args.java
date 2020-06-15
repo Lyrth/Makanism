@@ -93,7 +93,7 @@ public class Args {
         return !isEmpty();
     }
 
-    public int getCount(){
+    public int count(){
         return split.length - 1;    // exclude the command name
     }
 

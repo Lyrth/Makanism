@@ -5,7 +5,6 @@ import discord4j.core.event.domain.message.MessageCreateEvent;
 import discord4j.core.object.entity.Member;
 import discord4j.core.object.entity.Message;
 import discord4j.core.object.entity.User;
-import discord4j.discordjson.json.ImmutableMessageData;
 import discord4j.discordjson.json.ImmutablePartialMemberData;
 import discord4j.discordjson.json.ImmutableUserData;
 import discord4j.discordjson.json.MessageData;
@@ -51,7 +50,7 @@ public class Sudo extends BotCommand {
     }
 
     private static MessageData getMessageData(User user, CommandCtx ctx){
-        return ImmutableMessageData.builder()
+        return MessageData.builder()
             .id(ctx.getMessage().getId().asString())
             .channelId(ctx.getChannelId().asString())
             .guildId(Possible.of(ctx.getGuildId().orElse(Snowflake.of(0L)).asString()))

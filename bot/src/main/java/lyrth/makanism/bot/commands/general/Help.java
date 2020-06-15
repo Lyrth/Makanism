@@ -44,7 +44,7 @@ public class Help extends BotCommand {
     private static Consumer<EmbedCreateSpec> buildHelp(Command command, CommandCtx ctx){
         return embed -> {
             embed.setTitle(command.getName())
-                .setDescription(command.getDesc())
+                .setDescription(command.getDesc(ctx))
                 .addField("Usage:", ctx.getPrefix() + command.getUsage().toLowerCase(), true);
             if (command.getAliases().length > 0)
                 embed.addField("Aliases:", String.join(", ", command.getAliases()), true);

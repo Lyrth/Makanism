@@ -61,8 +61,12 @@ public abstract class Command {         // TODO: subCommands and help (?)
         return Collections.unmodifiableSet(categories);
     }
 
-    public String getDesc(){
-        return commandInfo.desc();
+    // Some parsed strings:
+    //  ${prefix} : replaced with the guild/bot prefix
+    public String getDesc(CommandCtx ctx){
+        return commandInfo.desc()
+            .replace("${prefix}", ctx.getPrefix())
+            ;
     }
 
     public String getUsage(){       // returns a string without the prefix.

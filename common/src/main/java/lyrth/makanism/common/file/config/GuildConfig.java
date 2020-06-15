@@ -23,7 +23,8 @@ public class GuildConfig {
     private HashSet<String> enabledModules;
     // private HashSet<String> enabledSubModules;      // submodules has module.submodule notation, no effect when parent module is disabled
     private HashSet<String> commandBlacklist;
-    private HashSet<String> commandWhitelist;    // Whitelist has precedence.
+    private HashSet<String> commandWhitelist;                   // Whitelist has precedence.
+    private HashMap<String, String> aliases;                    // Command aliases for the guild. (Converts key to value)
 
     private Snowflake guildId;
     private String prefix;
@@ -49,6 +50,9 @@ public class GuildConfig {
                     .setCommandBlacklist(config.getCommandBlacklist() == null ?
                         new HashSet<>() :
                         config.getCommandBlacklist())
+                    .setAliases(config.getAliases() == null ?
+                        new HashMap<>() :
+                        config.getAliases())
                     .setEnabledModules(config.getEnabledModules() == null ?
                         new HashSet<>() :
                         config.getEnabledModules())
@@ -120,6 +124,11 @@ public class GuildConfig {
         return this;
     }
 
+    public GuildConfig setAliases(HashMap<String, String> aliases) {
+        this.aliases = aliases;
+        return this;
+    }
+
     private GuildConfig setSource(SourceProvider source){
         this.source = source;
         return this;
@@ -173,6 +182,10 @@ public class GuildConfig {
 
     public HashSet<String> getCommandWhitelist() {
         return commandWhitelist;
+    }
+
+    public HashMap<String, String> getAliases() {
+        return aliases;
     }
 
     public String getPrefix() {

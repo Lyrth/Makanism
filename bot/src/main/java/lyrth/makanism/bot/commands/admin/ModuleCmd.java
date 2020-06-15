@@ -45,7 +45,7 @@ public class ModuleCmd extends GuildCommand {
         String moduleName = ctx.getArg(2).toLowerCase();
 
         // if first arg isn't enable/disable, or the arg is just enable/disable
-        if (!mode.matches("enable|disable") || ctx.getArgs().getCount() == 1)
+        if (!mode.matches("enable|disable") || ctx.getArgs().count() == 1)
             return ctx.sendReply("Invalid args.");
 
         Optional<Boolean> success;
