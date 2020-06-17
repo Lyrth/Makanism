@@ -67,6 +67,18 @@ public class Args {
         return this.flags;
     }
 
+    // concat the flags into a string that can be put back into a command message
+    public String concatFlags(){
+        StringBuilder result = new StringBuilder(" ");
+        for (Map.Entry<Character, String> entry : getFlags().entrySet()) {
+            result.append('/').append(entry.getKey());
+            if (!entry.getValue().isBlank())
+                result.append('=').append(entry.getValue());
+            result.append(' ');
+        }
+        return result.toString();
+    }
+
     public String[] asArray(){
         return split;
     }
@@ -112,6 +124,10 @@ public class Args {
         return FLAG_PATTERN.matcher(in).replaceAll("");
     }
 
+    // parse flags
+    // /F   -> "F":""
+    // /n=  -> "n":""
+    // /0=x -> "0":"x"
     private static Map<Character, String> parseFlags(String in){
         HashMap<Character, String> map = new HashMap<>();
         Matcher mat = FLAG_PATTERN.matcher(in);
