@@ -21,7 +21,6 @@ ext {
 
 allprojects {
     apply plugin: 'java-library'
-    apply plugin: 'extra-java-module-info'
 
     dependencies {
         // api deps are exposed to dependents
@@ -41,30 +40,6 @@ allprojects {
 
         implementation "org.fusesource.jansi:jansi:$jansi_version"
         implementation "org.apache.logging.log4j:log4j-slf4j-impl:$log4j_slf4j_impl_version"
-    }
-
-    java {
-        modularity.inferModulePath = true
-    }
-
-    extraJavaModuleInfo {
-        module("classgraph-${classgraph_version}.jar", 'io.github.classgraph', classgraph_version) {
-            exports 'io.github.classgraph'
-        }
-        automaticModule("emoji4j-${emoji4j_version}.jar", 'emoji4j')
-        //automaticModule("log4j-slf4j-impl-${log4j_slf4j_impl_version}.jar", 'org.apache.logging.log4j.impl')
-
-        automaticModule("simple-fsm-1.0.1.jar", 'com.discord4j.fsm')
-        automaticModule("Servicer-1.0.3.jar", 'com.austinv11.servicer')
-
-        automaticModule("client-2.1.jar", 'com.ongres.scram.client')
-        automaticModule("common-2.1.jar", 'com.ongres.scram.common')
-        automaticModule("lambdaj-2.3.3.jar", 'ch.lambdaj')
-        automaticModule("hamcrest-all-1.1.jar", 'org.hamcrest')
-        automaticModule("objenesis-1.2.jar", 'org.objenesis')
-        automaticModule("cglib-nodep-2.2.jar", 'net.sf.cglib')
-        automaticModule("saslprep-1.1.jar", 'com.ongres.saslprep')
-        automaticModule("stringprep-1.1.jar", 'com.ongres.stringprep')
     }
 
     repositories {
