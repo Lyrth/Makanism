@@ -34,7 +34,6 @@ module lyrth.makanism.common {
     requires transitive io.netty.codec.http;
     requires transitive io.netty.handler;
     requires transitive lettuce.core;
-    requires transitive org.apache.logging.log4j.impl;
     requires transitive org.fusesource.jansi;
     requires transitive org.reactivestreams;
     requires transitive org.slf4j;

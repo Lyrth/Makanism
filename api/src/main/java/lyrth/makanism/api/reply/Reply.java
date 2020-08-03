@@ -2,10 +2,10 @@ package lyrth.makanism.api.reply;
 
 import discord4j.common.util.Snowflake;
 import discord4j.core.object.entity.Message;
-import discord4j.core.object.entity.channel.AllowedMentions;
 import discord4j.core.object.entity.channel.MessageChannel;
 import discord4j.core.spec.EmbedCreateSpec;
 import discord4j.core.spec.MessageCreateSpec;
+import discord4j.rest.util.AllowedMentions;
 import lyrth.makanism.api.object.CommandCtx;
 import reactor.core.publisher.Mono;
 import reactor.function.TupleUtils;
