@@ -38,6 +38,8 @@ dependencies {
     runtimeOnly project(':bot')
 }
 
+jar.enabled = false     // disable jar creation for root project
+
 def FINAL_TASKS = 'Finalizing tasks'
 task copyDeps { group = FINAL_TASKS
     mkdir absoluteOutputDir
