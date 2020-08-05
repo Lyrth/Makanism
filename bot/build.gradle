@@ -22,6 +22,9 @@ processResources {
 jar {
     archiveFileName = bot_archive_name
     manifest {
-        attributes 'Main-Class': bot_main_class
+        attributes (
+                'Main-Class': bot_main_class,
+                'Class-Path': rootProject.configurations.runtimeClasspath.collect {"$outputLibDir/$it.name" }.join(' ')
+        )
     }
 }

@@ -100,6 +100,7 @@ task moveMainJar { group = FINAL_TASKS
 
 tasks.findAll { it.group == FINAL_TASKS }.each {
     it.dependsOn(build)
+    it.shouldRunAfter(build)
     subprojects.each { pr -> it.dependsOn(":${pr.name}:build") }
     build.finalizedBy(it)
 }
