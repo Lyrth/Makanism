@@ -40,25 +40,23 @@ dependencies {
 
 jar.enabled = false     // disable jar creation for root project
 
-def FINAL_TASKS = 'Finalizing tasks'
-task copyDeps { group = FINAL_TASKS
+task buildOutput {
+    dependsOn(build)
+    subprojects.each { pr -> dependsOn(":${pr.name}:jar") }
+    shouldRunAfter(build)
+
     mkdir absoluteOutputDir
     mkdir absoluteOutputLibDir
-    inputs .dir(absoluteOutputLibDir)
-    outputs.dir(absoluteOutputLibDir)
+    inputs .dir(absoluteOutputDir)
+    outputs.dir(absoluteOutputDir)
     doLast {
         println "Copying dependencies into ${absoluteOutputLibDir}..."
         copy {  // copy the dependencies
             from configurations.runtimeClasspath
             into absoluteOutputLibDir
         }
-    }
-}
 
-task removeUnneeded { group = FINAL_TASKS
-    shouldRunAfter(copyDeps)
-    inputs .dir(absoluteOutputLibDir)   // always run
-    doLast {
+        // Filter unneeded dependencies (from previous copies)
         Collection<String> inDir = layout.files {
             file(absoluteOutputLibDir).listFiles()
         }.collect { it.name }
@@ -69,38 +67,21 @@ task removeUnneeded { group = FINAL_TASKS
 
         println 'Deleting unneeded files...'
         toDelete.each { println "- $it" }
-        delete {
-            delete toDelete
-        }
-    }
-}
+        delete toDelete
 
-task moveMainJar { group = FINAL_TASKS
-    dependsOn(':bot:build')
-    shouldRunAfter(removeUnneeded)
-    inputs .dir(absoluteOutputLibDir)   // always run
-    doLast {
-        String jarName = bot_archive_name
-        if (jarName == null || jarName.blank){
+        String mainJarName = bot_archive_name
+        if (!mainJarName){
             println("jarName is blank!")
             return
         }
-        if (!file("$absoluteOutputLibDir/$jarName").exists()){
-            return
-        }
+        String jarFile = "$absoluteOutputLibDir/$mainJarName"
+
+        println 'Moving main jar file...'
+        if (!file(jarFile).exists()) return
         copy {
-            from "$absoluteOutputLibDir/$jarName"
+            from jarFile
             into absoluteOutputDir
         }
-        delete {
-            delete "$absoluteOutputLibDir/$jarName"
-        }
+        delete jarFile
     }
-}
-
-tasks.findAll { it.group == FINAL_TASKS }.each {
-    it.dependsOn(build)
-    it.shouldRunAfter(build)
-    subprojects.each { pr -> it.dependsOn(":${pr.name}:build") }
-    build.finalizedBy(it)
 }
