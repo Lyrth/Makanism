@@ -21,6 +21,9 @@ processResources {
 
 jar {
     archiveFileName = bot_archive_name
+    afterEvaluate {
+        destinationDirectory = file(project.ext.baseOutputDir)
+    }
     manifest {
         attributes (
                 'Main-Class': bot_main_class,

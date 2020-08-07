@@ -22,6 +22,8 @@ allprojects {
 subprojects {
     archivesBaseName = "makanism-$project.name"
 
+    project.ext.baseOutputDir = "$rootProject.projectDir/$outputDir"
+
     jar {
         manifest {
             attributes(
@@ -42,17 +44,21 @@ jar.enabled = false     // disable jar creation for root project
 
 task buildOutput {
     dependsOn(build)
-    subprojects.each { pr -> dependsOn(":${pr.name}:jar") }
     shouldRunAfter(build)
+    subprojects.each { dependsOn it.tasks.jar }
 
     mkdir absoluteOutputDir
     mkdir absoluteOutputLibDir
-    inputs .dir(absoluteOutputDir)
-    outputs.dir(absoluteOutputDir)
+    outputs.dir(absoluteOutputLibDir)
+    def deps = [] as Collection<File>
+    afterEvaluate {
+        deps = configurations.runtimeClasspath.findAll { it.name != bot_archive_name }
+        inputs.files(deps)
+    }
     doLast {
         println "Copying dependencies into ${absoluteOutputLibDir}..."
         copy {  // copy the dependencies
-            from configurations.runtimeClasspath
+            from deps
             into absoluteOutputLibDir
         }
 
@@ -61,27 +67,12 @@ task buildOutput {
             file(absoluteOutputLibDir).listFiles()
         }.collect { it.name }
 
-        Collection<String> required = configurations.runtimeClasspath.collect { it.name }
+        Collection<String> required = deps.collect { it.name }
 
         Collection<String> toDelete = (inDir - required).collect { "$absoluteOutputLibDir/$it" as String }
 
         println 'Deleting unneeded files...'
         toDelete.each { println "- $it" }
         delete toDelete
-
-        String mainJarName = bot_archive_name
-        if (!mainJarName){
-            println("jarName is blank!")
-            return
-        }
-        String jarFile = "$absoluteOutputLibDir/$mainJarName"
-
-        println 'Moving main jar file...'
-        if (!file(jarFile).exists()) return
-        copy {
-            from jarFile
-            into absoluteOutputDir
-        }
-        delete jarFile
     }
 }
