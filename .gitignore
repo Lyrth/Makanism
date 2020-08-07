@@ -6,13 +6,13 @@ hs_err_pid*
 */target/**
 *.class
 *.jar
-/output/
-build/*
-/_build/
+output/**
+build/**
+*/build/**
+_build/**
 
 # Gradle
 .gradle
-/build/
 !*.gradle
 !gradle-wrapper.jar
 
