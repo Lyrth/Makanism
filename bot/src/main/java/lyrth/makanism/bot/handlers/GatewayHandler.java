@@ -31,12 +31,13 @@ public class GatewayHandler {
 
     public static Mono<Void> onConnect(GatewayDiscordClient client, BotConfig config){
         Runtime.getRuntime().addShutdownHook(new Thread(() -> {
-            log.info("Shutdown initiated. Saving...");
+            System.out.println("Shutdown initiated. Saving...");
             config.saveAll()             // TODO: disable modules
                 .and(client.logout().timeout(Duration.ofMinutes(2)).retry(3))
                 .block();
             System.out.println("Shutting down.");
         }));
+        log.debug("Shutdown hook added.");
 
         return Mono.when(
             config.getModuleHandler().handle(client, config),   // Initializing each guild module
