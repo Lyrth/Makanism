@@ -18,7 +18,9 @@ public class GatewayHandler {
 
     public static Mono<BotConfig> init(SourceProvider source, Props props){
         // Only load ModuleHandler once subscribed to, to not block main thread
-        return Mono.defer(() -> BotConfig.load(source, new HashMap<>(), props, new ModuleHandler())).cache();
+        return Mono.defer(ModuleHandler::create)
+            .flatMap(mh ->  BotConfig.load(source, new HashMap<>(), props, mh))
+            .cache();
     }
 
     public static Mono<Void> onSetup(EventDispatcher dispatcher, Mono<BotConfig> config){

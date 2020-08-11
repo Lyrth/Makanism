@@ -13,6 +13,8 @@ import java.util.Set;
 
 public interface IModuleHandler {
 
+    Mono<Void> reload(GatewayDiscordClient client, BotConfig config);
+
     void setupModulesFor(GuildConfig config);
 
     Mono<?> handleCommand(MessageCreateEvent event, BotConfig config, String invokedName);
@@ -25,4 +27,6 @@ public interface IModuleHandler {
     Class<? extends ModuleConfig> getModuleConfigClass(String moduleName);
 
     Set<String> getModuleNames();
+
+    Mono<Void> unload();
 }

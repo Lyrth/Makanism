@@ -10,6 +10,7 @@ import lyrth.makanism.common.file.config.ModuleConfig;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import reactor.core.publisher.DirectProcessor;
+import reactor.core.publisher.Flux;
 import reactor.core.publisher.FluxSink;
 import reactor.core.publisher.Mono;
 
@@ -54,6 +55,12 @@ public abstract class GuildModule<T extends ModuleConfig> implements IModule {
 
     protected Mono<?> onRemove(GuildConfig config) {     // callback when module disabled
         return Mono.empty();
+    }
+
+    public Mono<?> uninit(){
+        return Flux.fromIterable(enabledGuilds.keySet())
+            .flatMap(id -> onRemove(enabledGuilds.get(id)))
+            .then();
     }
 
 

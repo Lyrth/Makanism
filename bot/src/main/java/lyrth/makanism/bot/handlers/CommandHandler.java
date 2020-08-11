@@ -17,6 +17,7 @@ import lyrth.makanism.bot.commands.general.*;
 import lyrth.makanism.bot.commands.info.UserInfo;
 import lyrth.makanism.bot.commands.owner.Gc;
 import lyrth.makanism.bot.commands.owner.Loaded;
+import lyrth.makanism.bot.commands.owner.Reload;
 import lyrth.makanism.bot.commands.owner.Sudo;
 import lyrth.makanism.common.file.config.BotConfig;
 import lyrth.makanism.common.file.config.GuildConfig;
@@ -54,7 +55,8 @@ public class CommandHandler {
             new Help(),
             new CommandsCmd(),
             new Loaded(),
-            new Gc()
+            new Gc(),
+            new Reload()
 
         ).collect(
             HashMap::new,

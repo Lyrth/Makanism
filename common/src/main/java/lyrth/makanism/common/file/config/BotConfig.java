@@ -148,6 +148,10 @@ public class BotConfig {
         return guildConfigs.get(guildId);
     }
 
+    public HashMap<Snowflake, GuildConfig> getGuildConfigs() {
+        return guildConfigs;
+    }
+
     public SourceProvider getSourceProvider() {
         return source;
     }
