@@ -26,10 +26,6 @@ public class Main {
     private static final Logger log = LoggerFactory.getLogger(Main.class);
 
     public static void main(String[] args) {
-//        log.debug("Installing BlockHound...");
-//        BlockHound.install();
-//        log.debug("BlockHound ready.");
-
         // load bot meta
         log.debug("Reading .properties...");
         BotProps props = new BotProps();
@@ -86,7 +82,6 @@ public class Main {
         Mono.zip(client, config)
             .flatMap(function(GatewayHandler::onConnect))
             .block();
-
     }
 
     private StoreService getStoreService(){
