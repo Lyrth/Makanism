@@ -8,5 +8,7 @@
   <component name="VcsDirectoryMappings">
     <mapping directory="$PROJECT_DIR$" vcs="Git" />
     <mapping directory="$PROJECT_DIR$/../MakanismDeploy" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/../MakanismModules/makamod-Music" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/../MakanismModules/makamod-ReactorDocs" vcs="Git" />
   </component>
 </project>
